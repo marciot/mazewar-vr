@@ -610,6 +610,7 @@ class SelfPlayer extends Actor {
     }
     
     respawn() {
+        liftFog();
         this.camera.position.y = eyeHeight;
         this.isDead = false;
         controls.enabled = true;

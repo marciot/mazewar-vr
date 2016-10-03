@@ -11,6 +11,49 @@ var maze;
 
 var clock = new THREE.Clock();
 
+const fogNear = 0.1;
+const fogFar  = 50;
+
+class Tween {
+    constructor() {
+        this.tasks = [];
+    }
+
+    add(duration, easing, task, min, max) {
+        this.tasks.push({
+            duration: duration,
+            task: task,
+            value: 0,
+            easing: easing ? easing : t => t,
+            min: min || 0,
+            max: max || 1
+        });
+        update(0);
+    }
+
+    update(dt) {
+        for(var i = 0; i < this.tasks.length; i++) {
+            var t = this.tasks[i];
+
+            t.value += dt / t.duration;
+            if(t.value > 1) {
+                this.tasks.splice(i,1);
+            } else {
+                var t0 = t.easing(t.value, 0, 1, 1);
+                t.task((t.max - t.min)*t0 + t.min);
+            }
+        }
+    }
+};
+
+function liftFog(t) {
+    tween.add(5, tweenFunctions.easeInQuint, t => scene.fog.far   = t, fogNear+0.01, fogFar);
+    tween.add(5, tweenFunctions.easeInCubic, t => light.intensity = t);
+}
+
+var tween = new Tween();
+var light;
+
 class ModernTheme {
     constructor(renderer) {
         // Attributes
@@ -18,7 +61,7 @@ class ModernTheme {
         this.useGroundPlane = false;
         
         // Materials for the walls
-        this.wallMaterial = new THREE.MeshBasicMaterial( {color: 0xffff55, side: THREE.DoubleSide} );
+        this.wallMaterial = new THREE.MeshLambertMaterial( {color: 0xffff55, side: THREE.DoubleSide} );
         
         // Materials for the eyes
         var texture = THREE.ImageUtils.loadTexture('textures/eye.png');
@@ -57,7 +100,7 @@ class ModernTheme {
     }
     
     addLightingToScene(scene) {
-        var light = new THREE.AmbientLight(0xFFFFFF);
+        light = new THREE.AmbientLight(0xFFFFFF);
         scene.add(light);
     }
 }
@@ -92,7 +135,7 @@ class ClassicTheme {
     }
     
     addLightingToScene(scene) {
-        var light = new THREE.AmbientLight(0xFFFFFF);
+        light = new THREE.AmbientLight(0xFFFFFF);
         scene.add(light);
     }
 }
@@ -240,6 +283,8 @@ function init() {
 
     scene = new THREE.Scene();
 
+    scene.fog = new THREE.Fog(0x000000, fogNear, fogFar);
+
     theme = new ModernTheme(renderer);
 
     theme.addLightingToScene(scene);
@@ -350,6 +395,7 @@ function update(dt) {
     controls.update(dt);
     
     actors.animate();
+    tween.update(dt);
 
     animateSkydome();
 }
@@ -361,8 +407,9 @@ function render(dt) {
 function animate(t) {
     requestAnimationFrame(animate);
 
-    update(clock.getDelta());
-    render(clock.getDelta());
+    var delta = clock.getDelta();
+    update(delta);
+    render(delta);
 }
 
 function fullscreen() {
