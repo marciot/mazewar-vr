@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+MazeWars VR
+Copyright (C) 2016 Marcio Teixeira
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+<html lang="en">
+    <head>
+        <title>MazeWar VR</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                margin: 0px;
+                overflow: hidden;
+            }
+            #container {
+                position: absolute;
+                top:      0;
+                left:     0;
+                right:    0;
+                bottom:   0;
+            }
+        </style>
+
+        <!-- For some reason using the full webcomponents library breaks WebGL on iOS -->
+        <script type="text/javascript" src="js/third-party/webcomponents/webcomponents-lite.min.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/three.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/StereoEffect.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/AnaglyphEffect.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/DeviceOrientationControls.js"></script>
+    </head>
+    <body>
+        <link rel="import" href="js/ScrollingPanel.html"></link>
+        <link rel="import" href="js/AboutBox.html"></link>
+
+        <div id="container"></div>
+        <about-box></about-box>
+
+        <!-- Shader programs for skydome -->
+        <script type="application/x-glsl" id="sky-vertex">  
+            varying vec2 vUV;
+
+            void main() {  
+              vUV = uv;
+              vec4 pos = vec4(position, 1.0);
+              gl_Position = projectionMatrix * modelViewMatrix * pos;
+            }
+        </script>
+
+        <script type="application/x-glsl" id="sky-fragment">  
+            uniform sampler2D texture;  
+            varying vec2 vUV;
+
+            void main() {  
+              vec4 sample = texture2D(texture, vUV);
+              gl_FragColor = vec4(sample.xyz, sample.w);
+            }
+        </script>
+
+        <!-- Main Program -->
+        <script type="text/javascript" src="js/LookAroundControls.js"></script>
+        <script type="text/javascript" src="js/Directions.js"></script>
+        <script type="text/javascript" src="js/Maze.js"></script>
+        <script type="text/javascript" src="js/Actors.js"></script>
+        <script type="text/javascript" src="js/Main.js"></script>
+    </body>
+</html>
