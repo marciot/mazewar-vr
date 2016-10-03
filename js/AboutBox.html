@@ -37,12 +37,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             color: yellow;
         }
 
-        img {
-            display:       block;
-            width:         30%;
-            height:        30%;
-        }
-
         br.clear {
             clear: both;
         }
@@ -64,8 +58,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             display:         flex;
             flex-direction:  row;
             justify-content: space-around;
-            align-items:     center; 
-            padding:         0 20%;
+            align-items:     center;
+            width:           100%;
         }
 
         .associate-link {
@@ -74,8 +68,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         .associate-link SPAN {
             padding:         1em;
-            font-size:       200%;
+            font-size:       150%;
             color:           yellow;
+        }
+        
+        IMG.viewmaster {
+            width:         30%;
+            height:        30%;
+        }
+        
+        DIV.associate-links {
             text-align:      center;
         }
         
@@ -114,17 +116,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             For the best <cite>Maze War VR</cite> experience, I suggest the <cite>Mattel ViewMaster VR</cite>. It is a sturdy headset with responsive trigger that works great for <cite>Maze War VR</cite>.
             
             Please consider purchasing your headset using the following link. Proceeds will help ensure the continued development of <cite>Maze War VR</cite>.
-            
-            <a class="associate-link" href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciotssuggeste&linkId=8c6b4ccc7593bbb2bbf14ef57629fae7">
-            <p class="side-by-side">
-            <img src="artwork/viewmaster.png">
-            
-            <span><cite>View-Master Virtual Reality Starter Pack</cite><br>at amazon.com</span>
-            
-            <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciotssuggeste&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
-            </p>
-            </a>
+            <div class="side-by-side">
+                <img src="artwork/viewmaster.png" class="viewmaster">
+            
+                <div class="associate-links">
+                    <a class="associate-link" href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciot-20&linkId=5bb5f23b398d2640a6191d9ef6e39e58 target="_blank">
+                    <span><cite>View-Master Virtual Reality Starter Pack</cite></span>
+                    </a>
+                    <p>or</p>
+                    <a class="associate-link" href="https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072" target="_blank">
+                    <span><cite>Deluxe View-Master VR Viewer</cite></span>
+                    <br>at amazon.com
+                    </a>
+                    <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+                </div>
+            </div>
+            
             
             <h2>Will my Google Cardboard viewer work?</h2>
             
