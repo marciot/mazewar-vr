@@ -1,7 +1,7 @@
 ![alt text][logo]
 
-Maze War __VR__
-===============
+Maze War _VR_
+=============
 
 _Maze War VR_ is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames
 Research Center in California. The game allowed players to hunt down opponents in a three-dimensional
