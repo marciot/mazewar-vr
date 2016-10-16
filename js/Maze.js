@@ -4,7 +4,7 @@ const altoMaze = [
     "█ █       █    █                █",
     "█ █ █ █ █ █ ██ █ ███ ███ ████ ███",
     "█   █ █ █ █ █  █ █    █   █   █ █",
-    "█ █ █   █   ██      █   █     █ █",
+    "█ █ █   █   ██      █   █   █ █ █",
     "█ █ ███ ██████ ██████████ █████ █",
     "█ █                             █",
     "█ ████ ███ ███ █ ████████████ ███",
@@ -51,20 +51,20 @@ class Maze {
     }
 
     setCell(x,z,val) {
-        this.cells[x+(this.mazeRows-z-1)*this.mazeCols]=val;
+        this.cells[x+z*this.mazeCols]=val;
     }
 
     getCell(x,z) {
         if(x < 0 || z < 0 || x >= this.mazeCols || z >= this.mazeRows) {
             return true;
         }
-        return this.cells[x+(this.mazeRows-z-1)*this.mazeCols];
+        return this.cells[x+z*this.mazeCols];
     }
 
     getAdjacentCell(x, z, dir) {
         switch(dir) {
-            case Directions.NORTH: return this.getCell(x,   z+1); break;
-            case Directions.SOUTH: return this.getCell(x,   z-1); break;
+            case Directions.NORTH: return this.getCell(x,   z-1); break;
+            case Directions.SOUTH: return this.getCell(x,   z+1); break;
             case Directions.WEST:  return this.getCell(x-1, z  ); break;
             case Directions.EAST:  return this.getCell(x+1, z  ); break;
         }

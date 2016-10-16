@@ -142,7 +142,7 @@ class ClassicTheme {
 
 var theme;
 
-var actors =  new Actors();
+var actors =  new WebGLActors();
 
 class MazeWalls extends Maze {
     constructor(a, b) {
@@ -179,14 +179,14 @@ class MazeWalls extends Maze {
         plane.position.y = this.wallHeight/2;
         switch(direction) {
             case 0x1: /* North */
-                plane.position.z = MazeWalls.cellDimension/2;
+                plane.position.z = -MazeWalls.cellDimension/2;
                 break;
             case 0x2: /* East */
                 plane.rotation.y = Math.PI/2;
                 plane.position.x = MazeWalls.cellDimension/2;
                 break;
             case 0x4: /* South */
-                plane.position.z = -MazeWalls.cellDimension/2;
+                plane.position.z = MazeWalls.cellDimension/2;
                 break;
             case 0x8: /* West */
                 plane.rotation.y = Math.PI/2;
@@ -279,7 +279,8 @@ function init() {
     container = document.getElementById('container');
     container.appendChild(element);
 
-    effect = new THREE.StereoEffect(renderer);
+    //effect = new THREE.StereoEffect(renderer);
+    effect = renderer;
 
     scene = new THREE.Scene();
 
@@ -290,8 +291,6 @@ function init() {
     theme.addLightingToScene(scene);
     
     camera = new THREE.PerspectiveCamera(70, 1, 0.001, 700);
-    camera.position.set(0, eyeHeight, 0);
-    scene.add(camera);
 
     // Ground plane
     if(theme.useGroundPlane) {
@@ -310,14 +309,14 @@ function init() {
     function placePlayer(player) {
         player.setPosition(maze.getRandomPosition());
         player.orientTowardsPassage();
-        if(player.startMoving) {
-            player.startMoving();
-        }
+        player.startAnimation();
         actors.add(player);
     }
     
-    placePlayer(new SelfPlayer(camera));
-    placePlayer(new RobotPlayer());
+    var selfRepresentation = new SelfRepresentation(camera);
+
+    placePlayer(new SelfPlayer(selfRepresentation));
+    placePlayer(new RobotPlayer(new EyeRepresentation()));
 
     addSkydome(scene, renderer);
 
@@ -331,7 +330,7 @@ function init() {
     container.addEventListener('touchend',   function(e) {useTouch=true; triggerRelease(e);}, false);
     
     /* Mouse controls (disabled if orientation based controls are available) */
-    controls = new THREE.LookAroundControls(camera, element);
+    controls = new THREE.LookAroundControls(selfRepresentation.cameraProxy, element);
 
     function setOrientationControls(e) {
         if (!e.alpha) {
@@ -356,6 +355,7 @@ function init() {
         console.log("Mode is", mode);
         switch(mode) {
             case "headset":
+                effect = new THREE.StereoEffect(renderer);
                 break;
             case "monitor":
                 effect = renderer;

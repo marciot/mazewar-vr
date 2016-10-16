@@ -18,6 +18,128 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 <template id="AboutBoxTemplate">
     <style>
+        .darken {
+            background:      rgba(0,0,0,0.8);
+            color:           white;
+        }
+
+        /* Break up the screen into three stacked regions */
+
+        .flex-layout {
+            display:        -ms-flex;
+            display:        -webkit-flex;
+            display:        flex;
+
+            flex-direction: column;
+            align-items:    center;
+        }
+
+        .header {
+            width:       100%;
+            flex-grow:   0;
+            flex-shrink: 1;
+        }
+
+        .footer {
+            width:       100%;
+            flex-grow:   1;
+            flex-shrink: 1;
+            min-height:  20%;
+        }
+
+        .middle {
+            flex-grow:      1;
+            flex-shrink:    1;
+            width:          80%;
+            height:         80%;
+        }
+
+        /* A dynamically sized grid */
+
+        .flex-grid {
+            display:        -ms-flex;
+            display:        -webkit-flex;
+            display:        flex;
+
+            flex-direction: column;
+            align-items:    center;
+            flex-wrap:      wrap;
+        }
+
+        @media (orientation: landscape) {
+            .flex-grid > div {
+                width:  50%;
+                height: 33%;
+            }
+
+            .button {
+                font-size:   7vh;
+            }
+
+            .button:active, .button:hover {
+                font-size:   7.25vh;
+            }
+
+            h1.title {
+                font-size: 10vh;
+            }
+        }
+
+        @media (orientation: portrait) {
+            .flex-grid > div {
+                width:  100%;
+                height: 16%;
+            }
+
+            .button {
+                font-size:   7vw;
+            }
+
+            .button:active, .button:hover {
+                font-size:   7.25vw;
+            }
+
+            h1.title {
+                font-size: 10vw;
+            }
+        }
+
+        .flex-grid > div {
+            padding:    10px;
+            box-sizing: border-box;
+            position:   relative;
+            flex-grow:  1;
+        }
+
+        /* A button */
+
+        .button {
+            position:   absolute;
+            top:        10px;
+            bottom:     10px;
+            right:      10px;
+            left:       10px;
+
+            min-height: 2em;
+            padding:    3px;
+        }
+
+        .center-text, .button {
+            display:        -ms-flex;
+            display:        -webkit-flex;
+            display:        flex;
+
+            justify-content: center;
+            align-items:     center;
+            text-align:      center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* The overlay */
+
         #overlay {
             position:      fixed;
             top:           0;
@@ -28,8 +150,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             font-family:   "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
         }
 
+        .header {
+            padding: 1em;
+        }
+
+        .button {
+            font-weight: bold;
+            text-shadow: 5px 5px rgba(0,0,0,0.5);
+            color:       rgb(255,255,128);
+
+            cursor:      pointer;
+        }
+
+        .button:hover {
+            font-weight: bold;
+        }
+
         h1.title {
-            font-size: 400%;
             text-align: center;
         }
 
@@ -71,89 +208,130 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             font-size:       150%;
             color:           yellow;
         }
-        
+
         IMG.viewmaster {
             width:         30%;
             height:        30%;
         }
-        
+
         DIV.associate-links {
             text-align:      center;
         }
-        
+
         A {
             color:           yellow;
         }
+
+        .scrolling {
+            overflow:   auto;
+            height:     100%;
+        }
+
+        .content {
+            padding:    2em 2em;
+        }
+
+        .swipe-arrow::before {
+            color: rgba(255,255,255,0.5)
+        }
     </style>
-    <div id="overlay">
-        <scrolling-panel class="darken rounded inset-from-window fadeaway">
-            <h1 class="title">Maze War <strong>VR</strong></h1>
-            <p>
-            <cite>Maze War VR</cite> is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California. The game allowed players to hunt down opponents in a three-dimensional maze, making it the very first first person shooter game.
-            </p>
-            <p>
-            <cite>Maze War VR</cite> recreates the game in virtual reality using modern web technologies.
-            </p>
-            <h1>How to Play</h1>
-            Hold the trigger (or mouse button) to move through the maze. Press and release the trigger quickly to shoot. Beware, if you miss your target, your bullets will ricochet off the far wall and may kill you!
-            <h2>Select your experience:</h2>
-            <p>
-            Choose an icon below to begin playing. I recommended a modern smartphone with a VR headset for the best experience. You may also choose to play <cite>Maze War VR</cite> on a PC with a regular monitor&mdash;either in 3D using red/cyan glasses or in 2D without.
-            </p>
-            <div id="mode-select">
-                <p class="side-by-side">
-                <svg id="headset" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 63 58.75" enable-background="new 0 0 63 47" xml:space="preserve"><line x1="87.4" y1="37.2" x2="97.2" y2="37.2"/><g><path d="M42.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S46.4,20,42.9,20z M42.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S40,21,42.9,21s5.2,2.4,5.2,5.2S45.8,31.5,42.9,31.5z"/><path d="M20.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S24.4,20,20.9,20z M20.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S18,21,20.9,21s5.2,2.4,5.2,5.2S23.8,31.5,20.9,31.5z"/><path d="M55.7,9V7.9c0-1.6-1.3-2.9-2.9-2.9H11.3C9.7,5,8.4,6.3,8.4,7.9V9c-2.3,0.7-4,2.8-4,5.3v22.6c0,3,2.5,5.5,5.5,5.5h13.4   c1.8,0,3.4-1,4.1-2.6c0,0,0-0.1,0-0.1l0.2-0.5h8l0.1,0.4c0,0,0,0.1,0,0.1c0.7,1.7,2.3,2.8,4.2,2.8h13.9c3,0,5.5-2.5,5.5-5.5V14.3   C59.4,11.8,57.8,9.8,55.7,9z M10.7,7.9c0-0.3,0.3-0.6,0.6-0.6h41.4c0.3,0,0.6,0.3,0.6,0.6v2H10.7V7.9z M27.3,36.7l2-5   c0.5-1,1.4-1.6,2.5-1.6c0.9,0,2.1,0.5,2.6,1.7l1.7,4.9H27.3z M57.2,36.9c0,1.8-1.5,3.2-3.2,3.2H40c-0.9,0-1.7-0.5-2.1-1.4l-2.6-7.3   c-0.6-1.4-1.9-2.3-3.5-2.3c-1.5,0-2.8,0.8-3.4,2.2l-3,7.5c-0.4,0.8-1.2,1.3-2.1,1.3H9.9c-1.8,0-3.2-1.5-3.2-3.2V14.3   c0-1.8,1.5-3.2,3.2-3.2h44c1.8,0,3.2,1.5,3.2,3.2V36.9z"/></g></svg>
-                <svg id="anaglyph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/><path d="m 41.3,40.2 c -2.4,0 -4.3,1.9 -4.3,4.3 l 0,17.1 c 0,2.4 1.9,4.3 4.3,4.3 l 21.4,0 c 1,0 1.9,-0.3 2.6,-0.9 l 6.4,-5 c 0.2,-0.1 0.2,-0.1 0.5,-0.2 0.6,-0.2 1.4,-0.3 1.2,-0.3 -0.2,0 0.5,0.1 1,0.3 0.3,0.1 0.3,0.1 0.5,0.2 l 6.6,5.1 c 0.7,0.6 1.7,0.9 2.6,0.9 l 21.4,0 c 2.4,0 4.3,-1.9 4.3,-4.3 l 0,-17.1 c 0,-2.4 -1.9,-4.3 -4.3,-4.3 z" /><path d="m 44.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkRed;"/><path d="m 85.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkCyan;"/></svg>
-                <svg id="monitor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/></svg>
+    <div class="darken" id="overlay">
+    <swipe-pages>
+        <div class="flex-layout" id="page1">
+            <div class="header center-text">
+                <h1 class="title">Maze War <strong>VR</strong></h1>
+            </div>
+            <div class="middle flex-grid">
+                <div><div class="button" data-page="pageAbout">About Mazewar</div></div>
+                <div><div class="button" id="playSolo">Play Solo</div></div>
+                <div><div class="button" data-page="pageNetPlay">Network Play</div></div>
+                <div><div class="button" data-page="pageOptions">Game Options</div></div>
+                <div><div class="button" data-page="pageCredits">Credits</div></div>
+                <div><div class="button" data-page="pageHeadsets">Recommended VR Headsets</div></div>
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+
+        <div class="flex-layout scrolling" id="pageNetPlay">
+            <div class="content">
+                <h1>Network Play</h1>
+                Stay tuned! Network play is coming soon!
+            </div>
+        </div>
+
+        <div class="flex-layout scrolling" id="pageAbout">
+            <div class="content">
+                <h1>About Maze War</h1>
+                <p>
+                <cite>Maze War VR</cite> is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California. The game allowed players to hunt down opponents in a three-dimensional maze, making it the very first first person shooter game.
                 </p>
-                <p class="side-by-side">
-                Icons by Nick Bluth from the Noun Project
+                <p>
+                <cite>Maze War VR</cite> recreates the game in virtual reality using modern web technologies.
                 </p>
-            <div>
+                <h1>How to Play</h1>
+                Hold the trigger (or mouse button) to move through the maze. Press and release the trigger quickly to shoot. Beware, if you miss your target, your bullets will ricochet off the far wall and may kill you!
+            </div>
+        </div>
 
-            <h1>Recommended VR Headset</h1>
+        <div class="flex-layout scrolling" id="pageCredits">
+            <div class="content">
+                <h1>Credits</h1>
+                This program includes code from <a href="https://threejs.org/">THREE.js</a>, <a href="http://webcomponents.org">Webcomponents.org</a> and <a href="https://github.com/chenglou/tween-functions">Tween-Functions</a>. Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
+            </div>
+        </div>
 
-            For the best <cite>Maze War VR</cite> experience, I suggest the <cite>Mattel ViewMaster VR</cite>. It is a sturdy headset with responsive trigger that works great for <cite>Maze War VR</cite>.
-            
-            Please consider purchasing your headset using the following link. Proceeds will help ensure the continued development of <cite>Maze War VR</cite>.
-
-            <div class="side-by-side">
-                <img src="artwork/viewmaster.png" class="viewmaster">
-            
-                <div class="associate-links">
-                    <a class="associate-link" href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciot-20&linkId=5bb5f23b398d2640a6191d9ef6e39e58 target="_blank">
-                    <span><cite>View-Master Virtual Reality Starter Pack</cite></span>
-                    </a>
-                    <p>or</p>
-                    <a class="associate-link" href="https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072" target="_blank">
-                    <span><cite>Deluxe View-Master VR Viewer</cite></span>
-                    <br>at amazon.com
-                    </a>
-                    <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+        <div class="flex-layout" id="pageOptions">
+            <div class="content">
+                <h1>Select your experience:</h1>
+                <p>
+                The best way to play <cite>Maze War VR</cite> is using a modern smartphone and a VR headset. However, you may also play on a PC&mdash;either in 3D using red/cyan glasses or in 2D without.
+                </p>
+                <div id="mode-select">
+                    <p class="side-by-side">
+                    <svg id="headset" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 63 58.75" enable-background="new 0 0 63 47" xml:space="preserve"><line x1="87.4" y1="37.2" x2="97.2" y2="37.2"/><g><path d="M42.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S46.4,20,42.9,20z M42.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S40,21,42.9,21s5.2,2.4,5.2,5.2S45.8,31.5,42.9,31.5z"/><path d="M20.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S24.4,20,20.9,20z M20.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S18,21,20.9,21s5.2,2.4,5.2,5.2S23.8,31.5,20.9,31.5z"/><path d="M55.7,9V7.9c0-1.6-1.3-2.9-2.9-2.9H11.3C9.7,5,8.4,6.3,8.4,7.9V9c-2.3,0.7-4,2.8-4,5.3v22.6c0,3,2.5,5.5,5.5,5.5h13.4   c1.8,0,3.4-1,4.1-2.6c0,0,0-0.1,0-0.1l0.2-0.5h8l0.1,0.4c0,0,0,0.1,0,0.1c0.7,1.7,2.3,2.8,4.2,2.8h13.9c3,0,5.5-2.5,5.5-5.5V14.3   C59.4,11.8,57.8,9.8,55.7,9z M10.7,7.9c0-0.3,0.3-0.6,0.6-0.6h41.4c0.3,0,0.6,0.3,0.6,0.6v2H10.7V7.9z M27.3,36.7l2-5   c0.5-1,1.4-1.6,2.5-1.6c0.9,0,2.1,0.5,2.6,1.7l1.7,4.9H27.3z M57.2,36.9c0,1.8-1.5,3.2-3.2,3.2H40c-0.9,0-1.7-0.5-2.1-1.4l-2.6-7.3   c-0.6-1.4-1.9-2.3-3.5-2.3c-1.5,0-2.8,0.8-3.4,2.2l-3,7.5c-0.4,0.8-1.2,1.3-2.1,1.3H9.9c-1.8,0-3.2-1.5-3.2-3.2V14.3   c0-1.8,1.5-3.2,3.2-3.2h44c1.8,0,3.2,1.5,3.2,3.2V36.9z"/></g></svg>
+                    <svg id="anaglyph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/><path d="m 41.3,40.2 c -2.4,0 -4.3,1.9 -4.3,4.3 l 0,17.1 c 0,2.4 1.9,4.3 4.3,4.3 l 21.4,0 c 1,0 1.9,-0.3 2.6,-0.9 l 6.4,-5 c 0.2,-0.1 0.2,-0.1 0.5,-0.2 0.6,-0.2 1.4,-0.3 1.2,-0.3 -0.2,0 0.5,0.1 1,0.3 0.3,0.1 0.3,0.1 0.5,0.2 l 6.6,5.1 c 0.7,0.6 1.7,0.9 2.6,0.9 l 21.4,0 c 2.4,0 4.3,-1.9 4.3,-4.3 l 0,-17.1 c 0,-2.4 -1.9,-4.3 -4.3,-4.3 z" /><path d="m 44.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkRed;"/><path d="m 85.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkCyan;"/></svg>
+                    <svg id="monitor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/></svg>
+                    </p>
+                    <p class="side-by-side">
+                    Icons by Nick Bluth from the Noun Project
+                    </p>
                 </div>
             </div>
-            
-            
-            <h2>Will my Google Cardboard viewer work?</h2>
-            
-            The first generation Google Cardboard with a magnetic switch will not work, as <cite>Maze War VR</cite> requires a mechanical touch switch. I have not tested version 2.0 of Google Cardboard or other headsets. If you have, please share your experiences with me so I can add more recommendations to this page.
-            <br class="clear">
-            
-            <h1>Credits</h1>
-            This program includes code from <a href="https://threejs.org/">THREE.js</a>, <a href="http://webcomponents.org">Webcomponents.org</a> and <a href="https://github.com/chenglou/tween-functions">Tween-Functions</a>. Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
-        </scrolling-panel>
+        </div>
+
+        <div class="scrolling" id="pageHeadsets">
+            <div class="content">
+                <h1>Recommended VR Headset</h1>
+                For the best <cite>Maze War VR</cite> experience, I suggest the <cite>Mattel ViewMaster VR</cite>. It is a sturdy headset with responsive trigger that works great for <cite>Maze War VR</cite>.
+
+                <div class="side-by-side">
+                    <img src="artwork/viewmaster.png" class="viewmaster">
+
+                    <div class="associate-links">
+                        <a class="associate-link" href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciot-20&linkId=5bb5f23b398d2640a6191d9ef6e39e58 target="_blank">
+                        <span><cite>View-Master Virtual Reality Starter Pack</cite></span>
+                        </a>
+                        <p>or</p>
+                        <a class="associate-link" href="https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072" target="_blank">
+                        <span><cite>Deluxe View-Master VR Viewer</cite></span>
+                        <br>at amazon.com
+                        </a>
+                        <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+                    </div>
+                </div>
+
+                <h2>Will my Google Cardboard viewer work?</h2>
+
+                The first generation Google Cardboard with a magnetic switch will not work, as <cite>Maze War VR</cite> requires a mechanical touch switch.
+            </div>
+        </div>
+    </swipe-pages>
     </div>
 </template>
 
 <script>
 (function (thisDoc) {
-    /* Creates an inline SVG so that it can be styled. Based on ideas presented here:
-    http://stackoverflow.com/questions/11978995/how-to-change-color-of-svg-image-using-css-jquery-svg-image-replacement */
-
-    /* Info about scaling SVGs
-     *   https://css-tricks.com/scale-svg/
-     */
-
     var AboutBoxProto = Object.create(HTMLElement.prototype);
 
     AboutBoxProto.createdCallback = function() {
@@ -164,7 +342,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         shadowRoot.appendChild(clone);
 
         function selectExperience(mode) {
-            shadowRoot.querySelector("#overlay").style.display = "none";
             if(this.modeSelectedCallback) {
                 this.modeSelectedCallback(mode);
             }
@@ -173,6 +350,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         shadowRoot.querySelector("#headset").addEventListener("click", selectExperience.bind(this, "headset"));
         shadowRoot.querySelector("#monitor").addEventListener("click", selectExperience.bind(this, "monitor"));
         shadowRoot.querySelector("#anaglyph").addEventListener("click", selectExperience.bind(this, "anaglyph"));
+
+        function startGame() {
+            shadowRoot.querySelector("#overlay").style.display = "none";
+        }
+        shadowRoot.querySelector("#playSolo").addEventListener("click", startGame);
     };
 
     AboutBoxProto.setModeCallback = function(callback) {

@@ -1,0 +1,217 @@
+<!--
+SwipePages.html
+Copyright (C) 2016 Marcio Teixeira
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+
+<template id="SwipePagesTemplate">
+    <style>
+    #swipe-pages > div {
+        position:       fixed;
+        top:            0;
+        left:           0;
+        right:          0;
+        bottom:         0;
+    }
+    
+    #swipe-pages.animationEnabled > div {
+        transition:     0.25s  ease-out;
+    }
+    
+    .hiddenRight {
+        transform: translate(100%, 0);
+    }
+    
+    .hiddenLeft {
+        transform: translate(-100%, 0);
+    }
+    
+    /* Chevron */
+    
+    #swipe-pages > div {
+        padding-left: 1.5em;
+    }
+    
+    .swipe-arrow::before {
+        position:   absolute;
+        font-size:  2rem;
+        content:    '\00BB';
+        
+        left:       5px;
+        top:        50%;
+        margin-top: -0.8em;
+        
+        transform : scale(1,2);
+    }
+    
+    .swipe-arrow {
+        border-left: 1px solid;
+    }
+    
+    #swipe-arrow {
+        position:   absolute;
+        left:       0;
+        top:        0;
+        bottom:     0;
+        width:      1.5em;
+        cursor:     pointer;
+    }
+    </style>
+    <div id="swipe-pages">
+        <content></content>
+    </div>
+    <div id="swipe-arrow"></div>
+</template>
+
+<script>
+(function (thisDoc) {
+    class Pages {
+        constructor(el, arrow) {
+            var startPage = el.children[0].id;
+            
+            this.pages       = el;
+            this.arrow       = arrow;
+            this.currentPage = startPage;
+            this.startPage   = startPage;
+            
+            var me = this;
+            window.onpopstate = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+        
+                me.showPage(e.state ? e.state.page : me.startPage);
+            }
+    
+            window.ontouchstart = function(e) {
+                // Disable animation effect on ontouchmove since
+                // the back swipe gesture on mobile devices already
+                // does an animation.
+                me.disablePageSlide();
+            }
+            
+            this.hideAllChildrenExceptFirst(el);
+            
+            if(history.state && history.state.page !== startPage) {
+                //this.showPage(history.state.page);
+                history.replaceState(null, startPage);
+            }
+            
+            function arrowBack() {
+                me.enablePageSlide();
+                history.back();
+            }
+            
+            if(this.arrow) {
+                this.arrow.addEventListener("click", arrowBack);
+                this.arrow.style.display = "none";
+            }
+        }
+        
+        hideAllChildrenExceptFirst(el) {
+            console.log(el);
+            var els = el.children;
+            for(var i = 1; i < els.length; i++) {
+                els[i].classList.add("hiddenRight");
+                els[i].classList.add("swipe-arrow");
+            }
+        }
+                
+        disablePageSlide() {
+            this.pages.classList.remove("animationEnabled");
+        }
+    
+        enablePageSlide() {
+            this.pages.classList.add("animationEnabled");
+        }
+        
+        showPage(newPage) {
+            if(this.currentPage === newPage) {
+                return;
+            }
+            if(this.arrow) {
+                this.arrow.style.display = (this.startPage !== newPage) ? "block" : "none";
+            }
+            var curEl = document.getElementById(this.currentPage);
+            var newEl = document.getElementById(newPage);
+            if(newEl.classList.contains("hiddenLeft")) {
+                curEl.classList.add("hiddenRight");
+                newEl.classList.remove("hiddenLeft");
+            } else {
+                curEl.classList.add("hiddenLeft");
+                newEl.classList.remove("hiddenRight");
+            }
+            this.currentPage = newPage;
+        }
+        
+        bindButtons(btns) {
+            for(var i = 0; i < btns.length; i++) {
+                btns[i].addEventListener("click", this.buttonAction.bind(this));
+            }
+        }
+    
+        buttonAction(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        
+            var newPage = e.target.getAttribute("data-page");
+            if(newPage) {
+                history.pushState({page: newPage}, newPage);
+                this.enablePageSlide();
+                this.showPage(newPage);
+            }
+        }
+    }
+        
+    /* The following function provides a fallback
+     * when createShadowRoot does not exist or
+     * is not desired.
+     */
+    function getShadowRoot(el, clone, fakeIt) {
+        if(el.createShadowRoot && !el.classList.contains("noShadowRoot") && !fakeIt) {
+            return el.createShadowRoot();
+        } else {
+            var content   = clone.querySelector("content");
+            var oldParent = el;
+            var newParent = content.parentNode;
+            newParent.removeChild(content);
+            while (oldParent.firstChild) newParent.appendChild(oldParent.firstChild);
+            return el;
+        }
+    }
+
+    var SwipePagesProto = Object.create(HTMLElement.prototype);
+
+    SwipePagesProto.createdCallback = function() {
+        var t = thisDoc.getElementById('SwipePagesTemplate');
+        var clone = document.importNode(t.content, true);
+        var shadowRoot = getShadowRoot(this, clone, true);
+        shadowRoot.appendChild(clone);
+
+        /* Copy class names from shadow host to shadow root */
+        var el = shadowRoot.querySelector("#swipe-pages");
+        el.classList.add.apply(el.classList, this.classList);
+        
+        var pages = new Pages(
+            shadowRoot.querySelector("#swipe-pages"),
+            shadowRoot.querySelector("#swipe-arrow")
+        );
+        pages.bindButtons(shadowRoot.querySelectorAll(".button"));
+    };
+
+    document.registerElement('swipe-pages', {prototype: SwipePagesProto});
+
+})((document._currentScript || document.currentScript).ownerDocument);
+</script>

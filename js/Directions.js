@@ -23,11 +23,11 @@ Directions = Object.freeze({
     },
     toUnitVector: function(d) {
         switch(d) {
-            case Directions.NORTH: return new THREE.Vector3(0, 0, 1);
-            case Directions.EAST:  return new THREE.Vector3(1, 0, 0);
-            case Directions.SOUTH: return new THREE.Vector3(0, 0, -1);
+            case Directions.NORTH: return new THREE.Vector3(0, 0, -1);
+            case Directions.EAST:  return new THREE.Vector3(1, 0,  0);
+            case Directions.SOUTH: return new THREE.Vector3(0, 0,  1);
             case Directions.WEST:  return new THREE.Vector3(-1, 0, 0);
-            case Directions.UP:    return new THREE.Vector3(0, 1, 0);
+            case Directions.UP:    return new THREE.Vector3(0, 1,  0);
             case Directions.DOWN:  return new THREE.Vector3(0, -1, 0);
         }
     },
