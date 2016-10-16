@@ -77,10 +77,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 font-size:   7vh;
             }
 
-            .button:active, .button:hover {
-                font-size:   7.25vh;
-            }
-
             h1.title {
                 font-size: 10vh;
             }
@@ -94,10 +90,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
             .button {
                 font-size:   7vw;
-            }
-
-            .button:active, .button:hover {
-                font-size:   7.25vw;
             }
 
             h1.title {
@@ -157,14 +149,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         .button {
             font-weight: bold;
-            text-shadow: 5px 5px rgba(0,0,0,0.5);
             color:       rgb(255,255,128);
+            text-shadow: 5px 5px rgba(0,0,0,0.5);
 
             cursor:      pointer;
         }
 
-        .button:hover {
-            font-weight: bold;
+        .button:active, .button:hover {
+            color:       rgb(255,255,192);
+            text-shadow: 5px 5px rgba(255,255,128,0.25);
+
+            -webkit-text-stroke: 2px rgb(255,255,192);
+            -webkit-text-fill-color: rgb(64,64,32);
         }
 
         h1.title {
@@ -192,31 +188,48 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             fill: yellow;
         }
 
-        .side-by-side {
-            display:         flex;
-            flex-direction:  row;
-            justify-content: space-around;
-            align-items:     center;
-            width:           100%;
+        @media (orientation: portrait) {
+            .side-by-side {
+                display:         flex;
+                align-items:     center;
+                width:           100%;
+                flex-direction:  column;
+            }
+
+            .side-by-side IMG {
+                display:       block;
+                width:         50%;
+                height:        50%;
+            }
         }
 
-        .associate-link {
-            text-decoration: none;
-        }
+        @media (orientation: landscape) {
+            .side-by-side {
+                display:         flex;
+                justify-content: space-around;
+                align-items:     center;
+                width:           100%;
+                flex-direction:  row;
+            }
 
-        .associate-link SPAN {
-            padding:         1em;
-            font-size:       150%;
-            color:           yellow;
-        }
-
-        IMG.viewmaster {
-            width:         30%;
-            height:        30%;
+            .side-by-side IMG {
+                display:       block;
+                width:         30%;
+                height:        30%;
+            }
         }
 
         DIV.associate-links {
+            padding:         1em 0;
             text-align:      center;
+        }
+
+        DIV.associate-links A {
+            text-decoration: none;
+        }
+
+        DIV.associate-links SPAN {
+            font-size:       150%;
         }
 
         A {
@@ -229,7 +242,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
 
         .content {
-            padding:    2em 2em;
+            padding:    2em 0;
         }
 
         .swipe-arrow::before {
@@ -304,23 +317,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <div class="scrolling" id="pageHeadsets">
             <div class="content">
                 <h1>Recommended VR Headset</h1>
-                For the best <cite>Maze War VR</cite> experience, I suggest the <cite>Mattel ViewMaster VR</cite>. It is a sturdy headset with responsive trigger that works great for <cite>Maze War VR</cite>.
+                I recommend the <cite>Mattel ViewMaster VR</cite> for the best <cite>Maze War VR</cite> experience. The Mattel headset is affordable and has a responsive trigger that works great with <cite>Maze War VR</cite>.
 
                 <div class="side-by-side">
-                    <img src="artwork/viewmaster.png" class="viewmaster">
+                    <img src="artwork/viewmaster.png">
 
                     <div class="associate-links">
-                        <a class="associate-link" href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciot-20&linkId=5bb5f23b398d2640a6191d9ef6e39e58 target="_blank">
-                        <span><cite>View-Master Virtual Reality Starter Pack</cite></span>
+                        <a href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciot-20&linkId=5bb5f23b398d2640a6191d9ef6e39e58 target="_blank">
+                        <span><cite>View-Master VR Starter Pack</cite></span>
                         </a>
                         <p>or</p>
-                        <a class="associate-link" href="https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072" target="_blank">
+                        <a href="https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072" target="_blank">
                         <span><cite>Deluxe View-Master VR Viewer</cite></span>
                         <br>at amazon.com
                         </a>
-                        <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
                     </div>
                 </div>
+                <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
                 <h2>Will my Google Cardboard viewer work?</h2>
 
