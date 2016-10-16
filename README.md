@@ -1,20 +1,20 @@
 ![alt text][logo]
 
-Maze War VR
-============
+Maze War __VR__
+===============
 
 _Maze War VR_ is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames
 Research Center in California. The game allowed players to hunt down opponents in a three-dimensional
 maze, making it the very first first person shooter game.
 
 _Maze War VR_ recreates the game in virtual reality. This remake is designed specifically for smartphones
-using inexpensive VR headsets such as the [Mattel ViewMaster VR][1], but can also be played on any PC
+using inexpensive VR headsets such as the [Mattel ViewMaster VR][1], but can also be played on a PC
 using the latest version of Chrome.
 
 ## How does it work?
 
 _Maze War VR_ is built using modern web technologies such as HTML, CSS and WebGL. The plan is to support
-multi-player mode through WebRTC and for the game to speak the same line protocol as the Maze War did
+multi-player mode through WebRTC and for the game to speak the same line protocol as Maze War did
 on the Xerox Alto, allowing for game play with players playing the original game on an online
 [Xerox Alto Emulator][2].
 
