@@ -24,6 +24,7 @@ class WebGLActors extends Actors {
     add(actor) {
         super.add(actor);
         scene.add(actor.representation.representation);
+        return actor;
     }
     
     remove(actor) {
@@ -280,7 +281,7 @@ class MapRepresentation extends VisibleRepresentation {
         const mapDistance    = 0.3;
         const mapDeclination = 50;
         
-        this.cellSize = 6;
+        this.cellSize = 4;
         
         this.mapCanvas = document.createElement("canvas");
         this.mapCanvas.width  = maze.mazeCols * this.cellSize;

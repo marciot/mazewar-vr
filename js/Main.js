@@ -10,6 +10,7 @@ var container;
 var maze;
 
 var clock = new THREE.Clock();
+var loader = new THREE.TextureLoader();
 
 const fogNear = 0.1;
 const fogFar  = 50;
@@ -64,7 +65,7 @@ class ModernTheme {
         this.wallMaterial = new THREE.MeshLambertMaterial( {color: 0xffff55, side: THREE.DoubleSide} );
         
         // Materials for the eyes
-        var texture = THREE.ImageUtils.loadTexture('textures/eye.png');
+        var texture = loader.load('textures/eye.png');
         texture.anisotropy = renderer.getMaxAnisotropy();
 
         this.eyeMaterial = new THREE.MeshPhongMaterial( { 
@@ -77,7 +78,7 @@ class ModernTheme {
         
         // Materials for the ground plane
         if(this.useGroundPlane) {
-            var texture = THREE.ImageUtils.loadTexture('textures/ground.png');
+            var texture = loader.load('textures/ground.png');
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
             texture.repeat = new THREE.Vector2(50, 50);
@@ -111,7 +112,7 @@ class ClassicTheme {
         this.wallMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
         
         // Materials for the eyes
-        var texture = THREE.ImageUtils.loadTexture('textures/eye.png');
+        var texture = loader.load('textures/eye.png');
         texture.anisotropy = renderer.getMaxAnisotropy();
 
         this.eyeMaterial = new THREE.MeshPhongMaterial( { 
@@ -245,7 +246,7 @@ function triggerRelease(e) {
 function addSkydome(scene, renderer) {
     /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
     
-    var texture = THREE.ImageUtils.loadTexture('textures/sky.jpg');
+    var texture = loader.load('textures/sky.jpg');
     texture.anisotropy = renderer.getMaxAnisotropy();
 
     var geometry = new THREE.SphereGeometry(500, 60, 40);
