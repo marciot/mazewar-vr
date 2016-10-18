@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Maze Tester</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style>
+            h1 {
+                text-align: center;
+            }
+
+            #maze {
+                border-collapse: collapse;
+                margin:          2em;
+            }
+
+            #maze td {
+                position:    relative;
+                width:       30px;
+                height:      30px;
+                border:      1px dotted lightGray;
+            }
+
+            td.filled {
+                background-color: black;
+            }
+
+            .sprite {
+                position: absolute;
+                top:      0;
+                bottom:   0;
+                left:     0;
+                right:    0;
+                opacity:  0.75;
+                text-align:  center;
+                font-size:   20px;
+            }
+            .sprite.robotPlayer {color: red;}
+            .sprite.selfPlayer  {color: green;}
+            .sprite.missile     {color: orange;}
+        </style>
+        <script src="../js/Directions.js"></script>
+        <script src="../js/Maze.js"></script>
+        <script src="../js/Actors.js"></script>
+    </head>
+    <body>
+        <h1>Maze Tester</h1>
+
+        <table id="maze">
+        </table>
+
+        <h2>Controls:</h2>
+        <ul>
+            <li>a: About face
+            <li>s: Turn left
+            <li>d: Move forwards
+            <li>f: Turn right
+            <li>c: Move backwards
+        </ul>
+    </body>
+    <script>
+        const sprites = {
+            NORTH: "&#129153;",
+            EAST:  "&#129154;",
+            SOUTH: "&#129155;",
+            WEST:  "&#129152;",
+            DEAD:   "&#10006;"
+        };
+
+        class MazeRepresentation {
+            constructor(tableEl, maze) {
+                tableEl.innerHTML = "";
+                for(var y = 0; y < maze.mazeRows; y++) {
+                    var rowEl = document.createElement("tr");
+                    for(var x = 0; x < maze.mazeCols; x++) {
+                        var cellEl = document.createElement("td");
+                        cellEl.id = this.cellId(x,y);
+                        if(maze.getCell(x,y)) {
+                            cellEl.className = "filled";
+                        }
+                        rowEl.appendChild(cellEl);
+                    }
+                    tableEl.appendChild(rowEl);
+                }
+            }
+
+            cellId(x,y) {
+                return "cell" + x + "_" + y;
+            }
+
+            moveSpriteToCell(x, y, dom) {
+                var cellEl = document.getElementById(this.cellId(x,y));
+                cellEl.appendChild(dom);
+            }
+        }
+
+        class PlayerRepresentation {
+            constructor(type) {
+                this.dir = Directions.NORTH;
+                this.callback = null;
+
+                this.dom = document.createElement("div");
+                this.dom.className = "sprite " + type;
+            }
+
+            setSpriteToArrow() {
+                var text = "";
+                switch(this.dir) {
+                    case Directions.NORTH: text=sprites.NORTH; break;
+                    case Directions.EAST:  text=sprites.EAST; break;
+                    case Directions.SOUTH: text=sprites.SOUTH; break;
+                    case Directions.WEST:  text=sprites.WEST; break;
+                }
+                this.dom.innerHTML = text;
+            }
+
+            setAnimationFinishedCallback(callback) {
+                this.callback = callback;
+            }
+
+            wasShot() {
+                this.dom.innerHTML = sprites.DEAD;
+            }
+
+            respawn() {
+                this.setSpriteToArrow();
+            }
+
+            setPosition(x, z) {
+                mazeRep.moveSpriteToCell(x, z, this.dom);
+                this.scheduleCallback();
+            }
+
+            orientTowards(direction) {
+                this.turnTowards(direction);
+            }
+
+            turnTowards(direction) {
+                this.dir = direction;
+                this.setSpriteToArrow();
+                this.scheduleCallback();
+            }
+
+            timerCallback() {
+                this.timer = null;
+                this.callback();
+            }
+
+            scheduleCallback() {
+                if(!this.timer) {
+                    this.timer = setTimeout(this.timerCallback.bind(this), 1000);
+                }
+            }
+
+            startAnimation() {
+                this.scheduleCallback();
+            }
+
+            destroy(actor) {
+                actors.remove(actor);
+                this.dom.remove();
+            }
+
+            shoot(fromPlayer) {
+                var missile = new MissileActor(
+                    new PlayerRepresentation("missile"),
+                    fromPlayer
+                );
+                return actors.add(missile);
+            }
+
+            get cardinalDirection() {
+                return this.dir;
+            }
+        };
+
+        var self;
+        var maze    = new Maze();
+        var mazeRep = new MazeRepresentation(document.querySelector("#maze"), maze);
+        var actors  = new Actors();
+        actors.placePlayer(self = new SelfPlayer (new PlayerRepresentation("selfPlayer")));
+        actors.placePlayer(       new RobotPlayer(new PlayerRepresentation("robotPlayer")));
+
+        function keypressEvent(e) {
+            switch(String.fromCharCode(e.charCode)) {
+                case 'a':
+                    self.aboutFace();
+                    break;
+                case 's':
+                    self.turnLeft();
+                    break;
+                case 'd':
+                    self.walk();
+                    break;
+                case 'f':
+                    self.turnRight();
+                    break;
+                case 'c':
+                    self.walkBackwards();
+                    break;
+                case ' ':
+                    self.shoot();
+                    break;
+            }
+        }
+        window.addEventListener('keypress', keypressEvent);
+    </script>
+</html>

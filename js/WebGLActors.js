@@ -264,6 +264,10 @@ class MissileRepresentation extends AnimatedRepresentation {
         super.animate();
         this.object.rotation.x += 0.1;
     }
+
+    destroy(actor) {
+        actors.remove(actor);
+    }
 };
 
 // A Map displays a map of the maze. It is carried by the SelfPlayer.
@@ -392,5 +396,10 @@ class SelfRepresentation extends AnimatedRepresentation {
 
         controls.enabled = true;
         this.map.show();
+    }
+
+    shoot(fromPlayer) {
+        var missile = new MissileActor(new MissileRepresentation(), fromPlayer);
+        return actors.add(missile);
     }
 };

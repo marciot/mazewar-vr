@@ -306,17 +306,10 @@ function init() {
     maze = new MazeWalls();
     scene.add(maze.representation);
     
-    function placePlayer(player) {
-        player.setPosition(maze.getRandomPosition());
-        player.orientTowardsPassage();
-        player.startAnimation();
-        actors.add(player);
-    }
-    
     var selfRepresentation = new SelfRepresentation(camera);
 
-    placePlayer(new SelfPlayer(selfRepresentation));
-    placePlayer(new RobotPlayer(new EyeRepresentation()));
+    actors.placePlayer(new SelfPlayer(selfRepresentation));
+    actors.placePlayer(new RobotPlayer(new EyeRepresentation()));
 
     addSkydome(scene, renderer);
 

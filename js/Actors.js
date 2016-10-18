@@ -25,6 +25,7 @@ class Actors {
     
     add(actor) {
         this.actors.push(actor);
+        return actor;
     }
     
     remove(actor) {
@@ -44,6 +45,13 @@ class Actors {
                 return this.actors[i];
             }
         }
+    }
+
+    placePlayer(player) {
+        player.setPosition(maze.getRandomPosition());
+        player.orientTowardsPassage();
+        player.startAnimation();
+        this.add(player);
     }
 };
 
@@ -85,6 +93,8 @@ class Actor {
 
     /* Movement in the indicated direction */
     walk(direction) {
+        direction = direction || this.facing;
+
         if(!this.canWalk(direction)) {
             return false;
         }
@@ -96,7 +106,11 @@ class Actor {
             case Directions.WEST:  this.x--; break;
         }
         if(this.representation) {
-            this.representation.walk(direction);
+            if(this.representation.walk) {
+                this.representation.walk(direction);
+            } else {
+                this.representation.setPosition(this.x, this.z, direction);
+            }
         }
         return true;
     }
@@ -123,6 +137,22 @@ class Actor {
         if(this.representation) {
             this.representation.startAnimation();
         }
+    }
+
+    turnRight() {
+        this.turnTowards(Directions.rightFrom(this.facing));
+    }
+
+    turnLeft() {
+        this.turnTowards(Directions.leftFrom(this.facing));
+    }
+
+    aboutFace() {
+        this.turnTowards(Directions.oppositeFrom(this.facing));
+    }
+
+    walkBackwards() {
+        this.walk(Directions.oppositeFrom(this.facing));
     }
 };
 
@@ -214,8 +244,7 @@ class SelfPlayer extends Actor {
     }
 
     shoot() {
-        var missile = new MissileActor(new MissileRepresentation(), this);
-        actors.add(missile);
+        this.representation.shoot(this).startAnimation();
     }
 
     wasShot() {
@@ -239,7 +268,9 @@ class SelfPlayer extends Actor {
 
     walk(direction) {
         super.walk(direction || this.representation.cardinalDirection);
-        this.representation.map.whereAmI(this.x, this.z);
+        if(this.representation.map) {
+            this.representation.map.whereAmI(this.x, this.z);
+        }
     }
 
     setAutoWalk(state) {
@@ -275,18 +306,22 @@ class MissileActor extends Actor {
                 this.orientTowards(this.facing);
                 this.walk(this.facing);
             } else {
-                actors.remove(this);
+                this.destroy();
             }
         }
 
         var hit = actors.isOccupied(this.x, this.z, this);
         if(hit && hit.wasShot) {
             hit.wasShot();
-            actors.remove(this);
+            this.destroy();
         }
     }
 
     wasShot() {
-        actors.remove(this);
+        this.destroy();
+    }
+
+    destroy() {
+        this.representation.destroy(this);
     }
 }
