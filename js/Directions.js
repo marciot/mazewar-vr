@@ -39,5 +39,21 @@ Directions = Object.freeze({
     },
     oppositeFrom: function(d) {
         return Directions.fromInteger(Directions.toInteger(d)+2);
+    },
+    toAltoDir: function(dir) {
+        switch(dir) {
+            case Directions.NORTH: return RetroWeb.PupMazeWarDirections.NORTH;
+            case Directions.EAST:  return RetroWeb.PupMazeWarDirections.EAST;
+            case Directions.SOUTH: return RetroWeb.PupMazeWarDirections.SOUTH;
+            case Directions.WEST:  return RetroWeb.PupMazeWarDirections.WEST;
+        }
+    },
+    fromAltoDir: function(dir) {
+        switch(dir) {
+            case RetroWeb.PupMazeWarDirections.NORTH: return Directions.NORTH;
+            case RetroWeb.PupMazeWarDirections.EAST:  return Directions.EAST;
+            case RetroWeb.PupMazeWarDirections.SOUTH: return Directions.SOUTH;
+            case RetroWeb.PupMazeWarDirections.WEST:  return Directions.WEST;
+        }
     }
 });

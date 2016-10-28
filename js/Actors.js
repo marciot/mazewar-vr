@@ -35,10 +35,6 @@ class Actors {
         }
     }
     
-    get first() {
-        return this.actors[0];
-    }
-    
     isOccupied(x, z, except) {
         for(var i = 0; i < this.actors.length; i++) {
             if((this.actors[i] !== except) && (this.actors[i].x) === x && (this.actors[i].z === z)) {
@@ -61,9 +57,21 @@ class Actor {
         this.x = 1;
         this.z = 1;
         this.facing = Directions.NORTH;
+        this.observers = [];
         this.representation = representation;
-        if(this.representation) {
-            this.representation.setPosition(this.x, this.z);
+
+        this.addObserver(representation);
+    }
+
+    addObserver(observer) {
+        this.observers.push(observer);
+    }
+
+    notifyObservers(method, ...args) {
+        for(var i = 0; i < this.observers.length; i++) {
+            if(this.observers[i][method]) {
+                this.observers[i][method].apply(this.observers[i], args);
+            }
         }
     }
 
@@ -74,9 +82,7 @@ class Actor {
         }
         this.x = x;
         this.z = z;
-        if(this.representation) {
-            this.representation.setPosition(x, z);
-        }
+        this.notifyObservers("setPosition", x, z);
     }
 
     choosePassage() {
@@ -105,21 +111,13 @@ class Actor {
             case Directions.SOUTH: this.z++; break;
             case Directions.WEST:  this.x--; break;
         }
-        if(this.representation) {
-            if(this.representation.walk) {
-                this.representation.walk(direction);
-            } else {
-                this.representation.setPosition(this.x, this.z, direction);
-            }
-        }
+        this.notifyObservers("walkTo", this.x, this.z, direction);
         return true;
     }
 
     orientTowards(direction) {
         this.facing = direction;
-        if(this.representation) {
-            this.representation.orientTowards(direction);
-        }
+        this.notifyObservers("orientTowards", direction);
     }
 
     orientTowardsPassage() {
@@ -128,15 +126,11 @@ class Actor {
 
     turnTowards(direction) {
         this.facing = direction;
-        if(this.representation) {
-            this.representation.turnTowards(direction);
-        }
+        this.notifyObservers("turnTowards", direction);
     }
 
     startAnimation() {
-        if(this.representation) {
-            this.representation.startAnimation();
-        }
+        this.notifyObservers("startAnimation");
     }
 
     turnRight() {
@@ -155,131 +149,6 @@ class Actor {
         this.walk(Directions.oppositeFrom(this.facing));
     }
 };
-
-class RobotPlayer extends Actor {
-    constructor(representation) {
-        super(representation);
-        this.orientTowards(this.choosePassage());
-        this.isDead   = false;
-
-        representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
-    }
-    
-    // Chooses a direction by considering all possibilities and
-    // giving a bias towards moving forwards. 
-    chooseDirection() {
-        function flipCoin() {
-            return Math.floor(Math.random()*2);
-        }
-        
-        var canGoStraight = this.canWalk(this.facing);
-        var canGoLeft     = this.canWalk(Directions.leftFrom(this.facing));
-        var canGoRight    = this.canWalk(Directions.rightFrom(this.facing));
-        
-        // 1:1 odds of going straight if there is the possibility to turn.
-        if(canGoStraight && (!(canGoLeft || canGoRight) || flipCoin())) {
-            return this.facing;
-        }
-        
-        // 1:1 odds of going left or right, or about-face if no other choice.
-        if(flipCoin()) {
-            // Try to go right, then left, then reverse
-            if(canGoRight) {
-                return Directions.rightFrom(this.facing);
-            } else if(canGoLeft) {
-                return Directions.leftFrom(this.facing);
-            } else {
-                return Directions.oppositeFrom(this.facing);
-            }
-        } else {
-            // Try to go left, then right, then reverse
-            if(canGoLeft) {
-                return Directions.leftFrom(this.facing);
-            } else if(canGoRight) {
-                return Directions.rightFrom(this.facing);
-            } else {
-                return Directions.oppositeFrom(this.facing);
-            }
-        }
-    }
-
-    turn(direction) {
-        if(direction > 0) {
-            this.facing = Directions.fromInteger(Directions.toInteger(this.facing) + 1);
-        } else {
-            this.facing = Directions.fromInteger(Directions.toInteger(this.facing) + 3);
-        }
-    }
-
-    wasShot() {
-        this.isDead = true;
-        this.representation.wasShot();
-    }
-
-    respawn() {
-        this.isDead = false;
-        this.setPosition(maze.getRandomPosition());
-        this.orientTowardsPassage();
-    }
-
-    animationFinished() {
-        if(!this.isDead) {
-            var direction = this.chooseDirection();
-            if(direction == this.facing) {
-                this.walk(direction);
-            } else {
-                this.turnTowards(direction);
-            }
-        }
-    }
-}
-
-class SelfPlayer extends Actor {
-    constructor(representation) {
-        super(representation);
-        this.isDead   = false;
-        this.autoWalk = false;
-
-        representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
-    }
-
-    shoot() {
-        this.representation.shoot(this).startAnimation();
-    }
-
-    wasShot() {
-        this.isDead = true;
-        this.representation.wasShot();
-    }
-
-    respawn() {
-        this.isDead = false;
-        this.setPosition(maze.getRandomPosition());
-        this.orientTowardsPassage();
-    }
-
-    animationFinished() {
-        if(!this.isDead) {
-            if(this.autoWalk) {
-                this.walk();
-            }
-        }
-    }
-
-    walk(direction) {
-        super.walk(direction || this.representation.cardinalDirection);
-        if(this.representation.map) {
-            this.representation.map.whereAmI(this.x, this.z);
-        }
-    }
-
-    setAutoWalk(state) {
-        this.autoWalk = state;
-        if(this.representation.isStopped) {
-            this.walk();
-        }
-    }
-}
 
 class MissileActor extends Actor {
     constructor(representation, fromPlayer) {
@@ -322,6 +191,45 @@ class MissileActor extends Actor {
     }
 
     destroy() {
-        this.representation.destroy(this);
+        this.notifyObservers("destroy");
+        actors.remove(this);
+    }
+}
+
+class Player extends Actor {
+    constructor(representation) {
+        super(representation);
+        this.isDead   = false;
+        this.myName   = "no name";
+    }
+
+    shoot() {
+        this.notifyObservers("shoot");
+
+        var missileRep = this.representation.getMissileRepresentation();
+        var missile = new MissileActor(missileRep, this);
+        missile.startAnimation();
+        return actors.add(missile);
+    }
+
+    wasShot() {
+        this.isDead = true;
+        this.notifyObservers("wasShot");
+    }
+
+    respawn() {
+        this.isDead = false;
+        this.setPosition(maze.getRandomPosition());
+        this.orientTowardsPassage();
+        this.notifyObservers("respawn");
+    }
+
+    set name(name) {
+        this.representation.name = name;
+        this.myName = name;
+    }
+
+    get name() {
+        return this.myName;
     }
 }

@@ -131,7 +131,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
         this.animationFinishedCallback = null;
     }
     
-    walk(direction) {
+    walkTo(x, z, direction) {
         var u = Directions.toUnitVector(direction);
         this.doAnimation(u.multiplyScalar(MazeWalls.cellDimension));
     }
@@ -222,6 +222,10 @@ class AnimatedRepresentation extends VisibleRepresentation {
     startAnimation() {
         this.animationFinished();
     }
+
+    getMissileRepresentation() {
+        return new MissileRepresentation();
+    }
 }
 
 class EyeRepresentation extends AnimatedRepresentation {
@@ -264,10 +268,6 @@ class MissileRepresentation extends AnimatedRepresentation {
     animate() {
         super.animate();
         this.object.rotation.x += 0.1;
-    }
-
-    destroy(actor) {
-        actors.remove(actor);
     }
 };
 
@@ -367,6 +367,16 @@ class SelfRepresentation extends AnimatedRepresentation {
         this.combined.add(camera);
     }
     
+    setPosition(x, z) {
+        super.setPosition(x, z);
+        this.map.whereAmI(x, z);
+    }
+
+    walkTo(x, z, direction) {
+        super.walkTo(x, z, direction)
+        this.map.whereAmI(x, z);
+    }
+
     get cameraProxy() {
         return this.object;
     }
@@ -397,10 +407,5 @@ class SelfRepresentation extends AnimatedRepresentation {
 
         controls.enabled = true;
         this.map.show();
-    }
-
-    shoot(fromPlayer) {
-        var missile = new MissileActor(new MissileRepresentation(), fromPlayer);
-        return actors.add(missile);
     }
 };

@@ -36,11 +36,37 @@
             }
             .sprite.robotPlayer {color: red;}
             .sprite.selfPlayer  {color: green;}
+            .sprite.netPlayer   {color: blue;}
             .sprite.missile     {color: orange;}
+
+            button, input {
+                margin-top:    5px;
+                margin-bottom: 5px;
+            }
+
+            button {
+                margin-left: 105px;
+            }
+
+            label {
+                font-weight: bold;
+                display:     inline-block;
+                width:       100px;
+                text-align:  right;
+                padding-right: 5px;
+            }
         </style>
         <script src="../js/Directions.js"></script>
         <script src="../js/Maze.js"></script>
         <script src="../js/Actors.js"></script>
+        <script src="../js/Directors.js"></script>
+        <script src="../js/GameMaster.js"></script>
+
+        <script src="../js/third-party/peerjs/peer.min.js"></script>
+        <script src="../js/networking/frame-utilities.js"></script>
+        <script src="../js/networking/pup-services.js"></script>
+        <script src="../js/networking/pup-services-mazewar.js"></script>
+        <script src="../js/networking/retroweb-network.js"></script>
     </head>
     <body>
         <h1>Maze Tester</h1>
@@ -56,6 +82,14 @@
             <li>f: Turn right
             <li>c: Move backwards
         </ul>
+
+        <div class="controls">
+        <p>
+            <label>Player Name</label><input type="text" id="playerName"><br>
+            <label>Host ID</label><input type="number" id="hostId" size="2" min="1" max="255"><br>
+            <button id="startGameButton" onclick="startGame()">Start Game</button>
+        <p>
+        </div>
     </body>
     <script>
         const sprites = {
@@ -89,7 +123,11 @@
 
             moveSpriteToCell(x, y, dom) {
                 var cellEl = document.getElementById(this.cellId(x,y));
-                cellEl.appendChild(dom);
+                if(cellEl) {
+                    cellEl.appendChild(dom);
+                } else {
+                    console.log("Invalid sprite location", x, y);
+                }
             }
         }
 
@@ -100,6 +138,7 @@
 
                 this.dom = document.createElement("div");
                 this.dom.className = "sprite " + type;
+                this.type = type;
             }
 
             setSpriteToArrow() {
@@ -127,6 +166,10 @@
 
             setPosition(x, z) {
                 mazeRep.moveSpriteToCell(x, z, this.dom);
+            }
+
+            walkTo(x, z, direction) {
+                mazeRep.moveSpriteToCell(x, z, this.dom);
                 this.scheduleCallback();
             }
 
@@ -142,7 +185,9 @@
 
             timerCallback() {
                 this.timer = null;
-                this.callback();
+                if(this.callback) {
+                    this.callback();
+                }
             }
 
             scheduleCallback() {
@@ -155,53 +200,70 @@
                 this.scheduleCallback();
             }
 
-            destroy(actor) {
-                actors.remove(actor);
+            destroy() {
                 this.dom.remove();
             }
 
-            shoot(fromPlayer) {
-                var missile = new MissileActor(
-                    new PlayerRepresentation("missile"),
-                    fromPlayer
-                );
-                return actors.add(missile);
+            getMissileRepresentation() {
+                return new PlayerRepresentation("missile");
             }
 
             get cardinalDirection() {
                 return this.dir;
             }
+
+            set name(name) {
+                this.dom.title = name;
+            }
         };
 
-        var self;
+        var actors  = new Actors();
         var maze    = new Maze();
         var mazeRep = new MazeRepresentation(document.querySelector("#maze"), maze);
-        var actors  = new Actors();
-        actors.placePlayer(self = new SelfPlayer (new PlayerRepresentation("selfPlayer")));
-        actors.placePlayer(       new RobotPlayer(new PlayerRepresentation("robotPlayer")));
 
-        function keypressEvent(e) {
-            switch(String.fromCharCode(e.charCode)) {
-                case 'a':
-                    self.aboutFace();
-                    break;
-                case 's':
-                    self.turnLeft();
-                    break;
-                case 'd':
-                    self.walk();
-                    break;
-                case 'f':
-                    self.turnRight();
-                    break;
-                case 'c':
-                    self.walkBackwards();
-                    break;
-                case ' ':
-                    self.shoot();
-                    break;
+        /* Suggest a random hostId */
+        const ETHERNET_ADDR_MIN       = 0x01;
+        const ETHERNET_ADDR_MAX       = 0xFF;
+
+        var playerNameField = document.getElementById("playerName");
+        var hostIdField = document.getElementById("hostId");
+        hostIdField.value = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
+
+        var playerFactory = {
+            newSelfPlayer: function() {
+                var actor = new Player(new PlayerRepresentation("selfPlayer"));
+                actors.placePlayer(actor);
+                new KeyboardDirector(actor);
+                return actor;
+            },
+            newRobotPlayer: function() {
+                var actor = new Player(new PlayerRepresentation("robotPlayer"));
+                actors.placePlayer(actor);
+                new RoboticDirector(actor);
+                return actor;
+            },
+            newOtherPlayer: function() {
+                var actor = new Player(new PlayerRepresentation("netPlayer"));
+                actors.placePlayer(actor);
+                return actor;
             }
+        };
+
+        var gameMaster = new NetworkedGame(playerFactory);
+        function startGame() {
+            if(!playerNameField.value) {
+                return;
+            }
+            hostIdField.disabled = true;
+            playerNameField.disabled  = true;
+
+            gameMaster.startGame(
+                parseInt(hostIdField.value),
+                playerNameField.value,
+                function stateChangedCallback(state) {
+                    document.getElementById("startGameButton").innerText = state;
+                }
+            );
         }
-        window.addEventListener('keypress', keypressEvent);
     </script>
 </html>

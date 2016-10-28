@@ -212,37 +212,6 @@ class MazeWalls extends Maze {
 init();
 animate();
 
-function triggerHeld() {
-    actors.first.setAutoWalk(true);
-}
-
-function triggerTap() {
-    actors.first.shoot();
-}
-
-var pressDelay = 200;
-var pressTimer = null;
-
-function triggerPressed(e) {
-    if(!pressTimer) {
-        pressTimer = window.setTimeout(function() {pressTimer = null; triggerHeld();}, pressDelay);
-    }
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function triggerRelease(e) {
-    if(pressTimer) {
-        window.clearTimeout(pressTimer);
-        triggerTap();
-        pressTimer = null;
-    } else {
-        actors.first.setAutoWalk(false);
-    }
-    e.preventDefault();
-    e.stopPropagation();
-}
-
 function addSkydome(scene, renderer) {
     /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
     
@@ -306,23 +275,23 @@ function init() {
     
     maze = new MazeWalls();
     scene.add(maze.representation);
-    
+
     var selfRepresentation = new SelfRepresentation(camera);
 
-    actors.placePlayer(new SelfPlayer(selfRepresentation));
-    actors.placePlayer(new RobotPlayer(new EyeRepresentation()));
+    var selfActor = new Player(selfRepresentation);
+    var robotActor = new Player(new EyeRepresentation());
+
+    actors.placePlayer(selfActor);
+    actors.placePlayer(robotActor);
+
+    var robotDirector = new RoboticDirector(robotActor);
+    var selfDirector  = new TriggerDirector(selfActor, container);
 
     addSkydome(scene, renderer);
 
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
 
-    var useTouch = false;
-    container.addEventListener('mousedown',  function(e) {if(!useTouch)  triggerPressed(e);}, false);
-    container.addEventListener('mouseup',    function(e) {if(!useTouch)  triggerRelease(e);}, false);
-    container.addEventListener('touchstart', function(e) {useTouch=true; triggerPressed(e);}, false);
-    container.addEventListener('touchend',   function(e) {useTouch=true; triggerRelease(e);}, false);
-    
     /* Mouse controls (disabled if orientation based controls are available) */
     controls = new THREE.LookAroundControls(selfRepresentation.cameraProxy, element);
 
