@@ -3,11 +3,8 @@ window.onerror = function(error) {
     //style.remove();
 };
 
-var camera, scene, renderer;
-var effect, controls;
-var container;
-
-var maze;
+var camera, scene, renderer, effect
+var container, maze;
 
 var clock = new THREE.Clock();
 var loader = new THREE.TextureLoader();
@@ -276,43 +273,13 @@ function init() {
     maze = new MazeWalls();
     scene.add(maze.representation);
 
-    var selfRepresentation = new SelfRepresentation(camera);
-
-    var selfActor = new Player(selfRepresentation);
-    var robotActor = new Player(new EyeRepresentation());
-
-    actors.placePlayer(selfActor);
-    actors.placePlayer(robotActor);
-
-    var robotDirector = new RoboticDirector(robotActor);
-    var selfDirector  = new TriggerDirector(selfActor, container);
+    var game = new SoloGame(getWebGLPlayerFactory(camera, element));
+    game.startGame();
 
     addSkydome(scene, renderer);
 
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
-
-    /* Mouse controls (disabled if orientation based controls are available) */
-    controls = new THREE.LookAroundControls(selfRepresentation.cameraProxy, element);
-
-    function setOrientationControls(e) {
-        if (!e.alpha) {
-            return;
-        }
-        
-        // Disable the mouse controls when operating on mobile.
-        controls.enabled = false;
-        controls.dispose();
-
-        controls = new THREE.DeviceOrientationControls(camera, true);
-        controls.connect();
-        controls.update();
-
-        element.addEventListener('click', fullscreen, false);
-
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-    }
-    window.addEventListener('deviceorientation', setOrientationControls, true);
 
     function modeSelected(mode) {
         console.log("Mode is", mode);
@@ -329,10 +296,31 @@ function init() {
         }
     }
 
+    function startSoloGame() {
+        console.log("Starting solo game");
+    }
+
+    function startNetworkGame() {
+        console.log("Starting network game");
+        game.endGame();
+
+        /* Choose random hostId. TODO: Implement check for conflicting ids */
+        const ETHERNET_ADDR_MIN       = 0x01;
+        const ETHERNET_ADDR_MAX       = 0xFF;
+        const hostId = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
+
+        var name = prompt("Please enter your name");
+
+        game = new NetworkedGame(getWebGLPlayerFactory(camera, element));
+        game.startGame(hostId, name, function(state) {console.log(state);});
+    }
+
     function webComponentsReady() {
         var about = document.querySelector("about-box");
         if(about) {
-            about.setModeCallback(modeSelected);
+            about.addCallback("gfxModeSelected", modeSelected);
+            about.addCallback("startSoloGame", startSoloGame);
+            about.addCallback("startNetworkGame", startNetworkGame);
         }
     }
 
@@ -355,7 +343,9 @@ function update(dt) {
 
     camera.updateProjectionMatrix();
 
-    controls.update(dt);
+    if(headsetDirector) {
+        headsetDirector.update(dt);
+    }
     
     actors.animate();
     tween.update(dt);

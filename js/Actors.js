@@ -33,6 +33,13 @@ class Actors {
         if (index > -1) {
             this.actors.splice(index, 1);
         }
+        actor.representation.dispose();
+    }
+
+    removeAll() {
+        while(this.actors.length) {
+            this.remove(this.actors[this.actors.length-1]);
+        }
     }
     
     isOccupied(x, z, except) {

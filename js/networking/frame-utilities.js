@@ -99,7 +99,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             this._checkRange();
             return this.frame[this.index++] << 24 |
                    this.frame[this.index++] << 16 |
-                   this.frame[this.index++] << 8  | 
+                   this.frame[this.index++] << 8  |
                    this.frame[this.index++];
         }
 

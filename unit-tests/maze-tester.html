@@ -44,7 +44,7 @@
                 margin-bottom: 5px;
             }
 
-            button {
+            button:first-child {
                 margin-left: 105px;
             }
 
@@ -54,6 +54,36 @@
                 width:       100px;
                 text-align:  right;
                 padding-right: 5px;
+            }
+
+            #controls {
+                display:         -ms-flex;
+                display:         -webkit-flex;
+                display:         flex;
+
+                flex-direction:  row;
+                justify-content: space-around;
+            }
+
+            #touchControls {
+                text-align: center;
+            }
+
+            #touchControls TABLE {
+                margin: 0 auto;
+            }
+
+            #touchControls TD {
+                font-size: 125%;
+                width:     1.25em;
+                height:    1.25em;
+                padding:   5px 5px;
+            }
+
+            #touchForward, #touchBackward, #touchLeft, #touchRight, #touchCenter, #touchUTurn {
+                border:     1px solid black;
+                background: lightGray;
+                cursor:     pointer;
             }
         </style>
         <script src="../js/Directions.js"></script>
@@ -67,6 +97,15 @@
         <script src="../js/networking/pup-services.js"></script>
         <script src="../js/networking/pup-services-mazewar.js"></script>
         <script src="../js/networking/retroweb-network.js"></script>
+
+        <script type="text/javascript" src="../js/third-party/yconsole-compiled.js"></script>
+        <script type="text/javascript">
+        window.onerror = function(error) {
+            YConsole.show();
+        };
+        YConsole.activate();
+        YConsole.docking="bottom";
+        </script>
     </head>
     <body>
         <h1>Maze Tester</h1>
@@ -74,29 +113,58 @@
         <table id="maze">
         </table>
 
-        <h2>Controls:</h2>
-        <ul>
-            <li>a: About face
-            <li>s: Turn left
-            <li>d: Move forwards
-            <li>f: Turn right
-            <li>c: Move backwards
-        </ul>
+        <div id="controls">
+            <div>
+                <h3>Keyboard Controls:</h3>
+                <ul>
+                    <li>a: About face
+                    <li>s: Turn left
+                    <li>d: Move forwards
+                    <li>f: Turn right
+                    <li>c: Move backwards
+                </ul>
+            </div>
 
-        <div class="controls">
-        <p>
-            <label>Player Name</label><input type="text" id="playerName"><br>
-            <label>Host ID</label><input type="number" id="hostId" size="2" min="1" max="255"><br>
-            <button id="startGameButton" onclick="startGame()">Start Game</button>
-        <p>
+            <div id="touchControls">
+                <h3>Touch Controls:</h3>
+                <table>
+                    <tr>
+                        <td></td>
+                        <td id="touchForward">&#9650;</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td id="touchLeft">&#9664;</td>
+                        <td id="touchCenter">&#11044;</td>
+                        <td id="touchRight">&#9654;</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td id="touchBackward">&#9660;</td>
+                        <td id="touchUTurn">&#10227;</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <h3>Networking Controls:</h3>
+                <p>
+                    <label>Player Name</label><input type="text" id="playerName" value="alice"><br>
+                    <label>Host ID</label><input type="number" id="hostId" size="2" min="1" max="255"><br>
+                    <span>
+                        <button id="startGameButton" onclick="startGame()">Start Game</button>
+                        <button onclick="YConsole.show()">Console</button>
+                    </span>
+                <p>
+            </div>
         </div>
     </body>
     <script>
         const sprites = {
-            NORTH: "&#129153;",
-            EAST:  "&#129154;",
-            SOUTH: "&#129155;",
-            WEST:  "&#129152;",
+            NORTH: "&#11014;",
+            EAST:  "&#10145;",
+            SOUTH: "&#11015;",
+            WEST:  "&#11013;",
             DEAD:   "&#10006;"
         };
 
@@ -200,7 +268,7 @@
                 this.scheduleCallback();
             }
 
-            destroy() {
+            dispose() {
                 this.dom.remove();
             }
 
@@ -216,6 +284,13 @@
                 this.dom.title = name;
             }
         };
+
+        var self;
+        document.getElementById("touchLeft").addEventListener("click", function(e) {self.turnLeft();});
+        document.getElementById("touchRight").addEventListener("click", function(e) {self.turnRight();});
+        document.getElementById("touchForward").addEventListener("click", function(e) {self.walk();});
+        document.getElementById("touchBackward").addEventListener("click", function(e) {self.walkBackwards();});
+        document.getElementById("touchUTurn").addEventListener("click", function(e) {self.aboutFace();});
 
         var actors  = new Actors();
         var maze    = new Maze();
@@ -234,6 +309,7 @@
                 var actor = new Player(new PlayerRepresentation("selfPlayer"));
                 actors.placePlayer(actor);
                 new KeyboardDirector(actor);
+                self = actor;
                 return actor;
             },
             newRobotPlayer: function() {
@@ -249,13 +325,18 @@
             }
         };
 
-        var gameMaster = new NetworkedGame(playerFactory);
+        var gameMaster = new SoloGame(playerFactory);
+        gameMaster.startGame();
+
         function startGame() {
             if(!playerNameField.value) {
                 return;
             }
             hostIdField.disabled = true;
             playerNameField.disabled  = true;
+
+            gameMaster.endGame();
+            gameMaster = new NetworkedGame(playerFactory);
 
             gameMaster.startGame(
                 parseInt(hostIdField.value),

@@ -33,9 +33,6 @@ class NetworkedGame {
         this.selfPlayer = this.factory.newSelfPlayer();
         this.selfPlayer.name = playerName;
 
-        var robot = this.factory.newRobotPlayer();
-        robot.name = "robot";
-
         // Start networking
 
         var initialPlayer = {
@@ -78,5 +75,20 @@ class NetworkedGame {
 
         actor.setPosition(rat.xLoc, rat.yLoc);
         actor.orientTowards(Directions.fromAltoDir(rat.dir));
+    }
+}
+
+class SoloGame {
+    constructor(playerFactory) {
+        this.factory  = playerFactory;
+    }
+
+    startGame() {
+        var self  = this.factory.newSelfPlayer();
+        var robot = this.factory.newRobotPlayer();
+    }
+
+    endGame() {
+        actors.removeAll();
     }
 }

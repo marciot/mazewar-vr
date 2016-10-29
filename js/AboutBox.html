@@ -57,7 +57,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         /* A dynamically sized grid */
 
-        .flex-grid {
+        .flex-grid-six, .flex-grid-four {
             display:        -ms-flex;
             display:        -webkit-flex;
             display:        flex;
@@ -68,9 +68,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
 
         @media (orientation: landscape) {
-            .flex-grid > div {
+            .flex-grid-six > div {
                 width:  50%;
                 height: 33%;
+            }
+
+            .flex-grid-four > div {
+                width:  50%;
+                height: 50%;
             }
 
             .button {
@@ -83,9 +88,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
 
         @media (orientation: portrait) {
-            .flex-grid > div {
+            .flex-grid-six > div {
                 width:  100%;
                 height: 16%;
+            }
+
+            .flex-grid-four > div {
+                width:  100%;
+                height: 24%;
             }
 
             .button {
@@ -97,7 +107,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             }
         }
 
-        .flex-grid > div {
+        .flex-grid-six > div, .flex-grid-four > div {
             padding:    10px;
             box-sizing: border-box;
             position:   relative;
@@ -281,7 +291,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="header center-text">
                 <h1 class="title">Maze War <strong>VR</strong></h1>
             </div>
-            <div class="middle flex-grid">
+            <div class="middle flex-grid-six">
                 <div><div class="button" data-page="pageAbout">About Mazewar</div></div>
                 <div><div class="button" id="playSolo">Play Solo</div></div>
                 <div><div class="button" data-page="pageNetPlay">Network Play</div></div>
@@ -293,10 +303,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             </div>
         </div>
 
-        <div class="flex-distribute" id="pageNetPlay">
-            <div>
-                <h1>Network Play</h1>
-                Stay tuned! Network play is coming soon!
+        <div class="flex-layout" id="pageNetPlay">
+            <div class="header center-text">
+                <h1 class="title">Network Play</h1>
+            </div>
+            <div class="middle flex-grid-four">
+                <div><div class="button" id="startNetworkGame">Start New Game</div></div>
+                <div><div class="button" id="joinExistingGame">Join Existing Game</div></div>
+                <div><div class="button" id="inviteFriends">Invite Friends</div></div>
+                <div><div class="button" id="customizeAvatar">Customize Avatar</div></div>
+            </div>
+            <div class="footer">
             </div>
         </div>
 
@@ -385,24 +402,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         shadowRoot.appendChild(clone);
 
         function selectExperience(mode) {
-            if(this.modeSelectedCallback) {
-                this.modeSelectedCallback(mode);
-            }
+            this.dispatchCallback("gfxModeSelected");
         }
 
         shadowRoot.querySelector("#headset").addEventListener("click", selectExperience.bind(this, "headset"));
         shadowRoot.querySelector("#monitor").addEventListener("click", selectExperience.bind(this, "monitor"));
         shadowRoot.querySelector("#anaglyph").addEventListener("click", selectExperience.bind(this, "anaglyph"));
 
-        function startGame() {
+        function startSoloGame() {
             shadowRoot.querySelector("#overlay").style.display = "none";
+            shadowRoot.dispatchCallback("startSoloGame");
         }
-        shadowRoot.querySelector("#playSolo").addEventListener("click", startGame);
+        shadowRoot.querySelector("#playSolo").addEventListener("click", startSoloGame);
+
+        function startNetworkGame() {
+            shadowRoot.querySelector("#overlay").style.display = "none";
+            shadowRoot.dispatchCallback("startNetworkGame");
+        }
+        shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
+
+        this.eventListeners = {
+            gfxModeSelected:  [],
+            startSoloGame:    [],
+            startNetworkGame: []
+        };
     };
 
-    AboutBoxProto.setModeCallback = function(callback) {
-        this.modeSelectedCallback = callback;
-    };
+    AboutBoxProto.addCallback = function(eventStr, callback) {
+        this.eventListeners[eventStr].push(callback);
+    }
+
+    AboutBoxProto.dispatchCallback = function(eventStr, ...args) {
+        for(var i = 0; i < this.eventListeners[eventStr].length; i++) {
+            this.eventListeners[eventStr][i].apply(null, args);
+        }
+    }
 
     var AboutBox = document.registerElement('about-box', {prototype: AboutBoxProto});
 })((document._currentScript || document.currentScript).ownerDocument);

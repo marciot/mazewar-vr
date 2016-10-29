@@ -240,6 +240,10 @@ class EyeRepresentation extends AnimatedRepresentation {
 
         this.object.position.y = eyeHeight;
     }
+
+    dispose() {
+        this.object.geometry.dispose();
+    }
     
     wasShot() {
         this.turnTowards(Directions.UP);
@@ -249,6 +253,10 @@ class EyeRepresentation extends AnimatedRepresentation {
     respawn() {
         this.object.position.y = eyeHeight;
         this.animationFinished();
+    }
+
+    dispose() {
+        this.object.geometry.dispose();
     }
 }
 
@@ -264,7 +272,11 @@ class MissileRepresentation extends AnimatedRepresentation {
         this.object.castShadow = true;
         this.object.position.y = 1.5;
     }
-    
+
+    dispose() {
+        this.object.geometry.dispose();
+    }
+
     animate() {
         super.animate();
         this.object.rotation.x += 0.1;
@@ -312,7 +324,13 @@ class MapRepresentation extends VisibleRepresentation {
         this.object.rotation.order = 'YXZ';
         this.object.rotation.x = -Math.PI/ 180 * mapDeclination;
     }
-    
+
+    dispose() {
+        this.object.children[0].geometry.dispose();
+        this.mapTexture.dispose();
+        this.mapMaterial.dispose();
+    }
+
     drawCell(ctx, x, z) {
         ctx.fillRect(x*this.cellSize, z*this.cellSize, this.cellSize, this.cellSize);
     }
@@ -366,7 +384,11 @@ class SelfRepresentation extends AnimatedRepresentation {
         this.combined.add(this.map.representation);
         this.combined.add(camera);
     }
-    
+
+    dispose() {
+        this.map.dispose();
+    }
+
     setPosition(x, z) {
         super.setPosition(x, z);
         this.map.whereAmI(x, z);
@@ -375,6 +397,10 @@ class SelfRepresentation extends AnimatedRepresentation {
     walkTo(x, z, direction) {
         super.walkTo(x, z, direction)
         this.map.whereAmI(x, z);
+    }
+
+    orientTowards(direction) {
+        // Disable this since this is controlled by the camera
     }
 
     get cameraProxy() {
@@ -409,3 +435,27 @@ class SelfRepresentation extends AnimatedRepresentation {
         this.map.show();
     }
 };
+
+function getWebGLPlayerFactory(camera, element) {
+    var playerFactory = {
+        newSelfPlayer: function() {
+            var selfRepresentation = new SelfRepresentation(camera);
+            var actor = new Player(selfRepresentation);
+            actors.placePlayer(actor);
+            new HeadsetDirector(actor, container);
+            return actor;
+        },
+        newRobotPlayer: function() {
+            var actor = new Player(new EyeRepresentation());
+            actors.placePlayer(actor);
+            new RoboticDirector(actor);
+            return actor;
+        },
+        newOtherPlayer: function() {
+            var actor = new Player(new EyeRepresentation());
+            actors.placePlayer(actor);
+            return actor;
+        }
+    };
+    return playerFactory;
+}

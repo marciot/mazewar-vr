@@ -92,7 +92,9 @@ class KeyboardDirector extends Director {
     }
 }
 
-class TriggerDirector extends Director {
+var headsetDirector;
+
+class HeadsetDirector extends Director {
     constructor(actor, container) {
         super(actor);
 
@@ -108,6 +110,31 @@ class TriggerDirector extends Director {
 
         this.autoWalk = false;
         actor.representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
+
+        headsetDirector = this;
+
+        var me = this;
+        function setOrientationControls(e) {
+            if (!e.alpha) {
+                return;
+            }
+
+            // Disable the mouse controls when operating on mobile.
+            me.controls.enabled = false;
+            me.controls.dispose();
+
+            me.controls = new THREE.DeviceOrientationControls(camera, true);
+            me.controls.connect();
+            me.controls.update();
+
+            container.addEventListener('click', fullscreen, false);
+
+            window.removeEventListener('deviceorientation', setOrientationControls, true);
+        }
+        window.addEventListener('deviceorientation', setOrientationControls, true);
+
+        /* Mouse controls (disabled if orientation based controls are available) */
+        this.controls = new THREE.LookAroundControls(actor.representation.cameraProxy, container);
     }
 
     triggerHeld() {
@@ -150,6 +177,18 @@ class TriggerDirector extends Director {
         this.autoWalk = state;
         if(this.actor.representation.isStopped) {
             this.actor.walk(this.actor.representation.cardinalDirection);
+        }
+    }
+
+    update(dt) {
+        this.controls.update(dt);
+
+        var cardinalDirection = this.actor.representation.cardinalDirection;
+        if(cardinalDirection !== this.lastDirection) {
+            console.log("Updating direction", cardinalDirection);
+            this.actor.orientTowards(cardinalDirection);
+
+            this.lastDirection = cardinalDirection;
         }
     }
 }
