@@ -221,7 +221,7 @@ class Player extends Actor {
 
     wasShot() {
         this.isDead = true;
-        this.notifyObservers("wasShot");
+        this.notifyObservers("wasShot", () => {this.respawn()});
     }
 
     respawn() {

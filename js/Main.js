@@ -296,10 +296,6 @@ function init() {
         }
     }
 
-    function startSoloGame() {
-        console.log("Starting solo game");
-    }
-
     function startNetworkGame() {
         console.log("Starting network game");
         game.endGame();
@@ -319,7 +315,6 @@ function init() {
         var about = document.querySelector("about-box");
         if(about) {
             about.addCallback("gfxModeSelected", modeSelected);
-            about.addCallback("startSoloGame", startSoloGame);
             about.addCallback("startNetworkGame", startNetworkGame);
         }
     }

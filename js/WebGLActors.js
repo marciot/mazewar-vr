@@ -191,7 +191,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
             } else {
                 this.fallSpeed        = 0;
                 this.fallAcceleration = 0;
-                this.respawn();
+                this.fallFinished();
             }
         }
         if(this.animationFinishedCallback) {
@@ -245,11 +245,18 @@ class EyeRepresentation extends AnimatedRepresentation {
         this.object.geometry.dispose();
     }
     
-    wasShot() {
+    wasShot(respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(1);
+        this.respawnCallback = respawnCallback;
     }
-    
+
+    fallFinished() {
+        if(this.respawnCallback) {
+            this.respawnCallback();
+        }
+    }
+
     respawn() {
         this.object.position.y = eyeHeight;
         this.animationFinished();
@@ -419,19 +426,26 @@ class SelfRepresentation extends AnimatedRepresentation {
         }
     }
 
-    wasShot() {
+    wasShot(respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(2);
-        controls.enabled = false;
+        headsetDirector.lockControls();
         
         this.map.hide();
+        this.respawnCallback = respawnCallback;
+    }
+
+    fallFinished() {
+        if(this.respawnCallback) {
+            this.respawnCallback();
+        }
     }
     
     respawn() {
         liftFog();
         this.object.position.y = eyeHeight;
 
-        controls.enabled = true;
+        headsetDirector.unlockControls();
         this.map.show();
     }
 };

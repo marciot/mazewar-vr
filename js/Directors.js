@@ -185,10 +185,16 @@ class HeadsetDirector extends Director {
 
         var cardinalDirection = this.actor.representation.cardinalDirection;
         if(cardinalDirection !== this.lastDirection) {
-            console.log("Updating direction", cardinalDirection);
             this.actor.orientTowards(cardinalDirection);
-
             this.lastDirection = cardinalDirection;
         }
+    }
+
+    lockControls() {
+        this.controls.enabled = false;
+    }
+
+    unlockControls() {
+        this.controls.enabled = true;
     }
 }
