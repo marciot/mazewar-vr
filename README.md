@@ -32,18 +32,18 @@ Maze War protocol was provided by the developer of the [Contralto] emulator from
 
 ## Play it now (beta):
 
-The game is currently playable in single player mode under Chrome. You can try the
+The game is currently playable as a beta. You can try the
 [online demo](http://marciot.com/mazewar-vr).
 
 ## Compatibility:
 
 My goals are to maintain compatibility with the most devices possible, provided you download the latest versions of a compatible web browser for that platform.
 
-* Desktop PCs: Should work with the latest version of Google Chrome
-* Android: Should work with the latest version of Google Chrome.
-* iOS: Single player mode is supported, but multi-player requires WebRTC which is not supported
+* __Desktop PCs__: Should work with the latest version of Google Chrome
+* __Android__: Should work with the latest version of Google Chrome.
+* __iOS__: Single player mode is supported, but multi-player requires WebRTC which is not supported
 under Safari; future compatibility is planned via an app.
-* Samsung Gear VR, Oculus Rift, HTC Vive: Not currently supported, but expected to be supported
+* __Samsung Gear VR, Oculus Rift, HTC Vive__: Not currently supported, but expected to be supported
 in Chrome once the game has been updated to use the [WebVR API].
 
 ### Tested Devices:
@@ -52,6 +52,7 @@ In order to attempt to maintain compatibility with a wide range of devices, I wi
 on the following devices which are available to me:
 
 | Device              | OS Version         | Browser             | Last Tested | Solo | Multi | Notes                    |
+| ------------------- | ------------------ | ------------------- | ----------- | ---- | ----- | ------------------------ |
 | Laptop Computer     | Window 10 ver 1607 | Chrome 54.0.2840.71 | 10/28/2016  | Yes  | Yes   |                          |
 | Laptop Computer     | Window 10 ver 1607 | Firefox 49.0.2      | 10/28/2016  | Yes  | No    | peerjs fails             |
 | Kindle Fire HDX 8.9 | Fire OS 4.5.5.2    | Chrome 54.0.2840.68 | 10/28/2016  | Yes  | Yes   | Install Chrome [via APK] |
