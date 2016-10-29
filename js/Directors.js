@@ -189,7 +189,7 @@ class HeadsetDirector extends Director {
             this.lastDirection = cardinalDirection;
 
             if(this.autoWalk && this.actor.representation.isStopped) {
-                // Walking in new direction if trigger is being held
+                // Walk in new direction if trigger is being held
                 this.animationFinished();
             }
         }
