@@ -3,18 +3,17 @@ SwipePages.html
 Copyright (C) 2016 Marcio Teixeira
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
+modify it under the terms of the GNU Affero General Public License
+as published by the Free Software Foundation; either version 3
 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <template id="SwipePagesTemplate">
@@ -156,22 +155,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             this.currentPage = newPage;
         }
         
-        bindButtons(btns) {
+        bindElements(btns) {
             for(var i = 0; i < btns.length; i++) {
                 btns[i].addEventListener("click", this.buttonAction.bind(this));
+            }
+        }
+
+        followLink(link) {
+            this.gotoPage(link.getAttribute("data-page"))
+        }
+
+        gotoPage(newPage) {
+            if(newPage) {
+                history.pushState({page: newPage}, newPage);
+                this.enablePageSlide();
+                this.showPage(newPage);
             }
         }
     
         buttonAction(e) {
             e.preventDefault();
             e.stopPropagation();
-        
-            var newPage = e.target.getAttribute("data-page");
-            if(newPage) {
-                history.pushState({page: newPage}, newPage);
-                this.enablePageSlide();
-                this.showPage(newPage);
-            }
+            this.followLink(e.target);
         }
     }
         
@@ -204,12 +209,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         var el = shadowRoot.querySelector("#swipe-pages");
         el.classList.add.apply(el.classList, this.classList);
         
-        var pages = new Pages(
+        this.pages = new Pages(
             shadowRoot.querySelector("#swipe-pages"),
             shadowRoot.querySelector("#swipe-arrow")
         );
-        pages.bindButtons(shadowRoot.querySelectorAll(".button"));
     };
+
+    SwipePagesProto.gotoPage = function(page) {
+        this.pages.gotoPage(page);
+    }
+
+    SwipePagesProto.bindElements = function(elements) {
+        this.pages.bindElements(elements);
+    }
+
+    SwipePagesProto.followLink = function(element) {
+        this.pages.followLink(element);
+    }
 
     document.registerElement('swipe-pages', {prototype: SwipePagesProto});
 

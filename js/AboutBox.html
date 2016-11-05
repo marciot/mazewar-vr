@@ -3,24 +3,23 @@ MazeWars VR
 Copyright (C) 2016 Marcio Teixeira
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
+modify it under the terms of the GNU Affero General Public License
+as published by the Free Software Foundation; either version 3
 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <template id="AboutBoxTemplate">
     <style>
         .darken {
             background:      rgba(0,0,0,0.8);
-            color:           white;
+            color:           lightGray;
         }
 
         /* Break up the screen into three stacked regions */
@@ -57,7 +56,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         /* A dynamically sized grid */
 
-        .flex-grid-six, .flex-grid-four {
+        .flex-grid {
             display:        -ms-flex;
             display:        -webkit-flex;
             display:        flex;
@@ -67,18 +66,32 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             flex-wrap:      wrap;
         }
 
+        .flex-grid > div {
+            padding:    10px;
+            box-sizing: border-box;
+            position:   relative;
+            flex-grow:  1;
+        }
+
         @media (orientation: landscape) {
-            .flex-grid-six > div {
+            .flex-grid > div {
                 width:  50%;
+            }
+
+            .flex-grid.six-element > div {
                 height: 33%;
             }
 
-            .flex-grid-four > div {
-                width:  50%;
+            .flex-grid.four-element > div {
                 height: 50%;
             }
 
-            .button {
+            .flex-grid.two-element > div {
+                height: 49%;
+                width:  100%;
+            }
+
+            .grid-button, .centered-button {
                 font-size:   7vh;
             }
 
@@ -88,30 +101,29 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
 
         @media (orientation: portrait) {
-            .flex-grid-six > div {
+            .flex-grid > div {
                 width:  100%;
+            }
+
+            .flex-grid.six-element > div {
                 height: 16%;
             }
 
-            .flex-grid-four > div {
-                width:  100%;
+            .flex-grid.four-element > div {
                 height: 24%;
             }
 
-            .button {
+            .flex-grid.two-element > div {
+                height: 49%;
+            }
+
+            .grid-button, .centered-button {
                 font-size:   7vw;
             }
 
             h1.title {
                 font-size: 10vw;
             }
-        }
-
-        .flex-grid-six > div, .flex-grid-four > div {
-            padding:    10px;
-            box-sizing: border-box;
-            position:   relative;
-            flex-grow:  1;
         }
 
         /* Distribute DIVs vertically */
@@ -136,7 +148,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         /* A button */
 
-        .button {
+        .grid-button {
             position:   absolute;
             top:        10px;
             bottom:     10px;
@@ -147,7 +159,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             padding:    3px;
         }
 
-        .center-text, .button {
+        .center-text, .grid-button {
             display:        -ms-flex;
             display:        -webkit-flex;
             display:        flex;
@@ -177,7 +189,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             padding: 1em;
         }
 
-        .button {
+        .clickable {
             font-weight: bold;
             color:       rgb(255,255,128);
             text-shadow: 5px 5px rgba(0,0,0,0.5);
@@ -185,7 +197,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             cursor:      pointer;
         }
 
-        .button:active, .button:hover {
+        .clickable:active, .clickable:hover {
             color:       rgb(255,255,192);
             text-shadow: 5px 5px rgba(255,255,128,0.25);
 
@@ -198,12 +210,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             text-align: center;
         }
 
+        h1, h2, h3, h4, h5, h6, strong {
+            color:       white;
+        }
+
         h1.title strong {
             color: yellow;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            color:       rgb(255,255,128);
             text-shadow: 5px 5px rgba(0,0,0,0.5);
         }
 
@@ -213,11 +228,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
 
         svg path {
-            fill: white;
+            fill: rgb(255,255,128);
         }
 
         svg:hover path {
-            fill: yellow;
+            fill: rgb(255,255,192);
         }
 
         DIV#mode-select P {
@@ -282,7 +297,66 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
 
         .swipe-arrow::before {
-            color: rgba(255,255,255,0.5)
+            color: rgba(255,255,128, 0.5);
+        }
+
+        /* Emulator page */
+
+        #pageAltoMazeWar {
+            padding:    0 0 !important;
+            background: black;
+        }
+
+        alto-emulator {
+            position:   absolute;
+            top:        0;
+            bottom:     0;
+            margin:     0 0;
+        }
+
+        alto-emulator canvas {
+            padding:    0 0;
+            margin:     0 auto;
+            max-height: 100%;
+            max-width:  100%;
+        }
+
+        .altoHelp {
+            display:        none;
+
+            background:     rgba(0,0,0,0.85);
+            text-align:     center;
+
+            position:       absolute;
+            bottom:         0;
+            left:           0;
+            right:          0;
+
+            padding:        5px;
+        }
+
+        /* Prevent font scaling in landscape while allowing user zoom
+            http://stackoverflow.com/questions/2710764/preserve-html-font-size-when-iphone-orientation-changes-from-portrait-to-landsca
+         */
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        @media (orientation: landscape) {
+            img.float {
+                float: right;
+                height: 25vw;
+                padding: 1em;
+            }
+        }
+
+        @media (orientation: portrait) {
+            img.float {
+                display: block;
+                height: 20vh;
+                padding: 0.5em;
+                margin: 0 auto;
+            }
         }
     </style>
     <div class="darken" id="overlay">
@@ -291,13 +365,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="header center-text">
                 <h1 class="title">Maze War <strong>VR</strong></h1>
             </div>
-            <div class="middle flex-grid-six">
-                <div><div class="button" data-page="pageAbout">About Mazewar</div></div>
-                <div><div class="button" id="playSolo">Play Solo</div></div>
-                <div><div class="button" data-page="pageNetPlay">Network Play</div></div>
-                <div><div class="button" data-page="pageOptions">Game Options</div></div>
-                <div><div class="button" data-page="pageCredits">Credits</div></div>
-                <div><div class="button" data-page="pageHeadsets">Recommended VR Headsets</div></div>
+            <div class="middle flex-grid six-element">
+                <div><div class="clickable grid-button" data-page="pageAbout">History &amp; Help</div></div>
+                <div><div class="clickable grid-button" id="playSolo">Play Solo</div></div>
+                <div><div class="clickable grid-button" data-page="pageNetPlay">Play with Friends</div></div>
+                <div><div class="clickable grid-button" data-page="pageOptions">VR Options</div></div>
+                <div><div class="clickable grid-button" data-page="pageCredits">Credits</div></div>
+                <div><div class="clickable grid-button" data-page="pageHeadsets">Recommended Headsets</div></div>
             </div>
             <div class="footer">
             </div>
@@ -305,13 +379,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         <div class="flex-layout" id="pageNetPlay">
             <div class="header center-text">
-                <h1 class="title">Network Play</h1>
+                <h1 class="title">Play with Friends</h1>
             </div>
-            <div class="middle flex-grid-four">
-                <div><div class="button" id="startNetworkGame">Start New Game</div></div>
-                <div><div class="button" id="joinExistingGame">Join Existing Game</div></div>
-                <div><div class="button" id="inviteFriends">Invite Friends</div></div>
-                <div><div class="button" id="customizeAvatar">Customize Avatar</div></div>
+            <div class="middle flex-grid two-element">
+                <div><div class="clickable grid-button" id="inviteFriends">Invite Friends</div></div>
+                <div><div class="clickable grid-button" id="startNetworkGame">Start Game</div></div>
             </div>
             <div class="footer">
             </div>
@@ -319,32 +391,82 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
         <div class="flex-distribute" id="pageAbout">
             <div>
-                <h1>About Maze War</h1>
+                <h1>History of Maze War</h1>
                 <p>
-                <cite>Maze War VR</cite> is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California. The game allowed players to hunt down opponents in a three-dimensional maze, making it the very first first person shooter game.
+                <cite>Maze War VR</cite> is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California. Players would hunt down opponents in a three-dimensional maze, making it the grandfather of first person shooter games.
+                By 1977, the game was taken to MIT, where it was played on the early computer networks of the time.
                 </p>
-                <p>
-                <cite>Maze War VR</cite> recreates the game in virtual reality using modern web technologies.
-                </p>
-            </div>
-            <div>
                 <h1>How to Play</h1>
-                Hold the trigger (or mouse button) to move through the maze. Press and release the trigger quickly to shoot. Beware, if you miss your target, your bullets will ricochet off the far wall and may kill you!
+                <p>
+                    This remake can be played either using a VR headset or without. Select "Display Options" to choose the VR mode.
+                </p>
+                <p>
+                <strong>Headset Controls:</strong> Hold down the trigger on your headset to move in the direction you are facing; press and release
+                the trigger rapidly to shoot.
+                </p>
+                <p>
+                <strong>Smartphone or Tablet Controls:</strong>
+                Move the device to look around, hold your finger anywhere on the screen to move in the direction you are facing; tap to shoot.
+                </p>
+                <strong>Desktop Controls:</strong>
+                Move the mouse to look around, hold down the mouse button to move in the direction you are facing; click rapidly to shoot.
+                </p>
             </div>
         </div>
 
         <div class="flex-distribute" id="pageCredits">
             <div>
                 <h1>Credits</h1>
-                This program includes code from <a href="https://threejs.org/">THREE.js</a>, <a href="http://webcomponents.org">Webcomponents.org</a> and <a href="https://github.com/chenglou/tween-functions">Tween-Functions</a>. Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
+                <p>
+                This game may include source code from:
+                <ul>
+                <li><a href="https://threejs.org/">THREE.js</a>
+                <li><a href="http://webcomponents.org">Webcomponents.org</a>
+                <li><a href="https://github.com/chenglou/tween-functions">Tween-Functions</a>
+                <li><a href="http://peerjs.com">Peerjs.com</a>
+                <li><a href="http://www.yorgsite.fr/experiments/YConsole/">YConsole</a>
+                <li><a href="https://github.com/eface2face/cordova-plugin-iosrtc">cordova-plugin-iosrtc</a>
+                </ul>
+                Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageInspiration">Next</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageInspiration">
+            <div>
+                <h1>The Inspiration:</h1>
+                <img src="artwork/mazewar-alto.png" class="float">
+                <p>
+                This remake was inspired by the Xerox Alto version of Maze War which was developed in 1977 at MIT and was itself a remake
+                of the 1974 version developed at NASA.
+                </p>
+                <p>
+                A playable demo of the original is made possible by:
+                <ul>
+                <li><a href="https://github.com/livingcomputermuseum/ContrAlto">Contralto</a> from <a href="http://www.livingcomputers.org">Living
+                Computers: Museum + Labs</a>
+                <li><a href="http://www.loomcom.com/contraltojs/">ContraltoJS</a> from <a href="http://www.loomcom.com">loomcom.com</a>
+                <li>The Xerox Alto preservation efforts of <a href="http://bitsavers.org">Bitsavers.org</a>
+                </ul>
+                </p>
+            </div>
+            <div>
+                <center>
+                <div id="altoLink" class="clickable centered-button" data-page="pageAltoMazeWar">Play the Alto Version!</div>
+                </center>
             </div>
         </div>
 
         <div class="flex-distribute" id="pageOptions">
             <div>
-                <h1>Select your experience:</h1>
+                <h1>Select your VR Experience:</h1>
                 <p>
-                The best way to play <cite>Maze War VR</cite> is using a modern smartphone and a VR headset. However, you may also play on a PC&mdash;either in 3D using red/cyan glasses or in 2D without.
+                The best way to play <cite>Maze War VR</cite> is using a modern smartphone and a VR headset. However, you may also play on a PC, tablet or smartphone without a headset&mdash;either in 3D using red/cyan glasses or in 2D without.
                 </p>
                 <div id="mode-select">
                     <p>
@@ -362,7 +484,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <div class="flex-distribute" id="pageHeadsets">
             <div>
                 <h1>Recommended VR Headset</h1>
-                I recommend the <cite>Mattel ViewMaster VR</cite> for the best <cite>Maze War VR</cite> experience. The Mattel headset is affordable and has a responsive trigger that works great with <cite>Maze War VR</cite>.
+                I recommend the <cite>Mattel ViewMaster VR</cite> for the best <cite>Maze War VR</cite> experience. It is inexpensive, works with most phones and has a responsive trigger that works great with <cite>Maze War VR</cite>.
 
                 <div class="side-by-side">
                     <img src="artwork/viewmaster.png">
@@ -386,6 +508,53 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 The first generation Google Cardboard with a magnetic switch will not work, as <cite>Maze War VR</cite> requires a mechanical touch switch.
             </div>
         </div>
+
+        <div id="pageAltoMazeWar">
+            <alto-emulator>
+            </alto-emulator>
+            <div class="altoHelp" id="altoHelp1">
+                Starting up.
+            </div>
+            <div class="altoHelp" id="altoHelp2">
+                Keep waiting. I'll say when.
+            </div>
+            <div class="altoHelp" id="altoHelp3">
+                Type "mazewar"
+            </div>
+            <div class="altoHelp" id="altoHelp4">
+                ...followed by ENTER
+            </div>
+            <div class="altoHelp" id="altoHelp5">
+                You're on your own now.
+            </div>
+            <div class="altoHelp" id="altoHelp6">
+                Leave the duke host blank.
+            </div>
+            <div class="altoHelp" id="altoHelp7">
+                Something's happening...
+            </div>
+            <div class="altoHelp" id="altoHelp8">
+                Searching for network players.
+            </div>
+            <div class="altoHelp" id="altoHelp9">
+                This takes a while.
+            </div>
+            <div class="altoHelp" id="altoHelp10">
+                A bloody long while.
+            </div>
+            <div class="altoHelp" id="altoHelp11">
+                Type D to move forwards.
+            </div>
+            <div class="altoHelp" id="altoHelp12">
+                Type S or F to turn left or right.
+            </div>
+            <div class="altoHelp" id="altoHelp13">
+                Type A to do an about face.
+            </div>
+            <div class="altoHelp" id="altoHelp14">
+                Click the mouse to shoot an opponent.
+            </div>
+        <div>
     </swipe-pages>
     </div>
 </template>
@@ -402,7 +571,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         shadowRoot.appendChild(clone);
 
         function selectExperience(mode) {
-            this.dispatchCallback("gfxModeSelected");
+            this.dispatchCallback("gfxModeSelected", mode);
+            swipePages.gotoPage("page1");
         }
 
         shadowRoot.querySelector("#headset").addEventListener("click", selectExperience.bind(this, "headset"));
@@ -421,11 +591,126 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }
         shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
 
+        var swipePages    = shadowRoot.querySelector("swipe-pages");
+        var emulator      = shadowRoot.querySelector("alto-emulator");
+        var altoStartHelp = shadowRoot.querySelector("#altoStartHelp");
+        var altoKeyHelp   = shadowRoot.querySelector("#altoKeyHelp");
+
+        swipePages.bindElements(shadowRoot.querySelectorAll(".page-link"));
+        swipePages.bindElements(shadowRoot.querySelectorAll(".grid-button"));
+
+        shadowRoot.querySelector("#altoLink").addEventListener("click",
+            function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                swipePages.followLink(e.target);
+                emulator.startEmulator();
+                altoHelper.start();
+            }
+        );
+
+        var altoHelper = new function() {
+            var enterPressed    = 0;
+            var gameKeysPressed = 0;
+            var currentState    = 0;
+            var currentTip      = 0;
+
+            var stateTransitions = [
+                {packetCount: 0,  enterCount: 0, gameKeyCount: 0},
+                {packetCount: 3,  enterCount: 0, gameKeyCount: 0},
+                {packetCount: 6,  enterCount: 0, gameKeyCount: 0},
+                {packetCount: 6,  enterCount: 0, gameKeyCount: 1},
+                {packetCount: 6,  enterCount: 1, gameKeyCount: 0},
+                {packetCount: 6,  enterCount: 2, gameKeyCount: 0},
+                {packetCount: 6,  enterCount: 3, gameKeyCount: 0},
+                {packetCount: 6,  enterCount: 3, gameKeyCount: 0, delay: 3000},
+                {packetCount: 10, enterCount: 3, gameKeyCount: 0},
+                {packetCount: 17, enterCount: 3, gameKeyCount: 0},
+                {packetCount: 17, enterCount: 3, gameKeyCount: 0, delay: 22000},
+                {packetCount: 17, enterCount: 3, gameKeyCount: 1, delay: 3000},
+                {packetCount: 17, enterCount: 3, gameKeyCount: 1, delay: 3000},
+                {packetCount: 17, enterCount: 3, gameKeyCount: 1, delay: 3000},
+                {packetCount: 17, enterCount: 3, gameKeyCount: 1, delay: 3000}
+            ];
+
+            this.checkState = function() {
+                if(currentState === stateTransitions.length) {
+                    clearInterval(this.timer);
+                    return;
+                }
+                var state = stateTransitions[currentState];
+                if((ethernetController.packetsSent >= state.packetCount) &&
+                   (enterPressed                  >= state.enterCount)  &&
+                   (gameKeysPressed               >= state.gameKeyCount))
+                {
+                    currentState++;
+                    gameKeysPressed = 0;
+                    showTip(currentState, state.delay);
+                }
+            }
+
+            function showTip(which, delayBefore) {
+                if(delayBefore) {
+                    setTimeout(showTip, delayBefore, which);
+                    return;
+                }
+                var cur = shadowRoot.querySelector("#altoHelp" + currentTip);
+                var next = shadowRoot.querySelector("#altoHelp" + which);
+                if(cur) {
+                    cur.style.display = "none";
+                }
+                if(next) {
+                    next.style.display = "block";
+                    currentTip = which;
+                }
+            }
+
+            this.keyHandler = function(event) {
+                switch (event.key) {
+                    case "Enter":
+                        enterPressed++;
+                        break;
+                    case "a":
+                    case "s":
+                    case "d":
+                    case "f":
+                    case "g":
+                        gameKeysPressed++;
+                }
+                this.checkState();
+            };
+
+            this.start = function() {
+                this.timer = setInterval(this.checkState.bind(this), 1000);
+            };
+        }
+
         this.eventListeners = {
             gfxModeSelected:  [],
             startSoloGame:    [],
             startNetworkGame: []
         };
+
+        var altoDisplay = shadowRoot.querySelector("#altoDisplay");
+        var altoInput = shadowRoot.querySelector("#altoTextArea");
+        if(altoDisplay) {
+            altoDisplay.addEventListener("keydown", altoHelper.keyHandler.bind(altoHelper));
+            altoDisplay.addEventListener("click",   altoInput.focus.bind(altoInput));
+        }
+
+        // Facebook share
+        function shareInviteOnFacebook(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if(typeof FB !== "undefined") {
+                FB.ui({
+                    method: 'share',
+                    mobile_iframe: true,
+                    href: 'http://www.marciot.com/mazewar-vr',
+                }, function(response){});
+            }
+        }
+        shadowRoot.querySelector("#inviteFriends").addEventListener("click", shareInviteOnFacebook);
     };
 
     AboutBoxProto.addCallback = function(eventStr, callback) {

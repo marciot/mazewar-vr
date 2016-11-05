@@ -1,7 +1,20 @@
-window.onerror = function(error) {
-    document.write(error);
-    //style.remove();
-};
+/*
+MazeWars VR
+Copyright (C) 2016 Marcio Teixeira
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 var camera, scene, renderer, effect
 var container, maze;
@@ -206,9 +219,6 @@ class MazeWalls extends Maze {
     }
 }
 
-init();
-animate();
-
 function addSkydome(scene, renderer) {
     /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
     
@@ -311,6 +321,7 @@ function init() {
         game.startGame(hostId, name, function(state) {console.log(state);});
     }
 
+    // WebComponents initialization
     function webComponentsReady() {
         var about = document.querySelector("about-box");
         if(about) {
@@ -320,6 +331,25 @@ function init() {
     }
 
     window.addEventListener('WebComponentsReady', webComponentsReady);
+
+    // Cordova initialization
+    window.isCordova    = (! /^http/.test(location.protocol));
+    window.isCordovaIOS = (window.device && window.device.platform === 'iOS');
+
+    function onDeviceReady() {
+        if (window.isCordovaIOS) {
+            cordova.plugins.iosrtc.registerGlobals();
+        }
+        if(peerJsInit) {
+            peerJsInit();
+        }
+    }
+
+    if(window.isCordova) {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    } else {
+        onDeviceReady();
+    }
 }
 
 function resize() {
@@ -371,3 +401,6 @@ function fullscreen() {
         container.webkitRequestFullscreen();
     }
 }
+
+init();
+animate();

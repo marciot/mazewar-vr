@@ -4,18 +4,17 @@ MazeWars VR
 Copyright (C) 2016 Marcio Teixeira
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
+modify it under the terms of the GNU Affero General Public License
+as published by the Free Software Foundation; either version 3
 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <html lang="en">
     <head>
@@ -32,7 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <meta property="og:url"                content="http://www.marciot.com/mazewar-vr" />
         <meta property="og:type"               content="article" />
         <meta property="og:title"              content="Maze War VR" />
-        <meta property="og:description"        content="Maze War VR is a virtual-reality remake of the very first first person shooter game (from 1974)." />
+        <meta property="og:description"        content="Hide, seek and destroy in this virtual reality remake of a 1974 chase game from NASA." />
         <meta property="og:image"              content="artwork/fb-share.jpg" />
         <meta property="og:image:width"        content="1200" />
         <meta property="og:image:height"       content="630" />
@@ -50,22 +49,62 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 right:    0;
                 bottom:   0;
             }
+
+            * {
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+                -webkit-touch-callout: none;
+                -moz-touch-callout: none;
+                -ms-touch-callout: none;
+                touch-callout: none;
+            }
         </style>
+
+        <!-- We use YConsole to help debugging on mobile devices -->
+        <script type="text/javascript" src="js/third-party/yconsole-compiled.js"></script>
+        <!--<script type="text/javascript">
+            window.onerror = function(error) {
+                YConsole.show();
+            };
+            YConsole.activate();
+            YConsole.docking="bottom";
+        </script>-->
+    </head>
+
+    <body>
+        <div id="container"></div>
+        <about-box></about-box>
+
+        <!-- Cordova CSP Configuration:
+             Note: This normally goes in the head, but when running under PhoneGap App, the meta tag in head
+             appears to get overwritten. Placing it here seems to be a workaround.
+        -->
+        <!--
+        <meta http-equiv="Content-Security-Policy" content="default-src * gap://ready file:; script-src 'unsafe-inline' 'unsafe-eval' * data: file:; style-src 'self' 'unsafe-inline'; connect-src *">
+        <script type="text/javascript" src="cordova.js"></script>
+        -->
 
         <!-- For some reason using the full webcomponents library breaks WebGL on iOS -->
         <script type="text/javascript" src="js/third-party/webcomponents/webcomponents-lite.min.js"></script>
+
+        <link rel="import" href="js/SwipePages.html"></link>
+        <link rel="import" href="js/AboutBox.html"></link>
+
+        <!-- Note: Something in here conflicts with ioswebrtc, disable when compiling for iOS -->
+        <link rel="import" href="extras/contralto-js/alto-emulator.html"></link>
+
+        <!-- Library Code -->
         <script type="text/javascript" src="js/third-party/tween-functions.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/three.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/StereoEffect.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/AnaglyphEffect.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/DeviceOrientationControls.js"></script>
-    </head>
-    <body>
-        <link rel="import" href="js/SwipePages.html"></link>
-        <link rel="import" href="js/AboutBox.html"></link>
 
-        <div id="container"></div>
-        <about-box></about-box>
+        <!-- Networking Code -->
+        <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
+        <script type="text/javascript" src="js/networking/frame-utilities.js"></script>
+        <script type="text/javascript" src="js/networking/pup-services.js"></script>
+        <script type="text/javascript" src="js/networking/pup-services-mazewar.js"></script>
+        <script type="text/javascript" src="js/networking/retroweb-network.js"></script>
 
         <!-- Shader programs for skydome -->
         <script type="application/x-glsl" id="sky-vertex">  
@@ -98,11 +137,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <script type="text/javascript" src="js/GameMaster.js"></script>
         <script type="text/javascript" src="js/Main.js"></script>
 
-        <!-- Networking Code -->
-        <script type="text/javascript" src="js/third-party/peerjs/peer.min.js"></script>
-        <script type="text/javascript" src="js/networking/frame-utilities.js"></script>
-        <script type="text/javascript" src="js/networking/pup-services.js"></script>
-        <script type="text/javascript" src="js/networking/pup-services-mazewar.js"></script>
-        <script type="text/javascript" src="js/networking/retroweb-network.js"></script>
+        <!--
+            I host SDK keys in a separate web server so they don't end up on GitHub.
+            If you forked this project, you should generate your own API keys.
+        -->
+        <script crossorigin="anonymous" type="text/javascript" src="http://marciot.freeshell.org/sdk-keys/sdk-keys-mazewar-vr.js"></script>
+        <script>
+            if(typeof fbAsyncInit === "undefined" || typeof RetroWeb.peerJSConfig === "undefined") {
+                alert("For full functionality, provide your own API keys for Facebook and Peer.js");
+            }
+        </script>
     </body>
 </html>

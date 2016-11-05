@@ -18,10 +18,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 (function(namespace){
-    /* The following API should only be used for RetroWeb network traffic.
-       If you want a PeerJS key for an unrelated project, please get your
-       own free PeerJS Cloud API key from http://peerjs.com! */
-    namespace.peerJSConfig = {key: 'u7htss9n8pz257b9'}
+    /* Please get your free PeerJS Cloud API key from http://peerjs.com and
+       uncomment the following:
+
+       namespace.peerJSConfig = {key: 'your-api-key'}
+    */
 
     namespace.PeerNetwork = class {
         constructor(peerOptions, networkDataCallback, stateChangedCallback) {
@@ -95,7 +96,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 me._info("retroweb-network: I am member of the network. My id is", me.myPeerId);
             }
             this._info("retroweb-network: Trying to connect to master", this.masterId);
-            this._processConnection(connectedToMaster, this.peer.connect(this.masterId));
+            try {
+                this._processConnection(connectedToMaster, this.peer.connect(this.masterId));
+            } catch(e) {
+                // Under iOS, peer.connect throws an exception after errorFunc fires, so
+                // this allows us to recover.
+            }
 
             // Handle subsequent connections from new peers
             function connectionOpenFunc() {
