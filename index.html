@@ -89,9 +89,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <link rel="import" href="js/SwipePages.html"></link>
         <link rel="import" href="js/AboutBox.html"></link>
 
-        <!-- Note: Something in here conflicts with ioswebrtc, disable when compiling for iOS -->
-        <link rel="import" href="extras/contralto-js/alto-emulator.html"></link>
-
         <!-- Library Code -->
         <script type="text/javascript" src="js/third-party/tween-functions.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/three.js"></script>
@@ -100,8 +97,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/third-party/threejs/DeviceOrientationControls.js"></script>
 
         <!-- Networking Code -->
-        <script type="text/javascript" src="js/networking/cordova-setup.js"></script>
         <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
+        <script type="text/javascript" src="js/networking/cordova-setup.js"></script>
         <script type="text/javascript" src="js/networking/frame-utilities.js"></script>
         <script type="text/javascript" src="js/networking/pup-services.js"></script>
         <script type="text/javascript" src="js/networking/pup-services-mazewar.js"></script>
@@ -137,6 +134,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/WebGLActors.js"></script>
         <script type="text/javascript" src="js/GameMaster.js"></script>
         <script type="text/javascript" src="js/Main.js"></script>
+
+        <!-- Note: Something in here conflicts with ioswebrtc, disable when compiling for iOS -->
+        <link rel="import" href="extras/contralto-js/alto-emulator.html"></link>
 
         <!--
             I host SDK keys in a separate web server so they don't end up on GitHub.

@@ -1,0 +1,88 @@
+<template id="ContraltoJSTemplate">
+    <style>
+        canvas {
+            background: #000;
+            display:    block;
+            cursor:     none;
+        }
+        
+        #altoTextArea {
+            position:   absolute;
+            top:        0;
+            width:      0px;
+            height:     0px;
+            opacity:    0;
+        }
+    </style>
+    <canvas id="altoDisplay" width="608" height="808"></canvas>
+    <textarea id="altoTextArea" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </textarea>
+</template>
+
+<script src="js/config.js"></script>
+<script src="js/scheduler.js"></script>
+<script src="js/shifter.js"></script>
+<script src="js/rom.js"></script>
+<script src="js/memory.js"></script>
+<script src="js/memory_bus.js"></script>
+<script src="js/tasks/task.js"></script>
+<script src="js/tasks/emulator_task.js"></script>
+<script src="js/tasks/disk_task.js"></script>
+<script src="js/io/diablo_pack.js"></script>
+<script src="js/io/diablo_drive.js"></script>
+<script src="js/io/disk_controller.js"></script>
+<script src="js/io/alto_display.js"></script>
+<script src="js/io/display_controller.js"></script>
+<script src="js/io/ethernet_controller_abridged.js"></script>
+<script src="js/io/mouse.js"></script>
+<script src="js/io/keyboard.js"></script>
+<script src="js/io/music_interface.js"></script>
+<script src="js/cpu.js"></script>
+<script src="js/system.js"></script>
+<script src="js/debugger/debugger.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+(function (thisDoc) {
+    var ContraltoJSProto = Object.create(HTMLElement.prototype);
+
+    ContraltoJSProto.createdCallback = function() {
+        var t = thisDoc.getElementById('ContraltoJSTemplate');
+        var clone = document.importNode(t.content, true);
+        //var shadowRoot = this.createShadowRoot();
+        var shadowRoot = this;
+        shadowRoot.appendChild(clone);
+        
+        this._shadowRoot = shadowRoot;
+    };
+
+    ContraltoJSProto.startEmulator = function() {
+        const ETHERNET_ADDR_MIN       = 0x01;
+        const ETHERNET_ADDR_MAX       = 0xFF;
+
+        const hostId = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
+
+        function connectionStateChangedCallback(state) {
+        }
+        
+        /* Set the interface to the address and prevent further changes */
+        ethernetController.setHostAddress(hostId);
+        ethernetController.joinPeerToPeerNetwork(connectionStateChangedCallback);
+        
+        this.system = initAlto(
+            this._shadowRoot.querySelector("#altoDisplay"),
+            this._shadowRoot.querySelector("#altoTextArea")
+        );
+        
+        function onDiskLoaded() {
+            setTimeout(startRunning, 1000);
+        }
+        
+        //const diskName = "allgames.dsk";
+        //this.system.loadPack("http://www.loomcom.com/jsalto/images/" + diskName, onDiskLoaded);
+        this.system.loadPack("extras/allgames.dsk", onDiskLoaded);
+    }
+
+    var ContraltoJS = document.registerElement('alto-emulator', {prototype: ContraltoJSProto});
+})((document._currentScript || document.currentScript).ownerDocument);
+</script>

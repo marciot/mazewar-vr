@@ -311,7 +311,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             position:   absolute;
             top:        0;
             bottom:     0;
-            margin:     0 0;
+            left:       0;
+            right:      0;
         }
 
         alto-emulator canvas {
@@ -324,15 +325,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         .altoHelp {
             display:        none;
 
-            background:     rgba(0,0,0,0.85);
+            background:     lightGray;
             text-align:     center;
+            border-radius:  5px;
 
             position:       absolute;
-            bottom:         0;
-            left:           0;
-            right:          0;
+            top:            0.5em;
+            right:          0.5em;
 
-            padding:        5px;
+            padding:        0.25em 0.5em;
+            color:          black;
+        }
+
+        /* Speech bubbles: http://nicolasgallagher.com/pure-css-speech-bubbles/ */
+        .altoHelp:after {
+            content: "";
+            display: block; /* reduce the damage in FF3.0 */
+            position: absolute;
+            bottom: -19px;
+            left: 10px;
+            width: 0;
+            border-width: 20px 0 0 10px;
+            border-style: solid;
+            border-color: lightGray transparent;
+        }
+
+        .altoHelp.hidden {
+            visibility: hidden;
         }
 
         /* Prevent font scaling in landscape while allowing user zoom
@@ -446,12 +465,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 of the 1974 version developed at NASA.
                 </p>
                 <p>
-                A playable demo of the original is made possible by:
+                This playable demo is made possible by:
                 <ul>
                 <li><a href="https://github.com/livingcomputermuseum/ContrAlto">Contralto</a> from <a href="http://www.livingcomputers.org">Living
                 Computers: Museum + Labs</a>
                 <li><a href="http://www.loomcom.com/contraltojs/">ContraltoJS</a> from <a href="http://www.loomcom.com">loomcom.com</a>
-                <li>The Xerox Alto preservation efforts of <a href="http://bitsavers.org">Bitsavers.org</a>
+                <li>The preservation efforts of <a href="http://bitsavers.org">Bitsavers.org</a>
                 </ul>
                 </p>
             </div>
@@ -524,8 +543,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div class="altoHelp" id="altoHelp4">
                 ...followed by ENTER
             </div>
-            <div class="altoHelp" id="altoHelp5">
-                You're on your own now.
+            <div class="altoHelp hidden" id="altoHelp5">
             </div>
             <div class="altoHelp" id="altoHelp6">
                 Leave the duke host blank.
@@ -640,8 +658,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 }
                 var state = stateTransitions[currentState];
                 if((ethernetController.packetsSent >= state.packetCount) &&
-                   (enterPressed                  >= state.enterCount)  &&
-                   (gameKeysPressed               >= state.gameKeyCount))
+                   (enterPressed                   >= state.enterCount)  &&
+                   (gameKeysPressed                >= state.gameKeyCount))
                 {
                     currentState++;
                     gameKeysPressed = 0;
@@ -666,6 +684,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
 
             this.keyHandler = function(event) {
+                console.log("Key handler", event);
                 switch (event.key) {
                     case "Enter":
                         enterPressed++;
@@ -676,11 +695,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     case "f":
                     case "g":
                         gameKeysPressed++;
+                        break;
                 }
                 this.checkState();
             };
 
             this.start = function() {
+                var altoDisplay = shadowRoot.querySelector("#altoDisplay");
+                var altoInput   = shadowRoot.querySelector("#altoTextArea");
+                if(altoDisplay) {
+                    altoInput.addEventListener("keydown", altoHelper.keyHandler.bind(altoHelper));
+                    altoDisplay.addEventListener("click",   altoInput.focus.bind(altoInput));
+                } else {
+                    console.log("cannot find alto display");
+                }
+
                 this.timer = setInterval(this.checkState.bind(this), 1000);
             };
         }
@@ -690,13 +719,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             startSoloGame:    [],
             startNetworkGame: []
         };
-
-        var altoDisplay = shadowRoot.querySelector("#altoDisplay");
-        var altoInput = shadowRoot.querySelector("#altoTextArea");
-        if(altoDisplay) {
-            altoDisplay.addEventListener("keydown", altoHelper.keyHandler.bind(altoHelper));
-            altoDisplay.addEventListener("click",   altoInput.focus.bind(altoInput));
-        }
 
         // Facebook share
         function shareInviteOnFacebook(e) {
