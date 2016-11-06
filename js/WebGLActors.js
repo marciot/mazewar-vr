@@ -130,6 +130,11 @@ class AnimatedRepresentation extends VisibleRepresentation {
         this.animationFinishedCallback = null;
     }
     
+    dispose() {
+        super.dispose();
+        this.animationFinishedCallback = null;
+    }
+
     walkTo(x, z, direction) {
         var u = Directions.toUnitVector(direction);
         this.doAnimation(u.multiplyScalar(MazeWalls.cellDimension));
@@ -241,10 +246,11 @@ class EyeRepresentation extends AnimatedRepresentation {
     }
 
     dispose() {
+        super.dispose();
         this.object.geometry.dispose();
     }
-    
-    wasShot(respawnCallback) {
+
+    shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(1);
         this.respawnCallback = respawnCallback;
@@ -280,6 +286,7 @@ class MissileRepresentation extends AnimatedRepresentation {
     }
 
     dispose() {
+        super.dispose();
         this.object.geometry.dispose();
     }
 
@@ -332,6 +339,7 @@ class MapRepresentation extends VisibleRepresentation {
     }
 
     dispose() {
+        super.dispose();
         this.object.children[0].geometry.dispose();
         this.mapTexture.dispose();
         this.mapMaterial.dispose();
@@ -392,6 +400,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     }
 
     dispose() {
+        super.dispose();
         this.map.dispose();
     }
 
@@ -425,7 +434,7 @@ class SelfRepresentation extends AnimatedRepresentation {
         }
     }
 
-    wasShot(respawnCallback) {
+    shotDead(byWhom, respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(2);
         headsetDirector.lockControls();

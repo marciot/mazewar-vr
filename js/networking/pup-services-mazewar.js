@@ -225,7 +225,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             this.eventListeners = {
                 newGame:    [],
-                ratUpdate:  []
+                ratUpdate:  [],
+                ratKill:    [],
+                ratDead:    []
             };
 
             this.SocketVersion20          = 0x4d415a45;
@@ -244,6 +246,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.MazeWarRatStatusSize     = 242;
             this.MazeWarRatNewSize        = 30;
             this.MazeWarRatLocationSize   = 6;
+            this.MazeWarRatKillSize       = 4;
+            this.MazeWarRatDeadSize       = 2;
             this.MazeWarRatQueryReplySize = 2;
 
             this.state = ParticipantState.waitingForNetwork;
@@ -264,7 +268,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 yLoc:       1,
                 dir:        0
             };
-            this.ratDead     = {};
+            this.ratDead     = {
+                ratId:      0,
+                killedBy:   0
+            };
             this.ratNew      = {
                 pass:       this.MazeWarPassword,
                 addr:       0,
@@ -341,11 +348,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     break;
                 case this.MazeWarRatKill:
                     PupMazeWarPackets.decodeRatKill(requestObj.reader, this.ratKill);
-                    console.log("Rat kill:", this.ratKill);
+                    this.updateRatKill();
                     break;
                 case this.MazeWarRatDead:
                     PupMazeWarPackets.decodeRatDead(requestObj.reader, this.ratDead);
-                    console.log("Rat dead:", this.ratDead);
+                    this.updateRatDead();
                     break;
                 case this.MazeWarRatStatus:
                     console.log("Receiving mazewar status");
@@ -590,6 +597,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
 
+        updateRatKill() {
+            var ratId = this.ratKill.ratId;
+            var rat   = this.ratStatus.rats[ratId];
+            this.dispatchEvent("ratKill", ratId, rat);
+        }
+
+        updateRatDead() {
+            var ratId     = this.ratDead.ratId;
+            var killedBy  = this.ratDead.killedBy;
+            this.dispatchEvent("ratDead", ratId, killedBy);
+        }
+
         // Methods to send state updates
 
         setRatPosition(ratId, xLoc, yLoc) {
@@ -605,6 +624,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.sendRatLocation(ratId);
         }
 
+        ratShoots(ratId) {
+            var rat = this.ratStatus.rats[ratId];
+            this.sendRatKill(ratId);
+        }
+
+        ratKilled(ratId, killedBy) {
+            var rat = this.ratStatus.rats[ratId];
+            this.sendRatDead(ratId, killedBy);
+        }
+
         sendRatLocation(ratId) {
             var rat = this.ratStatus.rats[ratId];
             this.ratLocation.ratId = ratId;
@@ -615,6 +644,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             var frameWriter = this.newMazeWarFrame(this.MazeWarRatLocation, this.MazeWarRatLocationSize);
             PupMazeWarPackets.encodeRatLocation(frameWriter, this.ratLocation);
+            this.multicastFrame(frameWriter.frame, this.multicastAddresses);
+        }
+
+        sendRatKill(ratId) {
+            var rat = this.ratStatus.rats[ratId];
+            this.ratKill.ratId = ratId;
+            this.ratKill.xLoc  = rat.xLoc;
+            this.ratKill.yLoc  = rat.yLoc;
+            this.ratKill.dir   = rat.dir;
+
+            var frameWriter = this.newMazeWarFrame(this.MazeWarRatKill, this.MazeWarRatKillSize);
+            PupMazeWarPackets.encodeRatKill(frameWriter, this.ratKill);
+            this.multicastFrame(frameWriter.frame, this.multicastAddresses);
+        }
+
+        sendRatDead(ratId, killedBy) {
+            this.ratDead.ratId    = ratId;
+            this.ratDead.killedBy = killedBy;
+
+            var frameWriter = this.newMazeWarFrame(this.MazeWarRatDead, this.MazeWarRatDeadSize);
+            PupMazeWarPackets.encodeRatDead(frameWriter, this.ratDead);
             this.multicastFrame(frameWriter.frame, this.multicastAddresses);
         }
 

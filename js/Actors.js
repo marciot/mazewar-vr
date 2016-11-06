@@ -33,9 +33,11 @@ class Actors {
             this.actors.splice(index, 1);
         }
         actor.representation.dispose();
+        actor.dispose();
     }
 
     removeAll() {
+        console.log("Removing all actors");
         while(this.actors.length) {
             this.remove(this.actors[this.actors.length-1]);
         }
@@ -67,6 +69,12 @@ class Actor {
         this.representation = representation;
 
         this.addObserver(representation);
+    }
+
+    dispose() {
+        this.notifyObservers("dispose");
+        this.observers.length = 0;
+        this.representation = null;
     }
 
     addObserver(observer) {
@@ -157,11 +165,12 @@ class Actor {
 };
 
 class MissileActor extends Actor {
-    constructor(representation, fromPlayer) {
+    constructor(representation, fromPlayer, data) {
         super(representation)
         this.x      = fromPlayer.x;
         this.z      = fromPlayer.z;
         this.facing = fromPlayer.representation.cardinalDirection;
+        this.data   = data;
 
         this.ricochet = true;
 
@@ -169,6 +178,12 @@ class MissileActor extends Actor {
         this.orientTowards(this.facing);
 
         representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
+    }
+
+    destroy() {
+        this.notifyObservers("destroy");
+        actors.remove(this);
+        this.data = null;
     }
 
     animationFinished() {
@@ -186,47 +201,58 @@ class MissileActor extends Actor {
         }
 
         var hit = actors.isOccupied(this.x, this.z, this);
-        if(hit && hit.wasShot) {
-            hit.wasShot();
+        if(hit && hit.wasHit) {
+            hit.wasHit(this.data);
             this.destroy();
         }
     }
 
-    wasShot() {
+    wasHit() {
         this.destroy();
-    }
-
-    destroy() {
-        this.notifyObservers("destroy");
-        actors.remove(this);
     }
 }
 
 class Player extends Actor {
     constructor(representation) {
         super(representation);
-        this.isDead   = false;
-        this.myName   = "no name";
+        this.isDead      = false;
+        this.myName      = "no name";
+        this.localPlayer = false;
     }
 
     shoot() {
         this.notifyObservers("shoot");
 
+        var facing = this.representation.cardinalDirection;
         var missileRep = this.representation.getMissileRepresentation();
-        var missile = new MissileActor(missileRep, this);
+        var missile = new MissileActor(missileRep, this, {shotBy: this});
         missile.startAnimation();
         return actors.add(missile);
     }
 
-    wasShot() {
+    wasHit(data) {
+        this.notifyObservers("wasHit", data.shotBy);
+        if(this.localPlayer) {
+            // When localPlayer is true, the player will shotDead when
+            // it is hit. Remote players are shot only upon receipt of
+            // a ratDead packet.
+            this.shotDead(data.shotBy);
+        }
+    }
+
+    shotDead(killedBy) {
         this.isDead = true;
-        this.notifyObservers("wasShot", () => {this.respawn()});
+        this.notifyObservers("shotDead", () => {this.respawn()});
     }
 
     respawn() {
+        if(this.localPlayer) {
+            // Only the local player has the responsibility of
+            // choosing a new position when respawning
+            this.setPosition(maze.getRandomPosition());
+            this.orientTowardsPassage();
+        }
         this.isDead = false;
-        this.setPosition(maze.getRandomPosition());
-        this.orientTowardsPassage();
         this.notifyObservers("respawn");
     }
 
@@ -237,5 +263,9 @@ class Player extends Actor {
 
     get name() {
         return this.myName;
+    }
+
+    setLocalPlayer() {
+        this.localPlayer = true;
     }
 }

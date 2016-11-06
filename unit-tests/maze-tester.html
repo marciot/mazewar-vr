@@ -103,25 +103,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 cursor:     pointer;
             }
         </style>
-        <script src="../js/Directions.js"></script>
-        <script src="../js/Maze.js"></script>
-        <script src="../js/Actors.js"></script>
-        <script src="../js/Directors.js"></script>
-        <script src="../js/GameMaster.js"></script>
+        <script type="text/javascript" src="../js/Directions.js"></script>
+        <script type="text/javascript" src="../js/Maze.js"></script>
+        <script type="text/javascript" src="../js/Actors.js"></script>
+        <script type="text/javascript" src="../js/Directors.js"></script>
+        <script type="text/javascript" src="../js/GameMaster.js"></script>
 
-        <script src="../js/third-party/peerjs/peer.min.js"></script>
-        <script src="../js/networking/frame-utilities.js"></script>
-        <script src="../js/networking/pup-services.js"></script>
-        <script src="../js/networking/pup-services-mazewar.js"></script>
-        <script src="../js/networking/retroweb-network.js"></script>
+        <script type="text/javascript" src="../js/third-party/peerjs/peer-modified.js"></script>
+        <script type="text/javascript" src="../js/networking/frame-utilities.js"></script>
+        <script type="text/javascript" src="../js/networking/pup-services.js"></script>
+        <script type="text/javascript" src="../js/networking/pup-services-mazewar.js"></script>
+        <script type="text/javascript" src="../js/networking/retroweb-network.js"></script>
+        <script type="text/javascript" src="../js/networking/cordova-setup.js"></script>
 
         <script type="text/javascript" src="../js/third-party/yconsole-compiled.js"></script>
         <script type="text/javascript">
-        window.onerror = function(error) {
+        /*window.onerror = function(error) {
             YConsole.show();
         };
         YConsole.activate();
-        YConsole.docking="bottom";
+        YConsole.docking="bottom";*/
         </script>
     </head>
     <body>
@@ -241,8 +242,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 this.callback = callback;
             }
 
-            wasShot() {
+            shotDead(respawnCallback) {
                 this.dom.innerHTML = sprites.DEAD;
+                setTimeout(respawnCallback, 1000);
             }
 
             respawn() {
@@ -287,6 +289,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             dispose() {
                 this.dom.remove();
+                this.callback = null;
             }
 
             getMissileRepresentation() {
@@ -362,6 +365,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     document.getElementById("startGameButton").innerText = state;
                 }
             );
+        }
+    </script>
+    <!--
+        I host SDK keys in a separate web server so they don't end up on GitHub.
+        If you forked this project, you should generate your own API keys.
+    -->
+    <script crossorigin="anonymous" type="text/javascript" src="http://marciot.freeshell.org/sdk-keys/sdk-keys-mazewar-vr.js"></script>
+    <script>
+        if(typeof RetroWeb.peerJSConfig === "undefined") {
+            alert("For full functionality, provide your own API keys for Peer.js");
         }
     </script>
 </html>

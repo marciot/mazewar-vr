@@ -16,10 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class NetworkObserver {
-    constructor(network, myId) {
+class NetworkTransmitter {
+    constructor(network, networkedGame, myId) {
         this.network  = network;
         this.ratId    = myId;
+        this.game     = networkedGame;
     }
 
     walkTo(x, z, direction) {
@@ -37,6 +38,15 @@ class NetworkObserver {
     turnTowards(direction) {
         this.network.setRatDirection(this.ratId, Directions.toAltoDir(direction));
     }
+
+    shoot() {
+        this.network.ratShoots(this.ratId);
+    }
+
+    wasHit(byWhom) {
+        var killedBy = this.game.getActorRatId(byWhom);
+        this.network.ratKilled(this.ratId, killedBy);
+    }
 }
 
 class NetworkedGame {
@@ -48,8 +58,9 @@ class NetworkedGame {
 
     startGame(hostId, playerName, stateChangedCallback) {
         // Create the new players
-        this.selfPlayer = this.factory.newSelfPlayer();
-        this.selfPlayer.name = playerName;
+        this.selfPlayer         = this.factory.newSelfPlayer();
+        this.selfPlayer.name    = playerName;
+        this.selfPlayer.setLocalPlayer();
 
         // Start networking
 
@@ -64,6 +75,8 @@ class NetworkedGame {
 
         this.mazeService.addEventListener("newGame",   this.newGameCallback.bind(this));
         this.mazeService.addEventListener("ratUpdate", this.ratUpdateCallback.bind(this));
+        this.mazeService.addEventListener("ratKill",   this.ratKillCallback.bind(this));
+        this.mazeService.addEventListener("ratDead",   this.ratDeadCallback.bind(this));
 
         this.server = new RetroWeb.PupServer();
         this.server.addService(this.mazeService);
@@ -72,7 +85,7 @@ class NetworkedGame {
 
     newGameCallback(myId, rat) {
         console.log("New game, my rat id is", myId);
-        this.selfPlayer.addObserver(new NetworkObserver(this.mazeService, myId));
+        this.selfPlayer.addObserver(new NetworkTransmitter(this.mazeService, this, myId));
 
         if(this.players[myId]) {
             console.log("WARNING: This slot is already occupied");
@@ -94,6 +107,26 @@ class NetworkedGame {
         actor.setPosition(rat.xLoc, rat.yLoc);
         actor.orientTowards(Directions.fromAltoDir(rat.dir));
     }
+
+    ratKillCallback(ratId, rat) {
+        var actor = this.players[ratId];
+        actor.setPosition(rat.xLoc, rat.yLoc);
+        actor.orientTowards(Directions.fromAltoDir(rat.dir));
+        actor.shoot();
+    }
+
+    ratDeadCallback(ratId, killedBy) {
+        var actor = this.players[ratId];
+        actor.shotDead(this.players[killedBy]);
+    }
+
+    getActorRatId(actor) {
+        for(var ratId = 0; ratId < this.players.length; ratId++) {
+            if(this.players[ratId] === actor) {
+                return ratId;
+            }
+        }
+    }
 }
 
 class SoloGame {
@@ -104,6 +137,8 @@ class SoloGame {
     startGame() {
         var self  = this.factory.newSelfPlayer();
         var robot = this.factory.newRobotPlayer();
+        self.setLocalPlayer();
+        robot.setLocalPlayer();
     }
 
     endGame() {

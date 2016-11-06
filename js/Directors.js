@@ -19,6 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Director {
     constructor(actor) {
         this.actor = actor;
+
+        // When the Actor which I am directing is
+        // disposed, I should dispose myself too.
+        var me = this;
+        class DeathObserver {
+            dispose() {
+                me.dispose();
+            }
+        }
+        actor.addObserver(new DeathObserver());
     }
 }
 
@@ -28,6 +38,9 @@ class RoboticDirector extends Director {
         actor.orientTowards(actor.choosePassage());
 
         actor.representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
+    }
+
+    dispose() {
     }
 
     // Chooses a direction by considering all possibilities and
@@ -83,7 +96,12 @@ class RoboticDirector extends Director {
 class KeyboardDirector extends Director {
     constructor(actor) {
         super(actor);
-        window.addEventListener('keypress', this.keypressEvent.bind(this));
+        this.listener = this.keypressEvent.bind(this);
+        window.addEventListener('keypress', this.listener);
+    }
+
+    dispose() {
+        window.removeEventListener('keypress', this.listener);
     }
 
     keypressEvent(e) {
