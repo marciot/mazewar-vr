@@ -640,7 +640,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.ratLocation.xLoc  = rat.xLoc;
             this.ratLocation.yLoc  = rat.yLoc;
             this.ratLocation.dir   = rat.dir;
-            this.ratLocation.score = rat.dir;
+            this.ratLocation.score = rat.score;
 
             var frameWriter = this.newMazeWarFrame(this.MazeWarRatLocation, this.MazeWarRatLocationSize);
             PupMazeWarPackets.encodeRatLocation(frameWriter, this.ratLocation);
