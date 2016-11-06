@@ -387,7 +387,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div class="middle flex-grid six-element">
                 <div><div class="clickable grid-button" data-page="pageAbout">History &amp; Help</div></div>
                 <div><div class="clickable grid-button" id="playSolo">Play Solo</div></div>
-                <div><div class="clickable grid-button" data-page="pageNetPlay">Play with Friends</div></div>
+                <div><div class="clickable grid-button" id="netPlay">Play with Friends</div></div>
                 <div><div class="clickable grid-button" data-page="pageOptions">VR Options</div></div>
                 <div><div class="clickable grid-button" data-page="pageCredits">Credits</div></div>
                 <div><div class="clickable grid-button" data-page="pageHeadsets">Recommended Headsets</div></div>
@@ -429,6 +429,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 </p>
                 <strong>Desktop Controls:</strong>
                 Move the mouse to look around, hold down the mouse button to move in the direction you are facing; click rapidly to shoot.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageNoWebRTC">
+            <div>
+                <h1>Not Available</h1>
+                <p>
+                We are sorry, this web browser does not support the functionality needed for multi-player mode.
+                </p>
+                <p>
+                If you are using an Apple device, multi-player mode will be made available through an app soon. Stay tuned!
                 </p>
             </div>
         </div>
@@ -614,6 +626,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         var altoStartHelp = shadowRoot.querySelector("#altoStartHelp");
         var altoKeyHelp   = shadowRoot.querySelector("#altoKeyHelp");
 
+        this.swipePages   = swipePages;
+
         swipePages.bindElements(shadowRoot.querySelectorAll(".page-link"));
         swipePages.bindElements(shadowRoot.querySelectorAll(".grid-button"));
 
@@ -733,6 +747,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
         shadowRoot.querySelector("#inviteFriends").addEventListener("click", shareInviteOnFacebook);
+
+        // Net play
+        var me = this;
+        function gotoNetPlay(e) {
+            if(typeof window.RTCPeerConnection === 'undefined') {
+                me.swipePages.gotoPage("pageNoWebRTC");
+            } else {
+                me.swipePages.gotoPage("pageNetPlay");
+            }
+        }
+        shadowRoot.querySelector("#netPlay").addEventListener("click", gotoNetPlay);
     };
 
     AboutBoxProto.addCallback = function(eventStr, callback) {
