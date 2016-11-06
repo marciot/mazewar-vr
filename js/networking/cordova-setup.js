@@ -1,8 +1,9 @@
 // Cordova initialization
 window.isCordova    = (! /^http/.test(location.protocol));
-window.isCordovaIOS = (window.device && window.device.platform === 'iOS');
 
 function onDeviceReady() {
+    window.isCordovaIOS = (window.device && window.device.platform === 'iOS');
+
     if (window.isCordovaIOS) {
         cordova.plugins.iosrtc.registerGlobals();
     }

@@ -139,10 +139,16 @@ class HeadsetDirector extends Director {
 
         var useTouch = false;
         var me = this;
-        container.addEventListener('mousedown',  function(e) {if(!useTouch)  me.triggerPressed(e);});
-        container.addEventListener('mouseup',    function(e) {if(!useTouch)  me.triggerRelease(e);});
-        container.addEventListener('touchstart', function(e) {useTouch=true; me.triggerPressed(e);});
-        container.addEventListener('touchend',   function(e) {useTouch=true; me.triggerRelease(e);});
+
+        this.mousedownFunc  = function(e) {if(!useTouch)  me.triggerPressed(e);};
+        this.mouseupFunc    = function(e) {if(!useTouch)  me.triggerRelease(e);};
+        this.touchStartFunc = function(e) {useTouch=true; me.triggerPressed(e);};
+        this.touchEndFunc   = function(e) {useTouch=true; me.triggerRelease(e);};
+
+        container.addEventListener('mousedown',  this.mousedownFunc);
+        container.addEventListener('mouseup',    this.mouseupFunc);
+        container.addEventListener('touchstart', this.touchStartFunc);
+        container.addEventListener('touchend',   this.touchEndFunc);
 
         this.autoWalk = false;
         actor.representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
@@ -171,6 +177,24 @@ class HeadsetDirector extends Director {
 
         /* Mouse controls (disabled if orientation based controls are available) */
         this.controls = new THREE.LookAroundControls(actor.representation.cameraProxy, container);
+    }
+
+    dispose() {
+        container.removeEventListener('mousedown',  this.mousedownFunc);
+        container.removeEventListener('mouseup',    this.mouseupFunc);
+        container.removeEventListener('touchstart', this.touchStartFunc);
+        container.removeEventListener('touchend',   this.touchEndFunc);
+
+        this.controls.dispose();
+        this.controls = null;
+
+        this.mousedownFunc = null;
+        this.mouseupFunc = null;
+        this.touchStartFunc = null;
+        this.touchEndFunc = null;
+        if(this.pressTimer) {
+            window.clearTimeout(this.pressTimer);
+        }
     }
 
     triggerHeld() {
