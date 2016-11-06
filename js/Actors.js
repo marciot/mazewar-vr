@@ -172,7 +172,7 @@ class MissileActor extends Actor {
         this.facing = fromPlayer.representation.cardinalDirection;
         this.data   = data;
 
-        this.ricochet = true;
+        this.ricochet = false;
 
         super.setPosition(this.x, this.z);
         this.orientTowards(this.facing);
@@ -231,6 +231,9 @@ class Player extends Actor {
     }
 
     wasHit(data) {
+        if(this.isDead) {
+            return;
+        }
         this.notifyObservers("wasHit", data.shotBy);
         if(this.localPlayer) {
             // When localPlayer is true, the player will shotDead when

@@ -27,8 +27,8 @@ class WebGLActors extends Actors {
     }
     
     remove(actor) {
-        super.remove(actor);
         scene.remove(actor.representation.representation);
+        super.remove(actor);
     }
     
     animate() {
@@ -40,6 +40,9 @@ class WebGLActors extends Actors {
 
 // VisibleRepresentations have a visual representation, generally a THREE.Mesh
 class VisibleRepresentation {
+    dispose() {
+    }
+
     get representation() {
         return this.object;
     }
@@ -123,11 +126,12 @@ class VisibleRepresentation {
 }
 
 class AnimatedRepresentation extends VisibleRepresentation {
-    constructor() {
+    constructor(speedUp) {
         super();
         this.animationFrames = 0;        
         this.fallSpeed = 0;
         this.animationFinishedCallback = null;
+        this.animationStep = 0.05 * (speedUp ? speedUp : 1);
     }
     
     dispose() {
@@ -147,7 +151,6 @@ class AnimatedRepresentation extends VisibleRepresentation {
 
     doAnimation(displacement, direction) {
         this.animationTween = 0;
-        this.animationStep  = 0.05;
         if(displacement) {
             this.animationDisplacement = displacement;
         }
@@ -274,7 +277,7 @@ class EyeRepresentation extends AnimatedRepresentation {
 
 class MissileRepresentation extends AnimatedRepresentation {
     constructor() {
-        super();
+        super(10);
 
         //var geometry = new THREE.ConeGeometry( 0.1, 0.3, 32 );
         var geometry = new THREE.TorusKnotGeometry(0.1, 0.02, 18);

@@ -279,7 +279,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             scheduleCallback() {
                 if(!this.timer) {
-                    this.timer = setTimeout(this.timerCallback.bind(this), 1000);
+                    console.log(this.type);
+                    var interval = (this.type === "missile") ? 100 : 1000;
+                    this.timer = setTimeout(this.timerCallback.bind(this), interval);
                 }
             }
 
