@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var vrDisplay, gpClicker;
 var camera, scene, renderer, effect
 var container, maze;
 
@@ -256,8 +257,7 @@ function init() {
     container = document.getElementById('container');
     container.appendChild(element);
 
-    //effect = new THREE.StereoEffect(renderer);
-    effect = renderer;
+    effect = new THREE.VREffect(renderer);
 
     scene = new THREE.Scene();
 
@@ -291,22 +291,34 @@ function init() {
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
 
+    var vrEnabled = false;
+
     function modeSelected(mode) {
         console.log("Mode is", mode);
         switch(mode) {
             case "headset":
-                effect = new THREE.StereoEffect(renderer);
+                vrEnabled = true;
+                effect = new THREE.VREffect(renderer);
                 break;
             case "monitor":
-                effect = renderer;
+                vrEnabled = false;
+                effect = new THREE.VREffect(renderer);
                 break;
             case "anaglyph":
+                vrEnabled = false;
                 effect = new THREE.AnaglyphEffect(renderer);
                 break;
         }
     }
 
+    function startVr() {
+        if(vrEnabled) {
+            vrDisplay.requestPresent([{source: renderer.domElement}]);
+        }
+    }
+
     function startNetworkGame() {
+        startVr();
         console.log("Starting network game");
         game.endGame();
 
@@ -321,16 +333,37 @@ function init() {
         game.startGame(hostId, name, function(state) {console.log(state);});
     }
 
+    function startSoloGame() {
+        startVr();
+    }
+
     // WebComponents initialization
     function webComponentsReady() {
         var about = document.querySelector("about-box");
         if(about) {
-            about.addCallback("gfxModeSelected", modeSelected);
+            about.addCallback("gfxModeSelected",  modeSelected);
+            about.addCallback("startSoloGame",    startSoloGame);
             about.addCallback("startNetworkGame", startNetworkGame);
         }
     }
 
     window.addEventListener('WebComponentsReady', webComponentsReady);
+
+    // Get the VRDisplay and save it for later.
+    vrDisplay = null;
+    if(navigator.getVRDisplays) {
+        navigator.getVRDisplays().then(function(displays) {
+          if (displays.length > 0) {
+            vrDisplay = displays[0];
+            // Kick off the render loop.
+            vrDisplay.requestAnimationFrame(animate);
+            console.log(vrDisplay.capabilities.canPresent     ? "Can present VR"  : "Cannot present VR");
+            console.log(vrDisplay.capabilities.hasOrientation ? "Has orientation" : "Does not have orientation");
+          }
+        });
+    } else {
+        console.log("WebVR is not supported");
+    }
 }
 
 function resize() {
@@ -351,6 +384,7 @@ function update(dt) {
 
     if(headsetDirector) {
         headsetDirector.update(dt);
+        gpClicker.poll();
     }
     
     actors.animate();
@@ -364,7 +398,7 @@ function render(dt) {
 }
 
 function animate(t) {
-    requestAnimationFrame(animate);
+    vrDisplay.requestAnimationFrame(animate);
 
     var delta = clock.getDelta();
     update(delta);
@@ -384,4 +418,3 @@ function fullscreen() {
 }
 
 init();
-animate();

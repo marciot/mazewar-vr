@@ -223,8 +223,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }
 
         svg {
-            height: 25%;
-            width:  25%;
+            height: 15%;
+            width:  15%;
         }
 
         svg path {
@@ -388,7 +388,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <div><div class="clickable grid-button" data-page="pageAbout">History &amp; Help</div></div>
                 <div><div class="clickable grid-button" id="playSolo">Play Solo</div></div>
                 <div><div class="clickable grid-button" id="netPlay">Play with Friends</div></div>
-                <div><div class="clickable grid-button" data-page="pageOptions">VR Options</div></div>
+                <div><div class="clickable grid-button" data-page="pageOptions">Game Setup</div></div>
                 <div><div class="clickable grid-button" data-page="pageCredits">Credits</div></div>
                 <div><div class="clickable grid-button" data-page="pageHeadsets">Recommended Headsets</div></div>
             </div>
@@ -420,8 +420,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     This remake can be played either using a VR headset or without. Select "Display Options" to choose the VR mode.
                 </p>
                 <p>
-                <strong>Headset Controls:</strong> Hold down the trigger on your headset to move in the direction you are facing; press and release
+                <strong>Headset Controls:</strong>Hold down the trigger on your headset to move in the direction you are facing; press and release
                 the trigger rapidly to shoot.
+                </p>
+                <p>
+                <strong>GearVR/Oculus/Vive Users:</strong> You must configure a trigger on the gamepad from the "Game Setup" screen prior to starting a game.
                 </p>
                 <p>
                 <strong>Smartphone or Tablet Controls:</strong>
@@ -497,7 +500,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <h1>Select your VR Experience:</h1>
                 <p>
-                The best way to play <cite>Maze War VR</cite> is using a modern smartphone and a VR headset. However, you may also play on a PC, tablet or smartphone without a headset&mdash;either in 3D using red/cyan glasses or in 2D without.
+                If you are using a simple headset or a playing without a headset, select one of the icons below.<br>
+                If you are using an electronic headset like the Samsung Gear VR, Oculus Rift or HTC Vive, proceed to the &quot;Advanced Configuration&quot;.
                 </p>
                 <div id="mode-select">
                     <p>
@@ -510,12 +514,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     </p>
                 </div>
             </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageAdvancedOptions">Advanced Configuration</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageAdvancedOptions">
+            <div>
+                <h1>Gamepad Configuration:</h1>
+                <p>
+                    Samsung GearVR, Oculus Rift or HTC Vive users will need to configure a game pad button for use with <cite>Maze War VR</cite>:
+                <p>
+            </div>
+            <div>
+                <center>
+                <div id="configureGamepad" class="clickable centered-button">Choose Gamepad Button</div>
+                </center>
+            </div>
+            <div>
+                <h1>Enable WebVR on the Samsung Gear VR:</h1>
+                To enable WebVR on the Samsung Gear VR, you need to download and open the <cite>Samsung Internet for Gear VR</cite> browser and visit one of these links:
+                <ul>
+                    <li><a href="internet://webvr-enable">Enable WebVR</a>
+                    <li><a href="internet://webvr-disable">Disable WebVR</a>
+                </ul>
+            </div>
+            <div>
+                <h1>Enable WebVR on the Oculus Rift or HTC Vive:</h1>
+                You will need to use a special build of <a href="https://webvr.info/get-chrome/">Chrome</a> or <a href="https://mozvr.com/">Firefox</a>.
+            </div>
         </div>
 
         <div class="flex-distribute" id="pageHeadsets">
             <div>
                 <h1>Recommended VR Headset</h1>
-                I recommend the <cite>Mattel ViewMaster VR</cite> for the best <cite>Maze War VR</cite> experience. It is inexpensive, works with most phones and has a responsive trigger that works great with <cite>Maze War VR</cite>.
+                I recommend the <cite>Mattel ViewMaster VR</cite> for the least complicated <cite>Maze War VR</cite> experience. It is inexpensive, works with most phones and has a responsive trigger that works great with <cite>Maze War VR</cite>.
 
                 <div class="side-by-side">
                     <img src="artwork/viewmaster.png">
@@ -590,6 +625,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 </template>
 
 <script>
+function gotoRecommendedHeadsets() {
+    document.querySelector("about-box").showRecommendedHeadsets();
+}
+
 (function (thisDoc) {
     var AboutBoxProto = Object.create(HTMLElement.prototype);
 
@@ -758,7 +797,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
         shadowRoot.querySelector("#netPlay").addEventListener("click", gotoNetPlay);
+
+        // Gamepad Configuration
+        function configureGamepad() {
+            gpClicker.captureButton(shadowRoot.querySelector("#configureGamepad"));
+        }
+        shadowRoot.querySelector("#configureGamepad").addEventListener("click", configureGamepad);
     };
+
+    AboutBoxProto.showRecommendedHeadsets = function() {
+        this.querySelector("#overlay").style.display = "block";
+        this.swipePages.gotoPage("pageHeadsets");
+    }
 
     AboutBoxProto.addCallback = function(eventStr, callback) {
         this.eventListeners[eventStr].push(callback);

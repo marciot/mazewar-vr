@@ -130,6 +130,20 @@ class KeyboardDirector extends Director {
 
 var headsetDirector;
 
+/* Pointer Lock API Support (very useful for games that rely on relative mouse positioning) */
+
+function requestPointerLock(element) {
+    element.requestPointerLock = element.requestPointerLock ||
+                                 element.mozRequestPointerLock ||
+                                 element.webkitRequestPointerLock;
+    // Ask the browser to lock the pointer
+    element.requestPointerLock();
+}
+
+function isPointerLocked() {
+    return document.pointerLockElement || document.mozPointerLockElement || document.webkitPointerLockElement;
+}
+
 class HeadsetDirector extends Director {
     constructor(actor, container) {
         super(actor);
@@ -140,10 +154,15 @@ class HeadsetDirector extends Director {
         var useTouch = false;
         var me = this;
 
-        this.mousedownFunc  = function(e) {if(!useTouch)  me.triggerPressed(e);};
-        this.mouseupFunc    = function(e) {if(!useTouch)  me.triggerRelease(e);};
+        this.mousedownFunc  = function(e) {
+            if(!isPointerLocked()) {
+                requestPointerLock(container);
+            }
+            if(!useTouch)  me.triggerPressed(e);
+        };
+        this.mouseupFunc    = function(e) {if(!useTouch)  me.triggerReleased(e);};
         this.touchStartFunc = function(e) {useTouch=true; me.triggerPressed(e);};
-        this.touchEndFunc   = function(e) {useTouch=true; me.triggerRelease(e);};
+        this.touchEndFunc   = function(e) {useTouch=true; me.triggerReleased(e);};
 
         container.addEventListener('mousedown',  this.mousedownFunc);
         container.addEventListener('mouseup',    this.mouseupFunc);
@@ -155,28 +174,16 @@ class HeadsetDirector extends Director {
 
         headsetDirector = this;
 
-        var me = this;
-        function setOrientationControls(e) {
-            if (!e.alpha) {
-                return;
-            }
+        this.controls = new THREE.VRControls(
+            actor.representation.cameraProxy,
+            err => {console.log(error)}
+        );
 
-            // Disable the mouse controls when operating on mobile.
-            me.controls.enabled = false;
-            me.controls.dispose();
-
-            me.controls = new THREE.DeviceOrientationControls(camera, true);
-            me.controls.connect();
-            me.controls.update();
-
-            container.addEventListener('click', fullscreen, false);
-
-            window.removeEventListener('deviceorientation', setOrientationControls, true);
+        if(!gpClicker) {
+            // Create an object for monitoring the gamepad controllers
+            gpClicker = new GamePadClicker();
         }
-        window.addEventListener('deviceorientation', setOrientationControls, true);
-
-        /* Mouse controls (disabled if orientation based controls are available) */
-        this.controls = new THREE.LookAroundControls(actor.representation.cameraProxy, container);
+        gpClicker.setCallbacks(this.triggerPressed.bind(this), this.triggerReleased.bind(this));
     }
 
     dispose() {
@@ -211,11 +218,13 @@ class HeadsetDirector extends Director {
                 this.pressTimer = null; this.triggerHeld();
             }.bind(this), this.pressDelay);
         }
-        e.preventDefault();
-        e.stopPropagation();
+        if(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
     }
 
-    triggerRelease(e) {
+    triggerReleased(e) {
         if(this.pressTimer) {
             window.clearTimeout(this.pressTimer);
             this.triggerTap();
@@ -223,8 +232,10 @@ class HeadsetDirector extends Director {
         } else {
             this.setAutoWalk(false);
         }
-        e.preventDefault();
-        e.stopPropagation();
+        if(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
     }
 
     animationFinished() {
@@ -241,7 +252,7 @@ class HeadsetDirector extends Director {
     }
 
     update(dt) {
-        this.controls.update(dt);
+        this.controls.update();
 
         var cardinalDirection = this.actor.representation.cardinalDirection;
         if(cardinalDirection !== this.lastDirection) {
@@ -261,5 +272,79 @@ class HeadsetDirector extends Director {
 
     unlockControls() {
         this.controls.enabled = true;
+    }
+}
+
+class GamePadClicker {
+    constructor() {
+        this.buttonCaptured  = false;
+        this.lastButtonState = false;
+        this.captureTries = 0;
+    }
+
+    waitForButton() {
+        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
+        if(gamepads && gamepads.length) {
+            for(var gpIndex = 0; gpIndex < gamepads.length; gpIndex++) {
+                var gp = gamepads[gpIndex];
+                if(gp && gp.connected) {
+                    for(var btnIndex = 0; btnIndex < gp.buttons.length; btnIndex++) {
+                        if(gp.buttons[btnIndex].pressed) {
+                            console.log("Button", btnIndex, "on controller", gpIndex, "pressed");
+                            this.buttonCaptured = true;
+                            this.gpIndex        = gpIndex;
+                            this.btnIndex       = btnIndex;
+                            this.statusDom.innerHTML = "Button set! (click again to reset)";
+                            return;
+                        }
+                    }
+                }
+            }
+        } else {
+            this.statusDom.innerHTML = "Cannot find gamepads";
+            return;
+        }
+
+        const captureTime = 10000;
+        if(this.captureTries < captureTime/250) {
+            this.captureTries++;
+            setTimeout(this.waitForButton.bind(this), 250);
+        } else {
+            this.statusDom.innerHTML = "Not buttons detected (click to try again)";
+        }
+    }
+
+    setCallbacks(pressedCallback, releasedCallback) {
+        this.pressedCallback  = pressedCallback;
+        this.releasedCallback = releasedCallback;
+    }
+
+    captureButton(statusDom) {
+        this.tries = 0;
+        this.statusDom = statusDom;
+        this.statusDom.innerHTML = "Press and hold down a button";
+        this.waitForButton();
+    }
+
+    poll() {
+        if(this.buttonCaptured) {
+            var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);            
+            var gp = gamepads[this.gpIndex];
+            if(gp.buttons[this.btnIndex].pressed) {
+                if(this.lastButtonState === false) {
+                    this.lastButtonState = true;
+                    if(this.pressedCallback) {
+                        this.pressedCallback();
+                    }
+                }
+            } else {
+                if(this.lastButtonState === true) {
+                    this.lastButtonState = false;
+                    if(this.releasedCallback) {
+                        this.releasedCallback();
+                    }
+                }
+            }
+        }
     }
 }
