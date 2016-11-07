@@ -222,9 +222,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             text-shadow: 5px 5px rgba(0,0,0,0.5);
         }
 
-        svg {
-            height: 15%;
-            width:  15%;
+        @media (orientation: portrait) {
+            svg {
+                width:  20vw;
+            }
+        }
+
+        @media (orientation: landscape) {
+            svg {
+                width:  20vh;
+            }
         }
 
         svg path {
