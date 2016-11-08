@@ -174,11 +174,6 @@ class HeadsetDirector extends Director {
 
         headsetDirector = this;
 
-        this.controls = new THREE.VRControls(
-            actor.representation.cameraProxy,
-            err => {console.log(error)}
-        );
-
         if(!gpClicker) {
             // Create an object for monitoring the gamepad controllers
             gpClicker = new GamePadClicker();
@@ -192,8 +187,7 @@ class HeadsetDirector extends Director {
         container.removeEventListener('touchstart', this.touchStartFunc);
         container.removeEventListener('touchend',   this.touchEndFunc);
 
-        this.controls.dispose();
-        this.controls = null;
+        this.rigidBody = null;
 
         this.mousedownFunc = null;
         this.mouseupFunc = null;
@@ -252,8 +246,6 @@ class HeadsetDirector extends Director {
     }
 
     update(dt) {
-        this.controls.update();
-
         var cardinalDirection = this.actor.representation.cardinalDirection;
         if(cardinalDirection !== this.lastDirection) {
             this.actor.orientTowards(cardinalDirection);
@@ -264,14 +256,6 @@ class HeadsetDirector extends Director {
                 this.animationFinished();
             }
         }
-    }
-
-    lockControls() {
-        this.controls.enabled = false;
-    }
-
-    unlockControls() {
-        this.controls.enabled = true;
     }
 }
 

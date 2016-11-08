@@ -32,7 +32,6 @@ class Actors {
         if (index > -1) {
             this.actors.splice(index, 1);
         }
-        actor.representation.dispose();
         actor.dispose();
     }
 
@@ -74,6 +73,7 @@ class Actor {
     dispose() {
         this.notifyObservers("dispose");
         this.observers.length = 0;
+        this.representation.dispose();
         this.representation = null;
     }
 
@@ -180,10 +180,12 @@ class MissileActor extends Actor {
         representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
     }
 
-    destroy() {
-        this.notifyObservers("destroy");
-        actors.remove(this);
+    dispose() {
         this.data = null;
+    }
+
+    explode() {
+        actors.remove(this);
     }
 
     animationFinished() {
@@ -196,19 +198,19 @@ class MissileActor extends Actor {
                 this.orientTowards(this.facing);
                 this.walk(this.facing);
             } else {
-                this.destroy();
+                this.explode();
             }
         }
 
         var hit = actors.isOccupied(this.x, this.z, this);
         if(hit && hit.wasHit) {
             hit.wasHit(this.data);
-            this.destroy();
+            this.explode();
         }
     }
 
     wasHit() {
-        this.destroy();
+        this.explode();
     }
 }
 

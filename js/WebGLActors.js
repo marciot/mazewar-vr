@@ -16,8 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const eyeHeight = 1.6;
-const eyeRadius = 0.75;
+const eyeRadius                      = 0.75;
+const eyeHeight                      = 1.6;
+const chestHeight                    = 1.3;
+const distanceOfHeldObjectsFromChest = 0.2;
 
 class WebGLActors extends Actors {
     add(actor) {
@@ -33,7 +35,11 @@ class WebGLActors extends Actors {
     
     animate() {
         for(var i = 0; i < this.actors.length; i++) {
-            this.actors[i].representation.animate(i);
+            if(this.actors[i].representation) {
+                this.actors[i].representation.animate(i);
+            } else {
+                console.log("WARNING: Actor has no representation");
+            }
         }
     }
 }
@@ -269,10 +275,6 @@ class EyeRepresentation extends AnimatedRepresentation {
         this.object.position.y = eyeHeight;
         this.animationFinished();
     }
-
-    dispose() {
-        this.object.geometry.dispose();
-    }
 }
 
 class MissileRepresentation extends AnimatedRepresentation {
@@ -306,8 +308,6 @@ class MapRepresentation extends VisibleRepresentation {
         
         const mapHeight      = 0.1;
         const mapWidth       = 0.2;
-        const mapDistance    = 0.3;
-        const mapDeclination = 50;
         
         this.cellSize = 4;
         
@@ -330,15 +330,8 @@ class MapRepresentation extends VisibleRepresentation {
         
         var geometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
         var plane    = new THREE.Mesh(geometry, this.mapMaterial);
-        plane.position.copy(
-            Directions.toUnitVector(Directions.NORTH).multiplyScalar(mapDistance)
-        );
         
-        this.object = new THREE.Object3D();
-        this.object.add(plane);
-        this.object.position.y = eyeHeight;
-        this.object.rotation.order = 'YXZ';
-        this.object.rotation.x = -Math.PI/ 180 * mapDeclination;
+        this.object = plane;
     }
 
     dispose() {
@@ -379,27 +372,22 @@ class MapRepresentation extends VisibleRepresentation {
         this.oldZ = z;
         this.mapTexture.needsUpdate = true;
     }
-    
-    // Translates and rotates the map to the location of another object
-    carriedBy(representation) {
-        this.object.rotation.y = -representation.bearingInRadians;
-        this.object.position.copy(representation.position);
-    }
 };
 
 // The player's own character. It carries the camera and a map around
 class SelfRepresentation extends AnimatedRepresentation {
     constructor(camera) {
         super();
-        
-        this.object = camera;
-        this.object.position.y = eyeHeight;
-        
         this.map = new MapRepresentation();
+
+        this.body = new SelfBody(camera);
+        this.body.carry(this.map);
         
-        this.combined = new THREE.Object3D();
-        this.combined.add(this.map.representation);
-        this.combined.add(camera);
+        this.object = this.body.getHead();
+    }
+
+    get representation() {
+        return this.body.representation;
     }
 
     dispose() {
@@ -418,29 +406,23 @@ class SelfRepresentation extends AnimatedRepresentation {
     }
 
     orientTowards(direction) {
-        // Disable this since this is controlled by the camera
-    }
-
-    get cameraProxy() {
-        return this.object;
-    }
-
-    get representation() {
-        return this.combined;
+        // Ignore, orientation is controlled by the VR headset
+        // via the SelfBody object
     }
     
     animate() {
         super.animate();
-        this.map.carriedBy(this);
         if(this.isFalling()) {
             this.object.rotation.z += 0.01;
+        } else {
+            this.body.update();
         }
     }
 
-    shotDead(byWhom, respawnCallback) {
+    shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(2);
-        headsetDirector.lockControls();
+        this.body.lockControls();
         
         this.map.hide();
         this.respawnCallback = respawnCallback;
@@ -454,14 +436,135 @@ class SelfRepresentation extends AnimatedRepresentation {
     
     respawn() {
         liftFog();
-        this.object.position.y = eyeHeight;
-
-        headsetDirector.unlockControls();
+        this.body.reattachHead();
+        this.body.unlockControls();
         this.map.show();
     }
 };
 
-function getWebGLPlayerFactory(camera, element) {
+/* In Maze War, players are represented by floating eyeballs.
+ * But since in Maze War VR the eyeballs carry a map, it is
+ * convenient to imagine the eyeballs as heads on a body and
+ * the map as being carried by hands.
+ *
+ * When the player's head looks left or right, the virtual
+ * body rotates underneath it. There is no concept in this
+ * game of facing in one direction while looking in another
+ * direction.
+ */
+class SelfBody {
+    constructor(head) {
+        const handsTilt = 45;
+
+        this.head           = head;
+        this.body           = new THREE.Object3D();
+        this.hands          = new THREE.Object3D();
+        this.carriedObjects = new THREE.Object3D();
+        this.combined       = new THREE.Object3D();
+
+        this.head.position.y  = eyeHeight;
+        this.hands.position.y = chestHeight;
+        this.hands.position.z = -distanceOfHeldObjectsFromChest;
+        this.carriedObjects.rotation.x = -handsTilt / 180 * Math.PI;
+
+        this.body.add(this.hands);
+        this.hands.add(this.carriedObjects);
+
+        this.combined.add(this.body);
+        this.combined.add(this.head);
+
+        if('VRFrameData' in window) {
+            this.frameData = new VRFrameData();
+        }
+    }
+
+    getHead() {
+        return this.head;
+    }
+
+    get representation() {
+        return this.combined;
+    }
+
+    reattachHead() {
+        // When the player dies, their head/eyeball falls into the
+        // abbyss. This reattaches the head so that play can continue.
+        this.head.position.y  = eyeHeight;
+    }
+
+    carry(object) {
+        this.carriedObjects.add(object.representation);
+    }
+
+    getHead() {
+        return this.head;
+    }
+
+    lockControls() {
+        this.locked = true;
+    }
+
+    unlockControls() {
+        this.locked = false;
+    }
+
+    updateBody(headsetPose, headsetOrientation) {
+        /* Compute the bearing and azimuth of the headset.
+         * The bearing is used to set the direction of the
+         * body, the azimuth is ignored for now.
+         */
+        var u = Directions.toUnitVector(Directions.NORTH);
+        u.applyQuaternion(headsetOrientation);
+        var projectionMagn = Math.sqrt(u.x*u.x + u.z*u.z);
+        var headsetBearing = Math.atan2(u.x, -u.z);
+        var headsetAzimuth = Math.atan2(u.y, projectionMagn);
+
+        // The RigidBody's head orientation is updated to match
+        // the orientation of the VR headset
+        this.head.rotation.setFromQuaternion(headsetOrientation);
+
+        // Keep the body underneath the head and facing in the
+        // same direction, except when the player is looking
+        // straight up and the direction is indeterminate.
+        this.body.position.x = this.head.position.x;
+        this.body.position.z = this.head.position.z;
+        if(projectionMagn > 0.1) {
+            this.body.rotation.y = -headsetBearing;
+        }
+    }
+
+    update() {
+        if(this.locked) {
+            // While the player dies and is falling through the
+            // abbyss, stop updating the position from the
+            // headset.
+            return;
+        }
+
+        // Get the headset position and orientation.
+        var headsetPose        = new THREE.Vector3();
+        var headsetOrientation = new THREE.Quaternion();
+
+        var pose;
+        if (vrDisplay.getFrameData) {
+            vrDisplay.getFrameData(this.frameData);
+            pose = this.frameData.pose;
+        } else if (vrDisplay.getPose) {
+            pose = vrDisplay.getPose();
+        }
+        if (pose.position !== null) {
+            headsetPose.fromArray(pose.position);
+        }
+        if (pose.orientation !== null ) {
+            headsetOrientation.fromArray(pose.orientation);
+        }
+
+        // Update body representation
+        this.updateBody(headsetPose, headsetOrientation);
+    }
+}
+
+function getWebGLPlayerFactory(camera) {
     var playerFactory = {
         newSelfPlayer: function() {
             var selfRepresentation = new SelfRepresentation(camera);
