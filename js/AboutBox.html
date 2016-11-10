@@ -670,7 +670,6 @@ function gotoRecommendedHeadsets() {
         shadowRoot.querySelector("#anaglyph").addEventListener("click", selectExperience.bind(this, "anaglyph"));
 
         function startSoloGame() {
-            this.setOverlayVisibility(false);
             shadowRoot.dispatchCallback("startSoloGame");
         }
         shadowRoot.querySelector("#playSolo").addEventListener("click", startSoloGame);

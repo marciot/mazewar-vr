@@ -137,7 +137,9 @@ function requestPointerLock(element) {
                                  element.mozRequestPointerLock ||
                                  element.webkitRequestPointerLock;
     // Ask the browser to lock the pointer
-    element.requestPointerLock();
+    if(element.requestPointerLock) {
+        element.requestPointerLock();
+    }
 }
 
 function isPointerLocked() {

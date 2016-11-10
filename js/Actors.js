@@ -190,7 +190,15 @@ class MissileActor extends Actor {
 
     animationFinished() {
         if(this.canWalk(this.facing)) {
+            // Keep moving the missle along until it hits a wall
             this.walk(this.facing);
+
+            // Did I collide with something?
+            var hit = actors.isOccupied(this.x, this.z, this);
+            if(hit && hit.wasHit) {
+                hit.wasHit(this.data);
+                this.explode();
+            }
         } else {
             if(this.ricochet) {
                 this.ricochet = false;
@@ -200,12 +208,6 @@ class MissileActor extends Actor {
             } else {
                 this.explode();
             }
-        }
-
-        var hit = actors.isOccupied(this.x, this.z, this);
-        if(hit && hit.wasHit) {
-            hit.wasHit(this.data);
-            this.explode();
         }
     }
 

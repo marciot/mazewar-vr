@@ -69,11 +69,10 @@ function init() {
     }
 
     function startNetworkGame() {
-        var aboutBox = document.querySelector("about-box");
-
         var name = prompt("Please enter your name");
 
         function stateChangedCallback(state, error) {
+            var aboutBox = document.querySelector("about-box");
             switch(state) {
                 case "joined":
                     aboutBox.setOverlayVisibility(false);
@@ -99,6 +98,8 @@ function init() {
     }
 
     function startSoloGame() {
+        var aboutBox = document.querySelector("about-box");
+        aboutBox.setOverlayVisibility(false);
         startVr();
     }
 
