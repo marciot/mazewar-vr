@@ -212,10 +212,6 @@ class HeadsetDirector extends Director {
                 this.pressTimer = null; this.triggerHeld();
             }.bind(this), this.pressDelay);
         }
-        if(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
     }
 
     triggerReleased(e) {
@@ -225,10 +221,6 @@ class HeadsetDirector extends Director {
             this.pressTimer = null;
         } else {
             this.setAutoWalk(false);
-        }
-        if(e) {
-            e.preventDefault();
-            e.stopPropagation();
         }
     }
 

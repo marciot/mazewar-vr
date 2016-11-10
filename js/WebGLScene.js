@@ -1,7 +1,7 @@
 const fogNear = 0.1;
 const fogFar  = 50;
 
-var camera, scene, renderer, effect, light;
+var camera, scene, renderer, effect, light, game;
 var maze, theme;
 var loader = new THREE.TextureLoader();
 var tween = new Tween();
@@ -17,6 +17,8 @@ function setupScene() {
     
     document.body.insertBefore(renderer.domElement, document.body.firstChild);
     
+    container = renderer.domElement;
+
     scene     = new THREE.Scene();
     scene.fog = new THREE.Fog(0x000000, fogNear, fogFar);
     theme     = new ModernTheme(renderer);
@@ -40,7 +42,7 @@ function setupScene() {
     
     // Start a game so we can have something interesting
     // going on in the background
-    var game = new SoloGame(getWebGLPlayerFactory(camera));
+    game = new SoloGame(getWebGLPlayerFactory(camera));
     game.startGame();
     
     // Kick off the render loop.

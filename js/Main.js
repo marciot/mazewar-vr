@@ -69,7 +69,23 @@ function init() {
     }
 
     function startNetworkGame() {
-        startVr();
+        var aboutBox = document.querySelector("about-box");
+
+        var name = prompt("Please enter your name");
+
+        function stateChangedCallback(state, error) {
+            switch(state) {
+                case "joined":
+                    aboutBox.setOverlayVisibility(false);
+                    startVr();
+                    break;
+                case "error":
+                    aboutBox.showNetworkError(error);
+                    console.log("Error", error);
+                    break;
+            }
+        }
+
         console.log("Starting network game");
         game.endGame();
 
@@ -78,10 +94,8 @@ function init() {
         const ETHERNET_ADDR_MAX       = 0xFF;
         const hostId = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
 
-        var name = prompt("Please enter your name");
-
         game = new NetworkedGame(getWebGLPlayerFactory(camera));
-        game.startGame(hostId, name, function(state) {console.log(state);});
+        game.startGame(hostId, name, stateChangedCallback);
     }
 
     function startSoloGame() {

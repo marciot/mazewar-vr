@@ -336,7 +336,7 @@ class MapRepresentation extends VisibleRepresentation {
 
     dispose() {
         super.dispose();
-        this.object.children[0].geometry.dispose();
+        this.object.geometry.dispose();
         this.mapTexture.dispose();
         this.mapMaterial.dispose();
     }

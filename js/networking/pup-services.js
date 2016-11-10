@@ -112,11 +112,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 "Alto",
                 RetroWeb.peerJSConfig,
                 gotNetworkPacket.bind(this),
-                function(state) {
+                function(state, info) {
                     if(state === "joined") {
                         me.networkReady();
                     }
-                    stateChangedCallback(state);
+                    stateChangedCallback(state, info);
                 }
             );
 

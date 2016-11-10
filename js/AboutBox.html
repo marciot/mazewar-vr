@@ -457,6 +457,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
+        <div class="flex-distribute" id="pageNetworkError">
+            <div>
+                <h1>Network Error</h1>
+                <p>
+                A network error has occured. Please try again later.
+                </p>
+                <p id="networkErrorReason">
+                </p>
+            </div>
+        </div>
+
         <div class="flex-distribute" id="pageCredits">
             <div>
                 <h1>Credits</h1>
@@ -659,13 +670,12 @@ function gotoRecommendedHeadsets() {
         shadowRoot.querySelector("#anaglyph").addEventListener("click", selectExperience.bind(this, "anaglyph"));
 
         function startSoloGame() {
-            shadowRoot.querySelector("#overlay").style.display = "none";
+            this.setOverlayVisibility(false);
             shadowRoot.dispatchCallback("startSoloGame");
         }
         shadowRoot.querySelector("#playSolo").addEventListener("click", startSoloGame);
 
         function startNetworkGame() {
-            shadowRoot.querySelector("#overlay").style.display = "none";
             shadowRoot.dispatchCallback("startNetworkGame");
         }
         shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
@@ -815,9 +825,23 @@ function gotoRecommendedHeadsets() {
         shadowRoot.querySelector("#configureGamepad").addEventListener("click", configureGamepad);
     };
 
-    AboutBoxProto.showRecommendedHeadsets = function() {
-        this.querySelector("#overlay").style.display = "block";
-        this.swipePages.gotoPage("pageHeadsets");
+    AboutBoxProto.showPage = function(page) {
+        this.setOverlayVisibility(true);
+        this.swipePages.gotoPage(page);
+    }
+
+    AboutBoxProto.showNetworkError = function(error) {
+        this.setOverlayVisibility(true);
+        this.swipePages.gotoPage("pageNetworkError");
+        this.querySelector("#networkErrorReason").innerHTML = error;
+    }
+
+    AboutBoxProto.setOverlayVisibility = function(state) {
+        if(state) {
+            this.querySelector("#overlay").style.display = "block";
+        } else {
+            this.querySelector("#overlay").style.display = "none";
+        }
     }
 
     AboutBoxProto.addCallback = function(eventStr, callback) {
