@@ -68,17 +68,22 @@ function init() {
         }
     }
 
+    function endVr() {
+        effect.endPresent();
+    }
+
     function startNetworkGame() {
+        var aboutBox = document.querySelector("about-box");
         var name = prompt("Please enter your name");
+        aboutBox.setOverlayVisibility(false);
+        startVr();
 
         function stateChangedCallback(state, error) {
-            var aboutBox = document.querySelector("about-box");
             switch(state) {
                 case "joined":
-                    aboutBox.setOverlayVisibility(false);
-                    startVr();
                     break;
                 case "error":
+                    endVr();
                     aboutBox.showNetworkError(error);
                     console.log("Error", error);
                     break;
