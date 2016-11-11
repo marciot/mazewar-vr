@@ -127,6 +127,10 @@ class NetworkedGame {
             }
         }
     }
+
+    endGame() {
+        actors.removeAll();
+    }
 }
 
 class SoloGame {

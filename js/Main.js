@@ -62,20 +62,27 @@ function init() {
         }
     }
 
+    function vrPresentationChange() {
+        document.querySelector("about-box").setOverlayVisibility(!vrDisplay.isPresenting);
+    }
+    window.addEventListener('vrdisplaypresentchange', vrPresentationChange);
+
     function startVr() {
-        if(vrEnabled && vrDisplay.capabilities.canPresent) {
+        if(vrEnabled && vrDisplay.capabilities.canPresent && effect.requestPresent) {
             effect.requestPresent();
         }
+        document.querySelector("about-box").setOverlayVisibility(false);
     }
 
     function endVr() {
-        effect.endPresent();
+        if(effect.endPresent) {
+            effect.endPresent();
+        }
+        document.querySelector("about-box").setOverlayVisibility(true);
     }
 
     function startNetworkGame() {
-        var aboutBox = document.querySelector("about-box");
         var name = prompt("Please enter your name");
-        aboutBox.setOverlayVisibility(false);
         startVr();
 
         function stateChangedCallback(state, error) {
@@ -84,7 +91,7 @@ function init() {
                     break;
                 case "error":
                     endVr();
-                    aboutBox.showNetworkError(error);
+                    document.querySelector("about-box").showNetworkError(error);
                     console.log("Error", error);
                     break;
             }
@@ -103,8 +110,6 @@ function init() {
     }
 
     function startSoloGame() {
-        var aboutBox = document.querySelector("about-box");
-        aboutBox.setOverlayVisibility(false);
         startVr();
     }
 
