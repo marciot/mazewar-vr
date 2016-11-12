@@ -30,10 +30,26 @@ the recommended web browser for that platform:
 * __Desktop PCs__: Should work with the latest version of Google Chrome
 * __Android__: Should work with the latest version of Google Chrome.
 * __iOS__: Single player mode is supported, but multi-player is not currently supported under Safari; future compatibility is planned via an app.
-* __Samsung Gear VR, Oculus Rift, HTC Vive__: Not currently supported, but expected to be supported
-in Chrome once the game has been updated to use the [WebVR API].
+* __Samsung Gear VR__: Should be supported using the [Samsung Internet Browser for Gear VR] from the Oculus store.
+* __Oculus Rift and HTC Vive__: Should be supported using special [WebVR] builds of [Chrome] and [Firefox].
 
 See the project [wiki page] for compatibility notes for specific devices that have been tested.
+
+## Licensing:
+
+I am a strong believer in open source. As such, I intend to release most of the source code for Maze War VR
+under the Affero GPL license. This includes all code as you see it in the playable website demo above.
+
+The portions of the code written by me and required MIT licensed libraries will also be made available in
+binary form in the app store under a non-free license (see this link for an explanation on why
+[apps are incompatible with the GPL]). This will be done to fund further development of this project and to
+expand the network of players.
+
+## Contributions:
+
+Code contributions or fixes to <cite>Maze War VR</cite> are welcome, although for the licensing reasons
+stated above I will not be able to incorporate it into the main-line distribution unless you dual license
+your code or assign the copyright of your enhancements to me.
 
 ## Credits:
 
@@ -52,5 +68,9 @@ Maze War protocol was provided by the developer of the [Contralto] emulator from
 [RetroWeb Vintage Computer Museum]: http://retroweb.maclab.org
 [Living Computers: Museum+Labs]: http://www.livingcomputers.org
 [Contralto]: https://github.com/livingcomputermuseum/ContrAlto
+[Samsung Internet Browser for Gear VR]: https://www.oculus.com/experiences/gear-vr/849609821813454/
 [WebVR API]: https://webvr.info
+[Chrome]:https://webvr.info/get-chrome/
+[Firefox]:https://mozvr.com/
 [wiki page]: https://github.com/marciot/mazewar-vr/wiki
+[apps are incompatible with the GPL]: https://www.fsf.org/blogs/licensing/more-about-the-app-store-gpl-enforcement
