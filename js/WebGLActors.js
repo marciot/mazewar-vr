@@ -306,18 +306,27 @@ class MapRepresentation extends VisibleRepresentation {
     constructor() {
         super();
         
-        const mapHeight      = 0.1;
-        const mapWidth       = 0.2;
+        this.cellSize    = 8;
+        this.scoreHeight = 16;
         
-        this.cellSize = 4;
+        const maxRats    = 8;
+
+        const mazePixelWidth    = maze.mazeCols * this.cellSize;
+        this.mazePixelHeight   = maze.mazeRows * this.cellSize;
+        const listPixelHeight   = maxRats * this.scoreHeight;
+        const bothPixelHeight   = this.mazePixelHeight + listPixelHeight;
         
         this.mapCanvas = document.createElement("canvas");
-        this.mapCanvas.width  = maze.mazeCols * this.cellSize;
-        this.mapCanvas.height = maze.mazeRows * this.cellSize;
+        this.mapCanvas.width  = mazePixelWidth;
+        this.mapCanvas.height = bothPixelHeight;
+
+        const mapGlHeight      = bothPixelHeight/this.mazePixelHeight * 0.1;
+        const mapGlWidth       = 0.2;
         
         this.mapTexture    = new THREE.Texture(this.mapCanvas);
         
         this.drawMap();
+        //this.drawScores();
         
         this.mapMaterial   = new THREE.MeshPhongMaterial({
             color:     0xffffff,
@@ -325,10 +334,11 @@ class MapRepresentation extends VisibleRepresentation {
             shininess: 20,
             shading:   THREE.FlatShading,
             map:       this.mapTexture,
-            side:      THREE.FrontSide
+            side:      THREE.FrontSide,
+            transparent: true
         });
         
-        var geometry = new THREE.PlaneGeometry(mapWidth, mapHeight);
+        var geometry = new THREE.PlaneGeometry(mapGlWidth, mapGlHeight);
         var plane    = new THREE.Mesh(geometry, this.mapMaterial);
         
         this.object = plane;
@@ -345,10 +355,13 @@ class MapRepresentation extends VisibleRepresentation {
         ctx.fillRect(x*this.cellSize, z*this.cellSize, this.cellSize, this.cellSize);
     }
     
+    clearCell(ctx, x, z) {
+        ctx.clearRect(x*this.cellSize, z*this.cellSize, this.cellSize, this.cellSize);
+    }
+
     drawMap() {
         var ctx = this.mapCanvas.getContext('2d');
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, this.mapCanvas.width, this.mapCanvas.height);
+        ctx.clearRect(0, 0, this.mapCanvas.width, this.mapCanvas.height);
         ctx.fillStyle = "green";
         var me = this;
         maze.forAll(function(x,z) {
@@ -358,13 +371,26 @@ class MapRepresentation extends VisibleRepresentation {
         });
         this.mapTexture.needsUpdate = true;
     }
-    
+
+    drawScores() {
+        const maxRats = 8;
+        for(var n = 0; n < maxRats; n++) {
+            this.drawScore(n);
+        }
+    }
+
+    drawScore(n) {
+        var ctx = this.mapCanvas.getContext('2d');
+        ctx.fillStyle = "white";
+        ctx.font = "italic bold " + this.scoreHeight + "px 'Lucida Grande'";
+        ctx.fillText("BOB AND ALICE", 10, (n+1) * this.scoreHeight + this.mazePixelHeight);
+    }
+
     // Paints a red dot representing the location of the character.
     whereAmI(x, z) {        
         var ctx = this.mapCanvas.getContext('2d');
         if(this.oldX) {
-            ctx.fillStyle = "white";
-            this.drawCell(ctx, this.oldX, this.oldZ);
+            this.clearCell(ctx, this.oldX, this.oldZ);
         }
         ctx.fillStyle = "red";
         this.drawCell(ctx, x, z);
