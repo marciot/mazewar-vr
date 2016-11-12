@@ -18,13 +18,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <template id="SwipePagesTemplate">
     <style>
-    #swipe-pages > div {
+    .swipe-page {
         position:       fixed;
         top:            0;
         left:           0;
         right:          0;
         bottom:         0;
+        border-left:    1px solid;
+    }
+
+    .swipe-page > div.contentPage {
+        position:       fixed;
+        top:            0;
+        left:           1.5em;
+        right:          0;
+        bottom:         0;
+
         overflow:       auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     #swipe-pages.animationEnabled > div {
@@ -41,10 +52,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     /* Chevron */
     
-    #swipe-pages > div {
-        padding: 0 1.5em;
-    }
-    
     .swipe-arrow::before {
         position:   fixed;
         font-size:  2rem;
@@ -52,38 +59,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         left:       5px;
         top:        50%;
+        width:      1en;
         margin-top: -0.8em;
         
         transform : scale(1,2);
     }
     
     .swipe-arrow {
-        border-left: 1px solid;
-    }
-    
-    #swipe-arrow {
-        position:   fixed;
-        left:       0;
-        top:        0;
-        bottom:     0;
-        width:      1.5em;
-        cursor:     pointer;
+        position:       fixed;
+        width:          0;
+        height:         0;
+        cursor:         pointer;
     }
     </style>
     <div id="swipe-pages">
         <content></content>
     </div>
-    <div id="swipe-arrow"></div>
 </template>
 
 <script>
 (function (thisDoc) {
     class Pages {
-        constructor(el, arrow) {
+        constructor(el) {
             var startPage = el.children[0].id;
             
             this.pages       = el;
-            this.arrow       = arrow;
             this.currentPage = startPage;
             this.startPage   = startPage;
             
@@ -95,36 +95,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 me.showPage(e.state ? e.state.page : me.startPage);
             }
     
+            var touchX, touchY, trackingSwipe;
+
             window.ontouchstart = function(e) {
-                // Disable animation effect on ontouchmove since
-                // the back swipe gesture on mobile devices already
-                // does an animation.
+                // Avoid duplicate animation if iOS interprets
+                // the swipe as a back navigation
                 me.disablePageSlide();
+
+                touchY = e.touches[0].screenY;
+                touchX = e.touches[0].screenX;
+                trackingSwipe = true;
             }
-            
+
+            window.ontouchmove = function(e) {
+                if(e.touches.length > 1) {
+                    trackingSwipe = false;
+                    return;
+                }
+                // Emulate back swipe on platforms other than iOS
+                // that lack a native back swipe gesture.
+                var deltaX = e.touches[0].screenX - touchX;
+                var deltaY = e.touches[0].screenY - touchY;
+                if(deltaX > 60 && Math.abs(deltaY) < deltaX/4 && trackingSwipe) {
+                    trackingSwipe = false;
+                    me.goBack();
+                }
+            }
+
+            this.wrapAllChildren(el);
             this.hideAllChildrenExceptFirst(el);
             
             if(history.state && history.state.page !== startPage) {
-                //this.showPage(history.state.page);
                 history.replaceState(null, startPage);
-            }
-            
-            function arrowBack() {
-                me.enablePageSlide();
-                history.back();
-            }
-            
-            if(this.arrow) {
-                this.arrow.addEventListener("click", arrowBack);
-                this.arrow.style.display = "none";
             }
         }
         
+        goBack() {
+            this.enablePageSlide();
+            history.back();
+        }
+
+        wrapAllChildren(el) {
+            var els = el.children;
+            for(var i = 0; i < els.length; i++) {
+                var old = els[i];
+                var oldId = old.id;
+                old.removeAttribute("id");
+                var page = old.ownerDocument.createElement("div");
+                page.id = oldId;
+                page.classList = "swipe-page";
+                el.replaceChild(page, old);
+                page.appendChild(old);
+                old.classList.add("contentPage");
+
+                if(i > 0) {
+                    // All pages except for first get a back arrow
+                    this.addSwipeArrowToPage(page);
+                }
+            }
+        }
+
+        addSwipeArrowToPage(page) {
+            var arrow = page.ownerDocument.createElement("div");
+            arrow.classList = "swipe-arrow";
+            arrow.addEventListener("click", () => goBack);
+            page.appendChild(arrow);
+        }
+
         hideAllChildrenExceptFirst(el) {
             var els = el.children;
             for(var i = 1; i < els.length; i++) {
                 els[i].classList.add("hiddenRight");
-                els[i].classList.add("swipe-arrow");
             }
         }
                 
@@ -139,9 +180,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         showPage(newPage) {
             if(this.currentPage === newPage) {
                 return;
-            }
-            if(this.arrow) {
-                this.arrow.style.display = (this.startPage !== newPage) ? "block" : "none";
             }
             var curEl = document.getElementById(this.currentPage);
             var newEl = document.getElementById(newPage);

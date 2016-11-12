@@ -120,6 +120,9 @@ function init() {
             about.addCallback("gfxModeSelected",  modeSelected);
             about.addCallback("startSoloGame",    startSoloGame);
             about.addCallback("startNetworkGame", startNetworkGame);
+            if(FastClick) {
+                FastClick.attach(about);
+            }
         }
     }
 

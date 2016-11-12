@@ -67,15 +67,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <!-- We use YConsole to help debugging on mobile devices -->
         <script type="text/javascript" src="js/third-party/yconsole-compiled.js"></script>
         <script type="text/javascript">
-            window.onerror = function(error) {
+            /*window.onerror = function(error) {
                 YConsole.show();
-            };
+            };*/
             YConsole.activate();
             YConsole.docking="bottom";
         </script>
-    </head>
-
     <body>
+        <script>
+            function onTouch(e) {
+                if(e.touches && e.touches.length === 4) {
+                    YConsole.show();
+                    e.preventDefault();
+                }
+            }
+            document.body.addEventListener("touchstart", onTouch);
+        </script>
         <about-box></about-box>
 
         <!-- Cordova CSP Configuration:
@@ -104,6 +111,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/third-party/threejs/VREffect.js"></script>
 
         <!-- Library Code -->
+        <script type="text/javascript" src="js/third-party/fastclick.js"></script>
         <script type="text/javascript" src="js/third-party/tween-functions.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/AnaglyphEffect.js"></script>
 
