@@ -59,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         left:       5px;
         top:        50%;
-        width:      1en;
+        width:      1em;
         margin-top: -0.8em;
         
         transform : scale(1,2);
@@ -67,8 +67,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
     .swipe-arrow {
         position:       fixed;
-        width:          0;
-        height:         0;
+        width:          1em;
+        height:         100%;
         cursor:         pointer;
     }
     </style>
@@ -132,7 +132,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         
         goBack() {
             this.enablePageSlide();
-            history.back();
+            window.history.back();
         }
 
         wrapAllChildren(el) {
@@ -158,7 +158,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         addSwipeArrowToPage(page) {
             var arrow = page.ownerDocument.createElement("div");
             arrow.classList = "swipe-arrow";
-            arrow.addEventListener("click", () => goBack);
+            arrow.addEventListener("click", this.goBack.bind(this));
             page.appendChild(arrow);
         }
 
