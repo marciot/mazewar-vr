@@ -29,7 +29,7 @@ the recommended web browser for that platform:
 
 * __Desktop PCs__: Should work with the latest version of Google Chrome
 * __Android__: Should work with the latest version of Google Chrome.
-* __iOS__: Single player mode is supported, but multi-player is not currently supported under Safari; future compatibility is planned via an app.
+* __iOS__: Single player mode is supported, but multi-player is not currently supported under Safari; multi-player capability is planned via an app.
 * __Samsung Gear VR__: Should be supported using the [Samsung Internet Browser for Gear VR] from the Oculus store.
 * __Oculus Rift and HTC Vive__: Should be supported using special [WebVR] builds of [Chrome] and [Firefox].
 
@@ -69,7 +69,7 @@ Maze War protocol was provided by the developer of the [Contralto] emulator from
 [Living Computers: Museum+Labs]: http://www.livingcomputers.org
 [Contralto]: https://github.com/livingcomputermuseum/ContrAlto
 [Samsung Internet Browser for Gear VR]: https://www.oculus.com/experiences/gear-vr/849609821813454/
-[WebVR API]: https://webvr.info
+[WebVR]: https://webvr.info
 [Chrome]:https://webvr.info/get-chrome/
 [Firefox]:https://mozvr.com/
 [wiki page]: https://github.com/marciot/mazewar-vr/wiki
