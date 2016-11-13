@@ -1,10 +1,11 @@
 const fogNear = 0.1;
 const fogFar  = 50;
 
-var camera, scene, renderer, effect, light, game;
+var camera, scene, renderer, effect, game;
 var maze, theme;
 var loader = new THREE.TextureLoader();
 var tween = new Tween();
+var lights = [];
 
 function setupScene() {
     renderer  = new THREE.WebGLRenderer();
@@ -21,7 +22,7 @@ function setupScene() {
 
     scene     = new THREE.Scene();
     scene.fog = new THREE.Fog(0x000000, fogNear, fogFar);
-    theme     = new ModernTheme(renderer);
+    theme     = new RetroTheme(renderer);
     theme.addLightingToScene(scene);
 
     // Ground plane
@@ -81,7 +82,10 @@ function animateSkydome() {
 
 function liftFog(t) {
     tween.add(5, tweenFunctions.easeInQuint, t => scene.fog.far   = t, fogNear+0.01, fogFar);
-    tween.add(5, tweenFunctions.easeInCubic, t => light.intensity = t);
+    for(var i = 0; i < lights.length; i++) {
+        var light = lights[i];
+        tween.add(5, tweenFunctions.easeInCubic, t => light.intensity = t, 0, t*light.intensity);
+    }
 }
 
 class MazeWalls extends Maze {
@@ -89,7 +93,6 @@ class MazeWalls extends Maze {
         super(a, b);
 
         this.wallHeight = 2.5;
-        //this.wallHeight = 0.1;
         this.geometry = new THREE.Geometry();
 
         this.forAll(this.addWalls);
@@ -148,7 +151,7 @@ class MazeWalls extends Maze {
     }
 }
 
-class ModernTheme {
+class RetroTheme {
     constructor(renderer) {
         // Attributes
         
@@ -164,9 +167,11 @@ class ModernTheme {
         this.eyeMaterial = new THREE.MeshPhongMaterial( { 
             color:     0xFFFFFF, 
             specular:  0x333333,
-            shininess: 100,
-            shading:   THREE.FlatShading,
-            map:       texture
+            shininess: 20,
+            emissive:  0xFFFFFF,
+            emissiveIntensity: 1,
+            emissiveMap: texture,
+            map:         texture
         } ) ;
         
         // Materials for the ground plane
@@ -194,7 +199,14 @@ class ModernTheme {
     }
     
     addLightingToScene(scene) {
-        light = new THREE.AmbientLight(0xFFFFFF);
+        var light = new THREE.AmbientLight(0xFFFFFF, 0.25);
+        lights.push(light);
         scene.add(light);
+
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
+        directionalLight.position.set( .25, 1, 0.5 );
+        lights.push(directionalLight);
+        scene.add(directionalLight);
+
     }
 }

@@ -328,10 +328,8 @@ class MapRepresentation extends VisibleRepresentation {
         this.drawMap();
         //this.drawScores();
         
-        this.mapMaterial   = new THREE.MeshPhongMaterial({
+        this.mapMaterial   = new THREE.MeshBasicMaterial({
             color:     0xffffff,
-            specular:  0xffffff,
-            shininess: 20,
             shading:   THREE.FlatShading,
             map:       this.mapTexture,
             side:      THREE.FrontSide,
