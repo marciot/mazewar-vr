@@ -60,7 +60,7 @@ class NetworkedGame {
         // Create the new players
         this.selfPlayer         = this.factory.newSelfPlayer();
         this.selfPlayer.name    = playerName;
-        this.selfPlayer.setLocalPlayer();
+        this.selfPlayer.setLocalPlayer(true);
 
         // Start networking
 
@@ -141,7 +141,7 @@ class SoloGame {
     startGame() {
         var self  = this.factory.newSelfPlayer();
         var robot = this.factory.newRobotPlayer();
-        self.setLocalPlayer();
+        self.setLocalPlayer(true);
         robot.setLocalPlayer();
     }
 

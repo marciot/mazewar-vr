@@ -222,13 +222,22 @@ class Player extends Actor {
         this.isDead      = false;
         this.myName      = "no name";
         this.localPlayer = false;
+
+        // The player always sees enemy missiles as yellow-red.
+        // The player always sees its own missiles as green.
+        this.enemyMissileColor = 0xFF0000 + (Math.floor(Math.random()*256) << 8);
+        this.selfMissileColor  = 0x00FF00;
+    }
+
+    get missileColor() {
+        return this.isSelf ? this.selfMissileColor : this.enemyMissileColor;
     }
 
     shoot() {
         this.notifyObservers("shoot");
 
         var facing = this.representation.cardinalDirection;
-        var missileRep = this.representation.getMissileRepresentation();
+        var missileRep = this.representation.getMissileRepresentation(this.missileColor);
         var missile = new MissileActor(missileRep, this, {shotBy: this});
         missile.startAnimation();
         return actors.add(missile);
@@ -272,7 +281,8 @@ class Player extends Actor {
         return this.myName;
     }
 
-    setLocalPlayer() {
+    setLocalPlayer(isSelf) {
         this.localPlayer = true;
+        this.isSelf      = isSelf;
     }
 }

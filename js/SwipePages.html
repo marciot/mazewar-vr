@@ -205,7 +205,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         gotoPage(newPage) {
             if(newPage) {
-                console.log("Goting to:", newPage);
                 history.pushState({page: newPage}, newPage);
                 this.enablePageSlide();
                 this.showPage(newPage);

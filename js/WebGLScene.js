@@ -190,9 +190,6 @@ class RetroTheme {
                 map: texture
             });
         }
-        
-        // Materials for the missiles
-        this.missileMaterial = new THREE.MeshBasicMaterial( {color: 0x00FF00} );
 
         // Sky color
         renderer.setClearColor(0x000000);

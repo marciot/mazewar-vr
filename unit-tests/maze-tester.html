@@ -350,11 +350,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         gameMaster.startGame();
 
         function startGame() {
+            var startGameButton = document.getElementById("startGameButton");
             if(!playerNameField.value) {
                 return;
             }
-            hostIdField.disabled = true;
-            playerNameField.disabled  = true;
+
+            hostIdField.disabled     = true;
+            playerNameField.disabled = true;
+            startGameButton.disabled = true;
 
             gameMaster.endGame();
             gameMaster = new NetworkedGame(playerFactory);
@@ -363,9 +366,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 parseInt(hostIdField.value),
                 playerNameField.value,
                 function stateChangedCallback(state) {
-                    document.getElementById("startGameButton").innerText = state;
+                    startGameButton.innerText = state;
                 }
             );
+
+            window.focus();
         }
     </script>
     <!--
