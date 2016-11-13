@@ -143,7 +143,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 old.removeAttribute("id");
                 var page = old.ownerDocument.createElement("div");
                 page.id = oldId;
-                page.classList = "swipe-page";
+                page.classList.add("swipe-page");
                 el.replaceChild(page, old);
                 page.appendChild(old);
                 old.classList.add("contentPage");
@@ -157,7 +157,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         addSwipeArrowToPage(page) {
             var arrow = page.ownerDocument.createElement("div");
-            arrow.classList = "swipe-arrow";
+            arrow.classList.add("swipe-arrow");
             arrow.addEventListener("click", this.goBack.bind(this));
             page.appendChild(arrow);
         }
