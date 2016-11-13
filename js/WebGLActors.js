@@ -249,7 +249,6 @@ class EyeRepresentation extends AnimatedRepresentation {
         geometry.rotateY(Math.PI);
         
         this.object = new THREE.Mesh(geometry, theme.eyeMaterial);
-        this.object.castShadow = true;
 
         this.object.position.y = eyeHeight;
     }
@@ -281,12 +280,19 @@ class MissileRepresentation extends AnimatedRepresentation {
     constructor() {
         super(10);
 
-        //var geometry = new THREE.ConeGeometry( 0.1, 0.3, 32 );
         var geometry = new THREE.TorusKnotGeometry(0.1, 0.02, 18);
         geometry.rotateZ(-Math.PI/2);
 
-        this.object = new THREE.Mesh(geometry, theme.missileMaterial);
-        this.object.castShadow = true;
+        // Set the fade out distance just shy of the wall on a
+        // neighboring corridor. This is important to keep light
+        // from going through walls in a multi-player game.
+        var fadeDistance = MazeWalls.cellDimension * 2.45;
+        var mesh = new THREE.Mesh(geometry, theme.missileMaterial);
+        var light = new THREE.PointLight( 0x00ff00, 5, fadeDistance);
+
+        this.object = new THREE.Object3D();
+        this.object.add(light);
+        this.object.add(mesh);
         this.object.position.y = 1.5;
     }
 
