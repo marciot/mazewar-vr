@@ -86,6 +86,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 height: 50%;
             }
 
+            .flex-grid.three-element > div {
+                height: 32%;
+                width:  100%;
+            }
+
             .flex-grid.two-element > div {
                 height: 49%;
                 width:  100%;
@@ -111,6 +116,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             .flex-grid.four-element > div {
                 height: 24%;
+            }
+
+            .flex-grid.three-element > div {
+                height: 32%;
             }
 
             .flex-grid.two-element > div {
@@ -232,6 +241,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             svg {
                 width:  20vh;
             }
+        }
+
+        svg {
+            cursor: pointer;
         }
 
         svg path {
@@ -396,10 +409,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <h1 class="title">Maze War <strong>VR</strong></h1>
             </div>
             <div class="middle flex-grid six-element">
-                <div><div class="clickable grid-button" data-page="pageAbout">History &amp; Help</div></div>
-                <div><div class="clickable grid-button" id="playSolo">Play Solo</div></div>
+                <div><div class="clickable grid-button" data-page="pageHelp">Help &amp; History</div></div>
+                <div><div class="clickable grid-button" id="playSolo">Play vs. Computer</div></div>
                 <div><div class="clickable grid-button" id="netPlay">Play with Friends</div></div>
-                <div><div class="clickable grid-button" data-page="pageOptions">Game Setup</div></div>
+                <div><div class="clickable grid-button" data-page="pageGameSetup">Game Setup</div></div>
                 <div><div class="clickable grid-button" data-page="pageCredits">Credits</div></div>
                 <div><div class="clickable grid-button" data-page="pageHeadsets">Recommended Headsets</div></div>
             </div>
@@ -419,33 +432,217 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
-        <div class="flex-distribute" id="pageAbout">
+        <div class="flex-layout" id="pageGameSetup">
+            <div class="header center-text">
+                <h1 class="title">Game Setup</h1>
+            </div>
+            <div class="middle flex-grid three-element">
+                <div><div class="clickable grid-button" data-page="pageDisplayOptions">Display Options</div></div>
+                <div><div class="clickable grid-button" data-page="pageGamepadConfiguration">Gamepad Options</div></div>
+                <div><div class="clickable grid-button" data-page="pageSetupWizard">Setup Wizard</div></div>
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageHelp">
             <div>
-                <h1>History of Maze War</h1>
+                <h1>About Maze War</h1>
                 <p>
-                <cite>Maze War VR</cite> is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California. Players would hunt down opponents in a three-dimensional maze, making it the grandfather of first person shooter games.
-                By 1977, the game was taken to MIT, where it was played on the early computer networks of the time.
+                <cite>Maze War VR</cite> is a remake of a game written by Steve Colley and Greg Thompson in 1974 at
+                the NASA Ames Research Center in California. Players would hunt down opponents in a three-dimensional
+                maze, making it the grandfather of first person shooter games.
                 </p>
+                <p>
+                By 1977, the game was taken to MIT, where it was played on the early computer networks
+                of the time.
+                </p>
+            </div>
+            <div>
                 <h1>How to Play</h1>
                 <p>
-                    This remake can be played either using a VR headset or without. Select "Display Options" to choose the VR mode.
+                    The objective of the game is to hunt down your opponents in the maze and shoot them down.
+                    Look around and then hold down the trigger to move in the direction you are facing; press
+                    and release the trigger rapidly to shoot.
                 </p>
+            </div>
+        </div>
+
+        <div class="flex-layout" id="pageSetupWizard">
+            <div>
+                <div class="header center-text">
+                    <h1 class="title">I have...</h1>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageSmartphone">...a smartphone</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageTablet">...a tablet</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageDesktop">...a desktop PC or laptop</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageDesktopVR">...an Oculus Rift or HTC Vive</div>
+                    </center>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-layout" id="pageSmartphone">
+            <div>
+                <div class="header center-text">
+                    <h1 class="title">I have...</h1>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageCardboardVR">...a Mattel ViewMaster</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageCardboardVR">...a Google Cardboard headset</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageGearVR">...a Samsung Gear VR headset</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageOtherVR">...some other headset</div>
+                    </center>
+                </div>
+                <div>
+                    <center>
+                    <div class="page-link clickable centered-button" data-page="pageTablet">...no headset, just my phone</div>
+                    </center>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageCardboardVR">
+            <div>
+                <h1>Headset Controls:</h1>
                 <p>
-                <strong>Headset Controls:</strong>
                 Hold down the trigger on your headset to move in the direction you are facing; press and release
                 the trigger rapidly to shoot.
                 </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="page1">Back</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageOtherVR">
+            <div>
+                <h1>Simple Headset Controls:</h1>
                 <p>
-                <strong>GearVR/Oculus/Vive Users:</strong>
-                You must configure a trigger on the gamepad from the "Game Setup" screen prior to starting a game.
+                Hold down the trigger on your headset to move in the direction you are facing; press and release
+                the trigger rapidly to shoot.
                 </p>
+            </div>
+            <div>
+                <h2>Using a Bluetooth Gamepad:</h2>
                 <p>
-                <strong>Smartphone or Tablet Controls:</strong>
-                Move the device to look around, hold your finger anywhere on the screen to move in the direction you are facing; tap to shoot.
+                If your headset came with a Bluetooth gamepad, you will need to pair the headset to your phone.
+                Then go to the "Game Setup" screen to configure a button on it as the trigger.
                 </p>
-                <strong>Desktop Controls:</strong>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageGameSetup">Game Setup</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageTablet">
+            <div>
+                <h1>Smartphone or Tablet Users:</h1>
+                <p>
+                Stand and hold the device in front of your face. Turn your body or move the device up and down to look around.
+                Press your finger anywhere on the screen to move in the direction you are facing; tap to shoot.</p>
+                <p>
+                By default, the display will be shown in 2D on your phone or tablet. If you would like, you can enable anaglyph 3D from the "Display Options"
+                screen. This allows you to see 3D using inexpensive red/cyan glasses.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageDisplayOptions">Display Options</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageDesktop">
+            <div>
+                <h1>Desktop or Laptop Users:</h1>
+                <p>
                 Move the mouse to look around, hold down the mouse button to move in the direction you are facing; click rapidly to shoot.
                 </p>
+                <p>
+                By default, the display will be shown in 2D on your monitor. If you would like, you can enable anaglyph 3D from the "Game Setup"
+                screen. This allows you to see 3D using inexpensive red/cyan glasses.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageDisplayOptions">Display Options</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageGearVR">
+            <div>
+                <h1>Samsung Gear VR Users:</h1>
+                <p>
+                You must download and view this page in the <a href="https://www.oculus.com/experiences/gear-vr/849609821813454/" target="_blank">Samsung Internet Browser for Gear VR</a>
+                from the <cite>Oculus Store Android</cite> app. This is not the same as the <cite>Samsung Internet for Android</cite> from the <cite>Galaxy App</cite> store.
+                </p>
+                <p>
+                Once you have this setup, you need to click one of the following links while you are viewing this page in VR:
+                <ul>
+                    <li><a href="internet://webvr-enable">Enable WebVR</a>
+                    <li><a href="internet://webvr-disable">Disable WebVR</a>
+                </ul>
+                </p>
+                <p>
+                Lastly, you must configure a headset button as a trigger from the "Game Setup" screen prior to starting a game.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageGameSetup">Game Setup</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageDesktopVR">
+            <div>
+                <h1>Oculus Rift &amp; HTC Vive Users:</h1>
+                <p>
+                At the present time, you must download an experimental version of <a href="https://webvr.info/get-chrome/" target="_blank">Chrome</a> or
+                <a href="https://mozvr.com/" target="_blank">Firefox</a> to play <cite>Maze War VR</cite>.
+                </p>
+                <p>
+                You must then configure a trigger button on your gamepad or controller from the "Game Setup" screen prior to
+                starting a game.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageGameSetup">Game Setup</div>
+                </center>
             </div>
         </div>
 
@@ -521,18 +718,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
-        <div class="flex-distribute" id="pageOptions">
+        <div class="flex-distribute" id="pageDisplayOptions">
             <div>
                 <h1>Select your VR Experience:</h1>
                 <p>
-                If you are using a simple headset or a playing without a headset, select one of the icons below.<br>
-                If you are using an electronic headset like the Samsung Gear VR, Oculus Rift or HTC Vive, proceed to the &quot;Advanced Configuration&quot;.
+                Click an icon below to choose your VR experience. Click the headset icon if you will be wearing a VR headset;
+                click the middle icon if you are playing without a headset in 2D; or click on the last icon if you will wear
+                red/cyan glasses for 3D.
                 </p>
                 <div id="mode-select">
                     <p>
                     <svg id="headset" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 63 58.75" enable-background="new 0 0 63 47" xml:space="preserve"><line x1="87.4" y1="37.2" x2="97.2" y2="37.2"/><g><path d="M42.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S46.4,20,42.9,20z M42.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S40,21,42.9,21s5.2,2.4,5.2,5.2S45.8,31.5,42.9,31.5z"/><path d="M20.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S24.4,20,20.9,20z M20.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S18,21,20.9,21s5.2,2.4,5.2,5.2S23.8,31.5,20.9,31.5z"/><path d="M55.7,9V7.9c0-1.6-1.3-2.9-2.9-2.9H11.3C9.7,5,8.4,6.3,8.4,7.9V9c-2.3,0.7-4,2.8-4,5.3v22.6c0,3,2.5,5.5,5.5,5.5h13.4   c1.8,0,3.4-1,4.1-2.6c0,0,0-0.1,0-0.1l0.2-0.5h8l0.1,0.4c0,0,0,0.1,0,0.1c0.7,1.7,2.3,2.8,4.2,2.8h13.9c3,0,5.5-2.5,5.5-5.5V14.3   C59.4,11.8,57.8,9.8,55.7,9z M10.7,7.9c0-0.3,0.3-0.6,0.6-0.6h41.4c0.3,0,0.6,0.3,0.6,0.6v2H10.7V7.9z M27.3,36.7l2-5   c0.5-1,1.4-1.6,2.5-1.6c0.9,0,2.1,0.5,2.6,1.7l1.7,4.9H27.3z M57.2,36.9c0,1.8-1.5,3.2-3.2,3.2H40c-0.9,0-1.7-0.5-2.1-1.4l-2.6-7.3   c-0.6-1.4-1.9-2.3-3.5-2.3c-1.5,0-2.8,0.8-3.4,2.2l-3,7.5c-0.4,0.8-1.2,1.3-2.1,1.3H9.9c-1.8,0-3.2-1.5-3.2-3.2V14.3   c0-1.8,1.5-3.2,3.2-3.2h44c1.8,0,3.2,1.5,3.2,3.2V36.9z"/></g></svg>
-                    <svg id="anaglyph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/><path d="m 41.3,40.2 c -2.4,0 -4.3,1.9 -4.3,4.3 l 0,17.1 c 0,2.4 1.9,4.3 4.3,4.3 l 21.4,0 c 1,0 1.9,-0.3 2.6,-0.9 l 6.4,-5 c 0.2,-0.1 0.2,-0.1 0.5,-0.2 0.6,-0.2 1.4,-0.3 1.2,-0.3 -0.2,0 0.5,0.1 1,0.3 0.3,0.1 0.3,0.1 0.5,0.2 l 6.6,5.1 c 0.7,0.6 1.7,0.9 2.6,0.9 l 21.4,0 c 2.4,0 4.3,-1.9 4.3,-4.3 l 0,-17.1 c 0,-2.4 -1.9,-4.3 -4.3,-4.3 z" /><path d="m 44.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkRed;"/><path d="m 85.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkCyan;"/></svg>
                     <svg id="monitor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/></svg>
+                    <svg id="anaglyph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/><path d="m 41.3,40.2 c -2.4,0 -4.3,1.9 -4.3,4.3 l 0,17.1 c 0,2.4 1.9,4.3 4.3,4.3 l 21.4,0 c 1,0 1.9,-0.3 2.6,-0.9 l 6.4,-5 c 0.2,-0.1 0.2,-0.1 0.5,-0.2 0.6,-0.2 1.4,-0.3 1.2,-0.3 -0.2,0 0.5,0.1 1,0.3 0.3,0.1 0.3,0.1 0.5,0.2 l 6.6,5.1 c 0.7,0.6 1.7,0.9 2.6,0.9 l 21.4,0 c 2.4,0 4.3,-1.9 4.3,-4.3 l 0,-17.1 c 0,-2.4 -1.9,-4.3 -4.3,-4.3 z" /><path d="m 44.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkRed;"/><path d="m 85.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkCyan;"/></svg>
                     </p>
                     <p>
                     Icons by Nick Bluth from the Noun Project
@@ -541,16 +739,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div>
                 <center>
-                <div class="page-link clickable centered-button" data-page="pageAdvancedOptions">Advanced Configuration</div>
+                <div class="page-link clickable centered-button" data-page="page1">Back</div>
                 </center>
             </div>
         </div>
 
-        <div class="flex-distribute" id="pageAdvancedOptions">
+        <div class="flex-distribute" id="pageGamepadConfiguration">
             <div>
                 <h1>Gamepad Configuration:</h1>
                 <p>
-                    Samsung GearVR, Oculus Rift or HTC Vive users will need to configure a game pad button for use with <cite>Maze War VR</cite>:
+                    If you have a device with an electronic controller or gamepad, you will need to configure a
+                    game pad button for use with <cite>Maze War VR</cite>:
                 <p>
             </div>
             <div>
@@ -559,24 +758,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 </center>
             </div>
             <div>
-                <h1>Enable WebVR on the Samsung Gear VR:</h1>
-                To enable WebVR on the Samsung Gear VR, you need to download and open the <cite>Samsung Internet for Gear VR</cite> browser and visit one of these links:
-                <ul>
-                    <li><a href="internet://webvr-enable">Enable WebVR</a>
-                    <li><a href="internet://webvr-disable">Disable WebVR</a>
-                </ul>
-            </div>
-            <div>
-                <h1>Enable WebVR on the Oculus Rift or HTC Vive:</h1>
-                You will need to use a special build of <a href="https://webvr.info/get-chrome/">Chrome</a> or <a href="https://mozvr.com/">Firefox</a>.
+                <center>
+                <div class="page-link clickable centered-button" data-page="page1">Go Back</div>
+                </center>
             </div>
         </div>
 
         <div class="flex-distribute" id="pageHeadsets">
             <div>
-                <h1>Recommended VR Headset</h1>
-                I recommend the <cite>Mattel ViewMaster VR</cite> for the least complicated <cite>Maze War VR</cite> experience. It is inexpensive, works with most phones and has a responsive trigger that works great with <cite>Maze War VR</cite>.
-
+                <h2>Starter Headset</h2>
+                The <cite>Mattel ViewMaster VR</cite> has a responsive trigger and is a delight with
+                <cite>Maze War VR</cite>. It accomodates most phones, is very simple to use and
+                you can get it on sale as low as $17, making it a fantastic choice for starting out.
+                The only downside is that it does not fit over glasses. If that is okay, the
+                <cite>Mattel ViewMaster VR</cite> is my choice for getting started with VR.
                 <div class="side-by-side">
                     <img src="artwork/viewmaster.png">
 
@@ -584,7 +779,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <a href="https://www.amazon.com/gp/product/B011EG5HJ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011EG5HJ2&linkCode=as2&tag=marciot-20&linkId=5bb5f23b398d2640a6191d9ef6e39e58 target="_blank">
                         <span><cite>View-Master VR Starter Pack</cite></span>
                         </a>
-                        <p>or</p>
+                        <br>or<br>
                         <a href="https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072" target="_blank">
                         <span><cite>Deluxe View-Master VR Viewer</cite></span>
                         </a>
@@ -594,9 +789,120 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
             </div>
             <div>
-                <h2>Will my Google Cardboard viewer work?</h2>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageHeadsets2">More Choices</div>
+                </center>
+            </div>
+        </div>
 
-                The first generation Google Cardboard with a magnetic switch will not work, as <cite>Maze War VR</cite> requires a mechanical touch switch.
+        <div class="flex-distribute" id="pageHeadsets2">
+            <div>
+                <h2>Choosing a Headset</h2>
+
+                Virtual reality is relatively new and there is a bewildering number of headset choices
+                out there. Before you buy, consider the following questions:
+                <ul>
+                    <li>What is your budget?
+                    <li>Is there a headset made specifically for my phone or should I buy
+                        a generic headset?
+                    <li>Do you wear glasses?
+                    <li>Does a headset have a trigger or will I need to buy a controller?
+                    <li>Do you care about 3D at all?
+                </ul>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageHeadsets3">Companion vs. Generic</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageHeadsets3">
+            <div>
+                <h2>Companion Headsets</h2>
+                <p>
+                Some phones, such as the Galaxy from Samsung, have a companion headset for VR.
+                The <cite>Gear VR</cite>, for example, is custom-made for the Galaxy and has extra
+                electronics to greatly improve the quality of your VR experience. This is the optimal
+                choice if you have a compatible phone, but will set you back around $100.
+                </p>
+                <h2>Generic Headsets</h2>
+                <p>
+                If your phone does not have a companion headset and you don't want to use the
+                <cite>ViewMaster</cite>, there are other generic headsets you can buy. Many come
+                with head straps, making it a good choice if you really dislike holding a
+                <cite>View Master</cite> to your face. Unlike the <cite>ViewMaster</cite>,
+                however, they don't have a trigger so you will need to buy a separate Bluetooth
+                controller or gamepad that is compatible with your phone. Many of these are
+                adjustable, spacious and may be a great choice for people that need to wear glasses.
+                </p>
+                <p>
+                These headsets and a controller will cost between $40 to $50.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageHeadsets4">Cardboard Headsets</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageHeadsets4">
+            <div>
+                <h1>Cardboard Headsets</h1>
+                <p>
+                Cardboard headsets are the least expensive and are often spacious enough for
+                people with glasses, but they have disadvantages. They are not very durable
+                nor particularly comfortable. They also leak a lot of light around the
+                sides which can detract from the VR experience.
+                </p>
+                <h2>Magnetic vs. Foam Trigger</h2>
+                <p>
+                Some of the cardboard headsets use a magnet and washer as a trigger. This
+                is an older design and won't work with <cite>Maze War VR</cite>. Look instead
+                for a cardboard headset listed as being compatible with Google Cardboard version
+                2. These have a trigger that touches a small foam tip on the screen of your phone.
+                </p>
+                <p>
+                Expect to spend about $7 to $15 for a cardboard headset.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="pageHeadsets5">Go Headset Free!</div>
+                </center>
+            </div>
+        </div>
+        
+        <div class="flex-distribute" id="pageHeadsets5">
+            <div>
+                <h1>Go headset free!</h1>
+                <p>
+                <cite>Maze War VR</cite> can be played on a regular PC, tablet or smartphone without a headset.
+                This is a good choice if you fear a fully-immersive VR environment may cause you nausea.
+                </p>
+            </div>
+            <div>
+                <h1>What about anaglyph stereo?</h1>
+                <p>
+                If you want to play in 3D without a headset, you can use the old-style 3D glasses that were common
+                in movies in the 50s. Using anaglyph 3D is an inexpensive
+                way to play <cite>Maze War VR</cite> in 3D on your regular PC, tablet or smartphone. 
+                </p>
+                <p>
+                You can buy various anaglyph glasses online from $1 to $10. Make sure you get the
+                red/cyan variety as the other color combinations will not work. Clear 3D
+                glasses from modern movie theaters will not work either.
+                </p>
+                <p>
+                The cheapest anaglyph glasses are made out of paper, but you can get frames or even clip-ons to
+                wear over your prescription glasses.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="page1">Done</div>
+                </center>
             </div>
         </div>
 
@@ -644,7 +950,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div class="altoHelp" id="altoHelp14">
                 Click the mouse to shoot an opponent.
             </div>
-        <div>
+        </div>
     </swipe-pages>
     </div>
 </template>

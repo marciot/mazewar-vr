@@ -205,9 +205,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         gotoPage(newPage) {
             if(newPage) {
+                console.log("Goting to:", newPage);
                 history.pushState({page: newPage}, newPage);
                 this.enablePageSlide();
                 this.showPage(newPage);
+
+                // When moving backwards, make sure that all pages
+                // ahead of me get returned to the left side
+                var el = document.getElementById(newPage);
+                while(el && el.nextElementSibling) {
+                    if(el.classList.contains("hiddenLeft")) {
+                        el.classList.remove("hiddenLeft");
+                        el.classList.add("hiddenRight");
+                        console.log("Hiding:", el.id);
+                    }
+                    el = el.nextElementSibling;
+                }
             }
         }
     
