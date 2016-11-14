@@ -21,6 +21,11 @@ const eyeHeight                      = 1.6;
 const chestHeight                    = 1.3;
 const distanceOfHeldObjectsFromChest = 0.2;
 
+/* Having the enemy fall slightly slower than ourselves makes it so we can see
+ * if we killed whomever shot us */
+const selfFallAcceleration           = 2;
+const enemyFallAcceleration          = 1.7;
+
 class WebGLActors extends Actors {
     add(actor) {
         super.add(actor);
@@ -272,7 +277,7 @@ class EyeRepresentation extends AnimatedRepresentation {
 
     shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
-        this.startFalling(1);
+        this.startFalling(enemyFallAcceleration);
         this.respawnCallback = respawnCallback;
     }
 
@@ -465,7 +470,7 @@ class SelfRepresentation extends AnimatedRepresentation {
 
     shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
-        this.startFalling(2);
+        this.startFalling(selfFallAcceleration);
         this.body.lockControls();
         
         this.map.hide();
