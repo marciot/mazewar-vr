@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <html lang="en">
     <head>
         <title>MazeWar VR</title>
-        <meta name="Description" CONTENT="Hide, seek and destroy in this multi-player virtual reality chase game. For smartphones and desktop VR, including Cardboard, GearVR, Oculus Rift and Vive.">
+        <meta name="Description" content="Hide, seek and destroy in this multi-player virtual reality chase game. For smartphones and desktop VR, including Cardboard, GearVR, Oculus Rift and Vive.">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -37,6 +37,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <meta property="og:image:width"        content="1200" />
         <meta property="og:image:height"       content="630" />
         <!-- End of Facebook Open Graph Markup -->
+
+        <!-- During development, the code is changing often and it may be useful not to cache things -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Expires" content="0"/>
 
         <style>
             body {
@@ -98,8 +103,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <!-- For some reason using the full webcomponents library breaks WebGL on iOS -->
         <script type="text/javascript" src="js/third-party/webcomponents/webcomponents-lite.min.js"></script>
 
-        <link rel="import" href="js/SwipePages.html"></link>
-        <link rel="import" href="js/AboutBox.html"></link>
+        <link rel="import" href="js/SwipePages.html?v=1"></link>
+        <link rel="import" href="js/AboutBox.html?v=1"></link>
 
         <!-- Library Code -->
         <script>
@@ -118,11 +123,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Networking Code -->
         <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
-        <script type="text/javascript" src="js/networking/cordova-setup.js"></script>
-        <script type="text/javascript" src="js/networking/frame-utilities.js"></script>
-        <script type="text/javascript" src="js/networking/pup-services.js"></script>
-        <script type="text/javascript" src="js/networking/pup-services-mazewar.js"></script>
-        <script type="text/javascript" src="js/networking/retroweb-network.js"></script>
+        <script type="text/javascript" src="js/networking/cordova-setup.js?v=1"></script>
+        <script type="text/javascript" src="js/networking/frame-utilities.js?v=1"></script>
+        <script type="text/javascript" src="js/networking/pup-services.js?v=1"></script>
+        <script type="text/javascript" src="js/networking/pup-services-mazewar.js?v=1"></script>
+        <script type="text/javascript" src="js/networking/retroweb-network.js?v=1"></script>
 
         <!-- Shader programs for skydome -->
         <script type="application/x-glsl" id="sky-vertex">  
@@ -146,25 +151,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </script>
 
         <!-- Main Program -->
-        <script type="text/javascript" src="js/LookAroundControls.js"></script>
-        <script type="text/javascript" src="js/Directions.js"></script>
-        <script type="text/javascript" src="js/Maze.js"></script>
-        <script type="text/javascript" src="js/Actors.js"></script>
-        <script type="text/javascript" src="js/Directors.js"></script>
-        <script type="text/javascript" src="js/Tween.js"></script>
-        <script type="text/javascript" src="js/WebGLActors.js"></script>
-        <script type="text/javascript" src="js/WebGLScene.js"></script>
-        <script type="text/javascript" src="js/GameMaster.js"></script>
-        <script type="text/javascript" src="js/Main.js"></script>
+        <script type="text/javascript" src="js/LookAroundControls.js?v=1"></script>
+        <script type="text/javascript" src="js/Directions.js?v=1"></script>
+        <script type="text/javascript" src="js/Maze.js?v=1"></script>
+        <script type="text/javascript" src="js/Actors.js?v=1"></script>
+        <script type="text/javascript" src="js/Directors.js?v=1"></script>
+        <script type="text/javascript" src="js/Tween.js?v=1"></script>
+        <script type="text/javascript" src="js/WebGLActors.js?v=1"></script>
+        <script type="text/javascript" src="js/WebGLScene.js?v=1"></script>
+        <script type="text/javascript" src="js/GameMaster.js?v=1"></script>
+        <script type="text/javascript" src="js/Main.js?v=1"></script>
 
         <!-- Note: Something in here conflicts with ioswebrtc, disable when compiling for iOS -->
-        <link rel="import" href="extras/contralto-js/alto-emulator.html"></link>
+        <link rel="import" href="extras/contralto-js/alto-emulator.html?v=1"></link>
 
         <!--
             I host SDK keys in a separate web server so they don't end up on GitHub.
             If you forked this project, you should generate your own API keys.
         -->
-        <script crossorigin="anonymous" type="text/javascript" src="http://marciot.freeshell.org/sdk-keys/sdk-keys-mazewar-vr.js"></script>
+        <script crossorigin="anonymous" type="text/javascript" src="http://marciot.freeshell.org/sdk-keys/sdk-keys-mazewar-vr.js?v=1"></script>
         <script>
             if(typeof fbAsyncInit === "undefined" || typeof RetroWeb.peerJSConfig === "undefined") {
                 alert("For full functionality, provide your own API keys for Facebook and Peer.js");
