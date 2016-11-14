@@ -92,6 +92,10 @@ class Maze {
                (this.hasWall(x,z, Directions.EAST)  ? 0 : Directions.EAST  );
     }
 
+    canMoveFrom(x, z, direction) {
+        return (direction & this.passageDirections(x, z));
+    }
+
     hasWall(x, z, dir) {
         return this.getAdjacentCell(x, z, dir);
     }

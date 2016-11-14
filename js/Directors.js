@@ -81,14 +81,30 @@ class RoboticDirector extends Director {
         }
     }
 
+    shootIfTargetInRange() {
+        var target = this.actor.actorInFrontOfMe;
+        if(target) {
+            this.actor.shoot();
+        }
+    }
+
     animationFinished() {
-        if(!this.actor.isDead) {
-            var direction = this.chooseDirection();
-            if(direction == this.actor.facing) {
-                this.actor.walk(direction);
-            } else {
-                this.actor.turnTowards(direction);
-            }
+        if(this.actor.isDead) {
+            return;
+        }
+
+        if(mwDebug) {
+            // Check to make sure the WebGL representation
+            // is kept in sync with the state of the actors.
+            this.actor.representation.assertPosition(this.actor.x, this.actor.z);
+        }
+
+        var direction = this.chooseDirection();
+        if(direction == this.actor.facing) {
+            this.actor.walk(direction);
+            this.shootIfTargetInRange();
+        } else {
+            this.actor.turnTowards(direction);
         }
     }
 }

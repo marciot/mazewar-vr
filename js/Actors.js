@@ -108,7 +108,7 @@ class Actor {
     }
 
     canWalk(direction) {
-        return (direction & maze.passageDirections(this.x, this.z));
+        return maze.canMoveFrom(this.x, this.z, direction);
     }
 
     /* Movement in the indicated direction */
@@ -118,13 +118,7 @@ class Actor {
         if(!this.canWalk(direction)) {
             return false;
         }
-
-        switch(direction) {
-            case Directions.NORTH: this.z--; break;
-            case Directions.EAST:  this.x++; break;
-            case Directions.SOUTH: this.z++; break;
-            case Directions.WEST:  this.x--; break;
-        }
+        Directions.updateCoordinates(this, direction);
         this.notifyObservers("walkTo", this.x, this.z, direction);
         return true;
     }
@@ -162,6 +156,18 @@ class Actor {
     walkBackwards() {
         this.walk(Directions.oppositeFrom(this.facing));
     }
+
+    get actorInFrontOfMe() {
+        var pos = {x: this.x, z: this.z};
+        while(maze.canMoveFrom(pos.x, pos.z, this.facing)) {
+            Directions.updateCoordinates(pos, this.facing);
+            var which = actors.isOccupied(pos.x, pos.z, this);
+            if(which) {
+                return which;
+            }
+        }
+        return null;
+    }
 };
 
 class MissileActor extends Actor {
@@ -195,7 +201,7 @@ class MissileActor extends Actor {
 
             // Did I collide with something?
             var hit = actors.isOccupied(this.x, this.z, this);
-            if(hit && hit.wasHit) {
+            if(hit && hit.wasHit && !hit.isDead) {
                 hit.wasHit(this.data);
                 this.explode();
             }

@@ -84,7 +84,10 @@ function liftFog(t) {
     tween.add(5, tweenFunctions.easeInQuint, t => scene.fog.far   = t, fogNear+0.01, fogFar);
     for(var i = 0; i < lights.length; i++) {
         var light = lights[i];
-        tween.add(5, tweenFunctions.easeInCubic, t => light.intensity = t, 0, t*light.intensity);
+        function getDimmerFunc(light) {
+            return t => light.intensity = t;
+        }
+        tween.add(5, tweenFunctions.easeInCubic, getDimmerFunc(light), 0, light.intensity);
     }
 }
 

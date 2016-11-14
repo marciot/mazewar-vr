@@ -73,5 +73,13 @@ Directions = Object.freeze({
             case RetroWeb.PupMazeWarDirections.SOUTH: return Directions.SOUTH;
             case RetroWeb.PupMazeWarDirections.WEST:  return Directions.WEST;
         }
+    },
+    updateCoordinates: function(coordinates, direction) {
+        switch(direction) {
+            case Directions.NORTH: coordinates.z--; break;
+            case Directions.EAST:  coordinates.x++; break;
+            case Directions.SOUTH: coordinates.z++; break;
+            case Directions.WEST:  coordinates.x--; break;
+        }
     }
 });

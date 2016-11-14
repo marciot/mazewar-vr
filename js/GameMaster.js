@@ -139,10 +139,15 @@ class SoloGame {
     }
 
     startGame() {
+        const numberOfRobots = 3;
+
         var self  = this.factory.newSelfPlayer();
-        var robot = this.factory.newRobotPlayer();
         self.setLocalPlayer(true);
-        robot.setLocalPlayer();
+
+        for(var i = 0; i < numberOfRobots; i++) {
+            var robot = this.factory.newRobotPlayer();
+            robot.setLocalPlayer();
+        }
     }
 
     endGame() {

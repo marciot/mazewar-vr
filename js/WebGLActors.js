@@ -62,12 +62,24 @@ class VisibleRepresentation {
     }
     
     set position(v) {
-        v.y = this.object.position.y; // Ignore changes in y
-        this.object.position.set(v.x, v.y, v.z);
+        // Ignore change in y
+        this.object.position.set(v.x, this.object.position.y, v.z);
     }
 
     displace(displacement) {
         this.object.position.add(displacement);
+    }
+
+    assertPosition(x, z) {
+        var repX = this.object.position.x / MazeWalls.cellDimension;
+        var repZ = this.object.position.z / MazeWalls.cellDimension;
+        if((x !== Math.round(repX)) || (z !== Math.round(repZ))) {
+            console.log("ASSERTION FAILED: Expected position: ", x, z, " Actual position: ", repX, repZ)
+        }
+
+        if(maze.getCell(x,z)) {
+            console.log("ASSERTION FAILED: Position: ", x, z, " inside wall");
+        }
     }
 
     get quaternion() {
@@ -272,7 +284,6 @@ class EyeRepresentation extends AnimatedRepresentation {
 
     respawn() {
         this.object.position.y = eyeHeight;
-        this.animationFinished();
     }
 }
 
