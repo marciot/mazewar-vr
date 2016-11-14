@@ -214,7 +214,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
     animationFinished() {
         if(this.fallAcceleration) {
             this.fallSpeed += this.fallAcceleration;
-            if(this.fallSpeed < 80) {
+            if(this.fallSpeed < 30) {
                 this.doAnimation(
                     new THREE.Vector3(0, -this.fallSpeed, 0)
                 );
@@ -264,9 +264,17 @@ class EyeRepresentation extends AnimatedRepresentation {
 
         var geometry = new THREE.SphereGeometry( eyeRadius, 64, 64 );
         geometry.rotateY(Math.PI);
-        
-        this.object = new THREE.Mesh(geometry, theme.eyeMaterial);
+        var mesh = new THREE.Mesh(geometry, theme.eyeMaterial);
 
+        // Set the fade out distance just shy of the wall on a
+        // neighboring corridor. This is important to keep light
+        // from going through walls in a multi-player game.
+        var fadeDistance = MazeWalls.cellDimension * 2;
+        this.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
+
+        this.object = new THREE.Object3D();
+        this.object.add(mesh);
+        this.object.add(this.headLight);
         this.object.position.y = eyeHeight;
     }
 
@@ -300,14 +308,14 @@ class MissileRepresentation extends AnimatedRepresentation {
         geometry.rotateZ(-Math.PI/2);
 
         // Materials for the missiles
-        var missileMaterial = new THREE.MeshBasicMaterial( {color: missileColor} );
+        this.material = new THREE.MeshBasicMaterial( {color: missileColor} );
 
         // Set the fade out distance just shy of the wall on a
         // neighboring corridor. This is important to keep light
         // from going through walls in a multi-player game.
         var fadeDistance = MazeWalls.cellDimension * 2.45;
-        var mesh = new THREE.Mesh(geometry, missileMaterial);
-        var light = new THREE.PointLight( missileColor, 5, fadeDistance);
+        var mesh  = new THREE.Mesh(geometry, this.material);
+        var light = new THREE.PointLight( missileColor, 0.5, fadeDistance);
 
         this.object = new THREE.Object3D();
         this.object.add(light);
@@ -317,6 +325,7 @@ class MissileRepresentation extends AnimatedRepresentation {
 
     dispose() {
         super.dispose();
+        this.material.dispose();
         this.object.geometry.dispose();
     }
 

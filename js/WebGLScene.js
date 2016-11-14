@@ -163,7 +163,7 @@ class RetroTheme {
         this.useGroundPlane = false;
         
         // Materials for the walls
-        this.wallMaterial = new THREE.MeshLambertMaterial( {color: 0xffff55, side: THREE.DoubleSide} );
+        this.wallMaterial = new THREE.MeshPhongMaterial( {color: 0xffff55, side: THREE.DoubleSide} );
         
         // Materials for the eyes
         var texture = loader.load('textures/eye.png');
@@ -201,12 +201,12 @@ class RetroTheme {
     }
     
     addLightingToScene(scene) {
-        var light = new THREE.AmbientLight(0xFFFFFF, 0.25);
+        var light = new THREE.AmbientLight(0xFFFFFF, 0.07);
         lights.push(light);
         scene.add(light);
 
-        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
-        directionalLight.position.set( .25, 1, 0.5 );
+        var directionalLight = new THREE.DirectionalLight(0xFFFFFF,0.20);
+        directionalLight.position.set( .25, 1, 0.15 );
         lights.push(directionalLight);
         scene.add(directionalLight);
 
