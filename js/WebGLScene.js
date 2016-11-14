@@ -1,5 +1,6 @@
-const fogNear = 0.1;
-const fogFar  = 50;
+const fogNear       = 0.1;
+const fogFar        = 50;
+const fogDuration   = 3;
 
 var camera, scene, renderer, effect, game;
 var maze, theme;
@@ -80,14 +81,14 @@ function animateSkydome() {
     skyBox.rotation.z += 0.0001;
 }
 
-function liftFog(t) {
-    tween.add(5, tweenFunctions.easeInQuint, t => scene.fog.far   = t, fogNear+0.01, fogFar);
+function liftFog() {
+    tween.add(fogDuration, tweenFunctions.easeInQuint, t => scene.fog.far   = t, fogNear+0.01, fogFar);
     for(var i = 0; i < lights.length; i++) {
         var light = lights[i];
         function getDimmerFunc(light) {
             return t => light.intensity = t;
         }
-        tween.add(5, tweenFunctions.easeInCubic, getDimmerFunc(light), 0, light.intensity);
+        tween.add(fogDuration, tweenFunctions.easeInCubic, getDimmerFunc(light), 0, light.intensity);
     }
 }
 
@@ -105,8 +106,9 @@ class MazeWalls extends Maze {
         this.maze = new THREE.Object3D();
         this.maze.add(walls);
 
-        var edges = new THREE.EdgesHelper(walls, 0x000000);
-        edges.material.linewidth = 2;
+        var edgeGeometry = new THREE.EdgesGeometry(this.geometry, 45);
+        var edgeMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 2});
+        var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
         this.maze.add(edges);
     }
 

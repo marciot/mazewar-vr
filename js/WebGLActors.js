@@ -358,7 +358,8 @@ class MapRepresentation extends VisibleRepresentation {
             shading:   THREE.FlatShading,
             map:       this.mapTexture,
             side:      THREE.FrontSide,
-            transparent: true
+            transparent: true,
+            opacity: 0.5
         });
         
         var geometry = new THREE.PlaneGeometry(mapGlWidth, mapGlHeight);
