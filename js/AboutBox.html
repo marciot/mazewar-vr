@@ -25,45 +25,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         /* Break up the screen into three stacked regions */
 
         .flex-layout {
-            display:         -ms-flex;
-            display:         -webkit-flex;
-            display:         flex;
-
+            display: flex;
             flex-direction:  column;
             align-items:     center;
         }
 
         .header {
-            width:       100%;
-            flex-grow:   0;
-            flex-shrink: 1;
-            height:      25%;
+            width:      100%;
+            flex:       0 1 25%;
         }
 
         .footer {
-            width:       100%;
-            flex-grow:   0;
-            flex-shrink: 1;
-            height:      15%;
+            width:      100%;
+            flex:       0 1 15%;
         }
 
         .middle {
-            flex-grow:      1;
-            flex-shrink:    0;
-            width:          80%;
-            height:         60%;
+            width:      80%;
+            flex:       1 0 60%;
         }
 
         /* A dynamically sized grid */
 
         .flex-grid {
-            display:        -ms-flex;
-            display:        -webkit-flex;
             display:        flex;
-
             flex-direction: column;
             align-items:    center;
             flex-wrap:      wrap;
+
+            /* Fallback: */
+            margin:     0 auto;
         }
 
         .flex-grid > div {
@@ -71,6 +62,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             box-sizing: border-box;
             position:   relative;
             flex-grow:  1;
+
+            /* Fallback: */
+            margin:     0 auto;
         }
 
         @media (orientation: landscape) {
@@ -79,29 +73,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
 
             .flex-grid.six-element > div {
-                height: 33%;
+                flex:       0 1 32%;
+                max-height: 32%;
             }
 
             .flex-grid.four-element > div {
-                height: 50%;
+                flex:       0 1 50%;
+                max-height: 50%;
             }
 
             .flex-grid.three-element > div {
-                height: 32%;
+                flex:       0 1 32%;
+                max-height: 32%;
                 width:  100%;
             }
 
             .flex-grid.two-element > div {
-                height: 49%;
-                width:  100%;
+                flex:       0 1 49%;
+                max-height: 49%;
+                width:      100%;
             }
 
             .grid-button, .centered-button {
-                font-size:   7vh;
+                font-size:  7vh;
             }
 
             h1.title {
-                font-size: 10vh;
+                font-size:  10vh;
             }
         }
 
@@ -111,35 +109,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
 
             .flex-grid.six-element > div {
-                height: 16%;
+                flex:       0 1 16%;
+                max-height: 16%;
             }
 
             .flex-grid.four-element > div {
-                height: 24%;
+                flex:       0 1 24%;
+                max-height: 24%;
             }
 
             .flex-grid.three-element > div {
-                height: 32%;
+                flex:       0 1 32%;
+                max-height: 32%;
             }
 
             .flex-grid.two-element > div {
-                height: 49%;
+                flex:       0 1 49%;
+                max-height: 49%;
             }
 
             .grid-button, .centered-button {
-                font-size:   7vw;
+                font-size:  7vw;
             }
 
             h1.title {
-                font-size: 10vw;
+                font-size:  10vw;
             }
         }
 
         /* Distribute DIVs vertically */
 
         .flex-distribute {
-            display:         -ms-flex;
-            display:         -webkit-flex;
             display:         flex;
 
             flex-direction:  column;
@@ -158,23 +158,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         /* A button */
 
         .grid-button {
-            position:   absolute;
-            top:        10px;
-            bottom:     10px;
-            right:      10px;
-            left:       10px;
-
-            min-height: 2em;
             padding:    3px;
         }
 
         .center-text, .grid-button {
-            display:        -ms-flex;
-            display:        -webkit-flex;
-            display:        flex;
-
-            justify-content: center;
-            align-items:     center;
             text-align:      center;
         }
 
@@ -192,10 +179,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             right:         0;
 
             font-family:   "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
-        }
-
-        .header {
-            padding: 1em 0;
         }
 
         .clickable {
@@ -400,6 +383,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 padding: 0.5em;
                 margin: 0 auto;
             }
+        }
+
+        figure {
+            padding: 0;
+            margin: 0;
+        }
+
+        figcaption {
+            font-size: small;
+            padding: 2px 0;
         }
     </style>
     <div class="darken" id="overlay">
@@ -685,6 +678,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 </ul>
                 Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
                 </p>
+            </div>
+            <div>
+                <figure class="sponsor">
+                    <figcaption>Testing services provided by:</figcaption>
+                    <a href="https://browserstack.com">
+                    <img src="artwork/browserstack.png">
+                    </a>
+                </figure>
             </div>
             <div>
                 <center>
@@ -1157,9 +1158,10 @@ function gotoRecommendedHeadsets() {
         this.eventListeners[eventStr].push(callback);
     }
 
-    AboutBoxProto.dispatchCallback = function(eventStr, ...args) {
+    AboutBoxProto.dispatchCallback = function() {
+        var eventStr = arguments.shift();
         for(var i = 0; i < this.eventListeners[eventStr].length; i++) {
-            this.eventListeners[eventStr][i].apply(null, args);
+            this.eventListeners[eventStr][i].apply(null, arguments);
         }
     }
 

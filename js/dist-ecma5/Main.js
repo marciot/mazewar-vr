@@ -16,39 +16,70 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const mwDebug = true;
+mwLog("Main loading");
+
+var mwDebug = true;
 
 var vrDisplay, gpClicker;
 
-var clock  = new THREE.Clock();
-var actors = new WebGLActors();
+var clock = new THREE.Clock();
+
+try {
+    var bar = function (a) {};
+
+    bar(helloWorld);
+} catch (e) {
+    mwLog("Access to undefined variable is failing");
+}
+
+var actors;
+try {
+    actors = new WebGLActors();
+} catch (e) {
+    mwLog("Failed to create WebGLActors");
+}
 
 function setupVR(sceneCallback) {
-    if(!navigator.getVRDisplays) {
+    mwLog("Checking for VR displays");
+
+    if (!navigator.getVRDisplays) {
         console.log("WebVR is not supported");
+        mwLog("WebVR is not supported");
         return;
     }
 
-    // Get the VRDisplay and save it for later.
-    vrDisplay = null;
-    navigator.getVRDisplays().then(
-        function(displays) {
-            if(displays.length > 0) {
+    mwLog("Checking for VR displays");
+
+    try {
+        // Get the VRDisplay and save it for later.
+        vrDisplay = null;
+        navigator.getVRDisplays().then(function (displays) {
+            if (displays.length > 0) {
                 vrDisplay = displays[0];
                 sceneCallback();
             }
-        }
-    );
+        });
+    } catch (e) {
+        mwLog("Query of VRDisplays failed");
+    }
 }
 
 function init() {
-    setupVR(setupScene);
+    mwLog("Init called");
+
+    try {
+        setupVR(setupScene);
+    } catch (e) {
+        mwLog("Setting up VR failed");
+    }
 
     var vrEnabled = true;
 
+    mwLog("Setting up VR2");
+
     function modeSelected(mode) {
         console.log("Mode is", mode);
-        switch(mode) {
+        switch (mode) {
             case "headset":
                 vrEnabled = true;
                 effect = new THREE.VREffect(renderer);
@@ -64,20 +95,22 @@ function init() {
         }
     }
 
+    mwLog("Setting up VR3");
+
     function vrPresentationChange() {
         document.querySelector("about-box").setOverlayVisibility(!vrDisplay.isPresenting);
     }
     window.addEventListener('vrdisplaypresentchange', vrPresentationChange);
 
     function startVr() {
-        if(vrEnabled && vrDisplay.capabilities.canPresent && effect.requestPresent) {
+        if (vrEnabled && vrDisplay.capabilities.canPresent && effect.requestPresent) {
             effect.requestPresent();
         }
         document.querySelector("about-box").setOverlayVisibility(false);
     }
 
     function endVr() {
-        if(effect.endPresent) {
+        if (effect.endPresent) {
             effect.endPresent();
         }
         document.querySelector("about-box").setOverlayVisibility(true);
@@ -88,7 +121,7 @@ function init() {
         startVr();
 
         function stateChangedCallback(state, error) {
-            switch(state) {
+            switch (state) {
                 case "joined":
                     break;
                 case "error":
@@ -103,9 +136,9 @@ function init() {
         game.endGame();
 
         /* Choose random hostId. TODO: Implement check for conflicting ids */
-        const ETHERNET_ADDR_MIN       = 0x01;
-        const ETHERNET_ADDR_MAX       = 0xFF;
-        const hostId = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
+        var ETHERNET_ADDR_MIN = 0x01;
+        var ETHERNET_ADDR_MAX = 0xFF;
+        var hostId = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
 
         game = new NetworkedGame(getWebGLPlayerFactory(camera));
         game.startGame(hostId, name, stateChangedCallback);
@@ -117,22 +150,24 @@ function init() {
 
     // WebComponents initialization
     function webComponentsReady() {
+        mwLog("Web components ready");
         var about = document.querySelector("about-box");
-        if(about) {
-            about.addCallback("gfxModeSelected",  modeSelected);
-            about.addCallback("startSoloGame",    startSoloGame);
+        if (about) {
+            about.addCallback("gfxModeSelected", modeSelected);
+            about.addCallback("startSoloGame", startSoloGame);
             about.addCallback("startNetworkGame", startNetworkGame);
-            if(FastClick) {
+            if (FastClick) {
                 FastClick.attach(about);
             }
         }
     }
 
+    mwLog("Starting web components");
     window.addEventListener('WebComponentsReady', webComponentsReady);
 }
 
 function resize() {
-    var width  = window.innerWidth;
+    var width = window.innerWidth;
     var height = window.innerHeight;
 
     camera.aspect = width / height;
@@ -146,11 +181,11 @@ function update(dt) {
 
     camera.updateProjectionMatrix();
 
-    if(headsetDirector) {
+    if (headsetDirector) {
         headsetDirector.update(dt);
         gpClicker.poll();
     }
-    
+
     actors.animate();
     tween.update(dt);
 
@@ -169,4 +204,5 @@ function animate() {
     render(delta);
 }
 
+mwLog("About to call init");
 init();

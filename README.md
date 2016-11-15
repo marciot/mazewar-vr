@@ -51,12 +51,16 @@ Code contributions or fixes to <cite>Maze War VR</cite> are welcome, although fo
 stated above I will not be able to incorporate it into the main-line distribution unless you dual license
 your code or assign the copyright of your enhancements to me.
 
-## Credits:
+## Credits &amp; Sponsors:
 
 This project makes use of [THREE.js], [peerjs] and [WebComponents] and relies on [mesh networking
 code] developed for my [RetroWeb Vintage Computer Museum] project. Assistance in reconstructing the
 Maze War protocol was provided by the developer of the [Contralto] emulator from the
 [Living Computers: Museum+Labs].
+
+Testing service provided by:
+
+![BrowserStack][https://github.com/marciot/mazewar-vr/raw/master/artwork/browserstack.png]
 
 [logo]: https://github.com/marciot/mazewar-vr/raw/master/artwork/fb-share.jpg "A screenshot from MazeWar VR"
 [Mattel ViewMaster VR]: https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072

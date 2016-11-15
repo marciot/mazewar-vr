@@ -1,0 +1,30 @@
+{
+  "name": "mazewar-vr",
+  "version": "1.0.0",
+  "description": "Hide, seek and destroy in this multi-player virtual reality chase game.",
+  "main": "index.html",
+  "dependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.8.0",
+    "babel-plugin-transform-es2015-block-scoped-functions": "^6.8.0",
+    "babel-plugin-transform-es2015-block-scoping": "^6.18.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.18.0",
+    "babel-plugin-transform-es2015-classes": "^6.18.0",
+    "babel-plugin-transform-es2015-literals": "^6.8.0",
+    "babel-plugin-transform-es2015-parameters": "^6.18.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marciot/mazewar-vr.git"
+  },
+  "author": "Marcio Teixeira",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/marciot/mazewar-vr/issues"
+  },
+  "homepage": "https://github.com/marciot/mazewar-vr#readme"
+}

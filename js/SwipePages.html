@@ -43,11 +43,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     }
     
     .hiddenRight {
-        transform: translate(100%, 0);
+        transform:         translate(100%, 0);
+        -webkit-transform: translate(100%, 0);
+        -mozTransform:     translate(100%, 0);
     }
     
     .hiddenLeft {
-        transform: translate(-100%, 0);
+        transform:         translate(-100%, 0);
+        -webkit-transform: translate(-100%, 0);
+        -mozTransform:     translate(-100%, 0);
     }
     
     /* Chevron */
@@ -62,7 +66,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         width:      1em;
         margin-top: -0.8em;
         
-        transform : scale(1,2);
+        transform :       scale(1,2);
+        -webkit-transform:  scale(1,2);
+        -mozTransform:     scale(1,2);
     }
     
     .swipe-arrow {
@@ -79,63 +85,58 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <script>
 (function (thisDoc) {
-    class Pages {
-        constructor(el) {
-            var startPage = el.children[0].id;
-            
-            this.pages       = el;
-            this.currentPage = startPage;
-            this.startPage   = startPage;
-            
-            var me = this;
-            window.onpopstate = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-        
-                me.showPage(e.state ? e.state.page : me.startPage);
+    var Pages = function(el) {
+        // Constructor
+
+        var startPage = el.children[0].id;
+
+        this.pages       = el;
+        this.currentPage = startPage;
+        this.startPage   = startPage;
+
+        var me = this;
+        window.onpopstate = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            me.showPage(e.state ? e.state.page : me.startPage);
+        }
+
+        var touchX, touchY, trackingSwipe;
+
+        window.ontouchstart = function(e) {
+            // Avoid duplicate animation if iOS interprets
+            // the swipe as a back navigation
+            me.disablePageSlide();
+
+            touchY = e.touches[0].screenY;
+            touchX = e.touches[0].screenX;
+            trackingSwipe = true;
+        }
+
+        window.ontouchmove = function(e) {
+            if(e.touches.length > 1) {
+                trackingSwipe = false;
+                return;
             }
-    
-            var touchX, touchY, trackingSwipe;
-
-            window.ontouchstart = function(e) {
-                // Avoid duplicate animation if iOS interprets
-                // the swipe as a back navigation
-                me.disablePageSlide();
-
-                touchY = e.touches[0].screenY;
-                touchX = e.touches[0].screenX;
-                trackingSwipe = true;
-            }
-
-            window.ontouchmove = function(e) {
-                if(e.touches.length > 1) {
-                    trackingSwipe = false;
-                    return;
-                }
-                // Emulate back swipe on platforms other than iOS
-                // that lack a native back swipe gesture.
-                var deltaX = e.touches[0].screenX - touchX;
-                var deltaY = e.touches[0].screenY - touchY;
-                if(deltaX > 60 && Math.abs(deltaY) < deltaX/4 && trackingSwipe) {
-                    trackingSwipe = false;
-                    me.goBack();
-                }
-            }
-
-            this.wrapAllChildren(el);
-            this.hideAllChildrenExceptFirst(el);
-            
-            if(history.state && history.state.page !== startPage) {
-                history.replaceState(null, startPage);
+            // Emulate back swipe on platforms other than iOS
+            // that lack a native back swipe gesture.
+            var deltaX = e.touches[0].screenX - touchX;
+            var deltaY = e.touches[0].screenY - touchY;
+            if(deltaX > 60 && Math.abs(deltaY) < deltaX/4 && trackingSwipe) {
+                trackingSwipe = false;
+                me.goBack();
             }
         }
-        
-        goBack() {
+
+        // Methods
+
+        this.goBack = function() {
             this.enablePageSlide();
             window.history.back();
         }
 
-        wrapAllChildren(el) {
+        this.wrapAllChildren = function(el) {
             var els = el.children;
             for(var i = 0; i < els.length; i++) {
                 var old = els[i];
@@ -155,29 +156,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
 
-        addSwipeArrowToPage(page) {
+        this.addSwipeArrowToPage = function(page) {
             var arrow = page.ownerDocument.createElement("div");
             arrow.classList.add("swipe-arrow");
             arrow.addEventListener("click", this.goBack.bind(this));
             page.appendChild(arrow);
         }
 
-        hideAllChildrenExceptFirst(el) {
+        this.hideAllChildrenExceptFirst = function(el) {
             var els = el.children;
             for(var i = 1; i < els.length; i++) {
                 els[i].classList.add("hiddenRight");
             }
         }
                 
-        disablePageSlide() {
+        this.disablePageSlide = function() {
             this.pages.classList.remove("animationEnabled");
         }
     
-        enablePageSlide() {
+        this.enablePageSlide = function() {
             this.pages.classList.add("animationEnabled");
         }
         
-        showPage(newPage) {
+        this.showPage = function(newPage) {
             if(this.currentPage === newPage) {
                 return;
             }
@@ -193,17 +194,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.currentPage = newPage;
         }
         
-        bindElements(btns) {
+        this.bindElements = function(btns) {
             for(var i = 0; i < btns.length; i++) {
                 btns[i].addEventListener("click", this.buttonAction.bind(this));
             }
         }
 
-        followLink(link) {
+        this.followLink = function(link) {
             this.gotoPage(link.getAttribute("data-page"))
         }
 
-        gotoPage(newPage) {
+        this.gotoPage = function(newPage) {
             if(newPage) {
                 history.pushState({page: newPage}, newPage);
                 this.enablePageSlide();
@@ -222,11 +223,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
     
-        buttonAction(e) {
+        this.buttonAction = function(e) {
             e.preventDefault();
             e.stopPropagation();
             this.followLink(e.target);
         }
+
+        this.wrapAllChildren(el);
+        this.hideAllChildrenExceptFirst(el);
+
+        if(history.state && history.state.page !== startPage) {
+            history.replaceState(null, startPage);
+        }
+
+        return this;
     }
         
     /* The following function provides a fallback

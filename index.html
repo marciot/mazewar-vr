@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <title>MazeWar VR</title>
         <meta name="Description" content="Hide, seek and destroy in this multi-player virtual reality chase game. For smartphones and desktop VR, including Cardboard, GearVR, Oculus Rift and Vive.">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- iOS Webapp Configuration -->
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -72,14 +72,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- We use YConsole to help debugging on mobile devices -->
         <script type="text/javascript" src="js/third-party/yconsole-compiled.js"></script>
+    <body>
+        <span id="statusAndError"></span>
         <script type="text/javascript">
+            function mwLog(str) {
+                document.querySelector("#statusAndError").innerHTML += str + "<br>";
+                console.log(str);
+            }
             /*window.onerror = function(error) {
                 YConsole.show();
-            };*/
+            }*/
             YConsole.activate();
             YConsole.docking="bottom";
         </script>
-    <body>
         <script>
             function onTouch(e) {
                 if(e.touches && e.touches.length === 4) {
@@ -123,11 +128,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Networking Code -->
         <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
-        <script type="text/javascript" src="js/networking/cordova-setup.js?v=1"></script>
-        <script type="text/javascript" src="js/networking/frame-utilities.js?v=1"></script>
-        <script type="text/javascript" src="js/networking/pup-services.js?v=1"></script>
-        <script type="text/javascript" src="js/networking/pup-services-mazewar.js?v=1"></script>
-        <script type="text/javascript" src="js/networking/retroweb-network.js?v=1"></script>
 
         <!-- Shader programs for skydome -->
         <script type="application/x-glsl" id="sky-vertex">  
@@ -151,16 +151,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </script>
 
         <!-- Main Program -->
-        <script type="text/javascript" src="js/LookAroundControls.js?v=1"></script>
-        <script type="text/javascript" src="js/Directions.js?v=1"></script>
-        <script type="text/javascript" src="js/Maze.js?v=1"></script>
-        <script type="text/javascript" src="js/Actors.js?v=1"></script>
-        <script type="text/javascript" src="js/Directors.js?v=1"></script>
-        <script type="text/javascript" src="js/Tween.js?v=1"></script>
-        <script type="text/javascript" src="js/WebGLActors.js?v=1"></script>
-        <script type="text/javascript" src="js/WebGLScene.js?v=1"></script>
-        <script type="text/javascript" src="js/GameMaster.js?v=1"></script>
-        <script type="text/javascript" src="js/Main.js?v=1"></script>
+
+        <script type="text/javascript" src="js/dist-ecma5/networking/frame-utilities.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/networking/pup-services.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/networking/pup-services-mazewar.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/networking/retroweb-network.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/Directions.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/Maze.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/Actors.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/Directors.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/Tween.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/WebGLActors.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/WebGLScene.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/GameMaster.js?v=1"></script>
+        <script type="text/javascript" src="js/dist-ecma5/Main.js?v=1"></script>
 
         <!-- Note: Something in here conflicts with ioswebrtc, disable when compiling for iOS -->
         <link rel="import" href="extras/contralto-js/alto-emulator.html?v=1"></link>
