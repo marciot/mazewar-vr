@@ -60,8 +60,9 @@ Maze War protocol was provided by the developer of the [Contralto] emulator from
 
 Testing service provided by:
 
-![BrowserStack][https://github.com/marciot/mazewar-vr/raw/master/artwork/browserstack.png]
+!alt text][BrowserStack]
 
+[BrowserStack]: https://github.com/marciot/mazewar-vr/raw/master/artwork/browserstack.png "BrowserStack Logo"
 [logo]: https://github.com/marciot/mazewar-vr/raw/master/artwork/fb-share.jpg "A screenshot from MazeWar VR"
 [Mattel ViewMaster VR]: https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072
 [Xerox Alto Emulator]: https://github.com/sethm/ContrAltoJS
