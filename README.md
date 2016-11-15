@@ -60,7 +60,7 @@ Maze War protocol was provided by the developer of the [Contralto] emulator from
 
 Testing service provided by:
 
-!alt text][BrowserStack]
+![alt text][BrowserStack]
 
 [BrowserStack]: https://github.com/marciot/mazewar-vr/raw/master/artwork/browserstack.png "BrowserStack Logo"
 [logo]: https://github.com/marciot/mazewar-vr/raw/master/artwork/fb-share.jpg "A screenshot from MazeWar VR"
