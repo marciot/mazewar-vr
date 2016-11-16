@@ -1,0 +1,49 @@
+<template id="TestComponentTemplate">
+	<content></content>
+</template>
+
+<style>
+	test-component {
+		position:	absolute;
+		top:		0;
+		left:		0;
+		bottom:		0;
+		right:		0;
+		padding:	2px;
+		color:		green;
+	}
+</style>
+
+<script>
+(function (thisDoc) {
+    /* The following function provides a fallback
+     * when createShadowRoot does not exist or
+     * is not desired.
+     */
+    function getShadowRoot(el, clone, fakeIt) {
+        if(el.createShadowRoot && !fakeIt) {
+            return el.createShadowRoot();
+        } else {
+            var content   = clone.querySelector("content");
+            var oldParent = el;
+            var newParent = content.parentNode;
+            newParent.removeChild(content);
+            while (oldParent.firstChild) newParent.appendChild(oldParent.firstChild);
+            return el;
+        }
+    }
+    
+	var TestComponentProto = Object.create(HTMLElement.prototype);
+    TestComponentProto.createdCallback = function() {
+        var t = thisDoc.getElementById('TestComponentTemplate');
+        var clone = document.importNode(t.content, true);
+        var shadowRoot = getShadowRoot(this, clone, true);
+        shadowRoot.appendChild(clone);
+        
+        shadowRoot.style.background = "white";
+        shadowRoot.innerHTML = "pass";
+    }
+    
+    document.registerElement('test-component', {prototype: TestComponentProto});
+})((document._currentScript || document.currentScript).ownerDocument);
+</script>

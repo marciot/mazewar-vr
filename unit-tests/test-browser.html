@@ -1,0 +1,232 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="../js/third-party/webcomponents/webcomponents-lite.min.js"></script>
+        <title>Web Broweser Tests</title>
+        <style>
+            table {
+                border-collapse: collapse;
+                border: 1px solid black;
+            }
+
+            table, tr, td, th {
+                border: 1px solid black;
+                padding: 2px;
+            }
+
+            #componentTest {
+                position: relative;
+            }
+
+            .pass {
+                color: green;
+            }
+
+            .fail {
+                color: red;
+            }
+        </style>
+        <template id="TemplateTest">
+            <content></content>
+        </template>
+    </head>
+    <body>
+        <link rel="import" href="test-webcomponent.html"></link>
+        <h1>Web Broweser Tests</h1>
+        <table id="results">
+            <tr>
+                <th>#</th>
+                <th>Feature</th>
+                <th>Test Result</th>
+                <th>Info</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>WebComponent Import</td>
+                <td id="componentTest" class="fail">fail<test-component></test-component></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Manual Import</td>
+                <td id="componentTest" class="fail">fail<embedded-component></embedded-component></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <script>
+            var testNumber = 1;
+
+            function runTest(name, func, shouldFail) {
+                var result, info = {};
+                
+                try {
+                    result = func(info);
+                } catch(e) {
+                    result = false;
+                    info.str   = e.toString();
+                }
+
+                var results = document.getElementById("results");
+                var row = document.createElement("tr");
+
+                var el = document.createElement("td");
+                el.innerText = ++testNumber;
+                row.appendChild(el);
+
+                var el = document.createElement("td");
+                el.innerText = name;
+                row.appendChild(el);
+
+                var el = document.createElement("td");
+                var resultStr;
+                if(shouldFail) {
+                    resultStr = (!result) ? "pass" : "fail";
+                } else {
+                    resultStr = result ? "pass" : "fail";
+                }
+                el.innerText = resultStr;
+                el.className = resultStr;
+                row.appendChild(el);
+
+                var el = document.createElement("td");
+                el.innerText = info.str ? info.str : "";
+                row.appendChild(el);
+
+                results.appendChild(row);
+            }
+
+            function testCSS(selectors, info) {
+                var prefixes = selectors.split(' ');
+                for(var i = 0; i < prefixes.length; i++) {
+                    if(document.createElement('div').style[prefixes[i]] !== undefined) {
+                        info.str = prefixes[i];
+                        return prefixes[i];
+                    }
+                }
+                return false;
+            }
+
+            function testWebGL(info) {
+                var ctx;
+                try {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('webgl');
+                    if(ctx === undefined) {
+                        ctx = canvas.getContext('experimental-webgl');
+                        if(ctx !== undefined) {
+                            info.str = 'experimental-webgl';
+                        }
+                    }
+                }
+                catch (e) {
+                    info.str = e.toString();
+                    return false;
+                }
+                return ctx !== undefined;
+            }
+
+            function testWebRTC(info) {
+                if(typeof RTCPeerConnection !== 'undefined') {
+                    return true;
+                }
+                if(typeof webkitRTCPeerConnection !== 'undefined') {
+                    info.str = "webkitRTCPeerConnection";
+                    return true;
+                }
+                return false;
+            }
+
+            runTest("Test pass passes", function() {return true});
+            runTest("Test failures fail", function() {return false}, true);
+            runTest("HTML template.content supported",
+                function() {return typeof document.getElementById("TemplateTest").content !== 'undefined'}
+            );
+            runTest("HTML template.innerHTML supported",
+                function() {return typeof document.getElementById("TemplateTest").innerHTML !== 'undefined'}
+            );
+            runTest("querySelector supported",
+                function() {return typeof document.querySelector !== 'undefined'}
+            );
+            runTest("importNode supported",
+                function() {return typeof document.importNode !== 'undefined'}
+            );
+            runTest("classList supported",
+                function() {return typeof document.body.classList !== 'undefined'}
+            );
+            runTest("CSS failures fail",
+                testCSS.bind(null, "daffy"),
+                true
+            );
+            runTest("CSS transform",
+                testCSS.bind(null, "transform WebkitTransform MozTransform OTransform msTransform")
+            );
+            runTest("CSS flex",
+                testCSS.bind(null, "flex")
+            );
+            runTest("CustomElements Object.create",
+                function() {return typeof Object.create !== 'undefined'}
+            );
+            runTest("CustomElements document.currentScript",
+                function() {return typeof document.currentScript !== 'undefined'}
+            );
+            runTest("CustomElements registerElement",
+                function() {return typeof document.registerElement !== 'undefined'}
+            );
+            runTest("ECMA6 classes supported",
+                function() {return eval("class Foo {}");}
+            );
+            runTest("ECMA6 continuation arguments supported",
+                function() {return eval("function foo(arg, ...list) {return list[0];}; foo(1,2);");}
+            );
+            
+            runTest("ECMA6 arrow functions supported",
+                function() {return eval("var foo = x => x + 1; foo(1);");}
+            );
+            runTest("ECMA6 promises supported",
+                function() {return typeof window.Promise !== 'undefined'}
+            );
+            runTest("GamePad API getGamepads",
+                function() {return typeof navigator.getGamepads !== 'undefined'}
+            );
+            runTest("WebGL", testWebGL);
+            runTest("WebRTC RTCPeerConnection", testWebRTC);
+            runTest("WebVR getVRDevices",
+                function(info) {return typeof navigator.getVRDevices !== 'undefined'}
+            );
+        </script>
+
+        <!-- Vulcanized component -->
+        <template id="EmbeddedComponentTemplate">
+            <content></content>
+        </template>
+
+        <style>
+            embedded-component {
+                position:   absolute;
+                top:        0;
+                left:       0;
+                bottom:     0;
+                right:      0;
+                padding:    2px;
+                color:      green;
+            }
+        </style>
+
+        <script>
+            function compatibleEmbed(elementName, templateId, initFunc) {
+                var oldParent = document.getElementById(templateId);
+                var newParent = document.getElementsByTagName(elementName)[0];
+                while (oldParent.firstChild) newParent.appendChild(oldParent.firstChild);
+                initFunc(newParent);
+            }
+
+            function embeddedComponentInit(shadowRoot) {
+                shadowRoot.style.background = "white";
+                shadowRoot.innerHTML = "pass";
+            }
+
+            compatibleEmbed("embedded-component", 'EmbeddedComponentTemplate', embeddedComponentInit);
+        </script>
+    </body>
+</html>
