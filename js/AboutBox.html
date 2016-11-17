@@ -1159,10 +1159,10 @@ function gotoRecommendedHeadsets() {
         this.eventListeners[eventStr].push(callback);
     }
 
-    AboutBoxProto.dispatchCallback = function() {
-        var eventStr = arguments.shift();
+    AboutBoxProto.dispatchCallback = function(eventStr) {
+        var argsRest = Array.prototype.slice.call(arguments, 1);
         for(var i = 0; i < this.eventListeners[eventStr].length; i++) {
-            this.eventListeners[eventStr][i].apply(null, arguments);
+            this.eventListeners[eventStr][i].apply(null, argsRest);
         }
     }
 
