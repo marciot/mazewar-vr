@@ -16,39 +16,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-mwLog("Main loading");
-
 var mwDebug = true;
 
 var vrDisplay, gpClicker;
 
 var clock = new THREE.Clock();
-
-try {
-    var bar = function (a) {};
-
-    bar(helloWorld);
-} catch (e) {
-    mwLog("Access to undefined variable is failing");
-}
-
-var actors;
-try {
-    actors = new WebGLActors();
-} catch (e) {
-    mwLog("Failed to create WebGLActors");
-}
+var actors = new WebGLActors();
 
 function setupVR(sceneCallback) {
-    mwLog("Checking for VR displays");
-
     if (!navigator.getVRDisplays) {
-        console.log("WebVR is not supported");
         mwLog("WebVR is not supported");
         return;
     }
-
-    mwLog("Checking for VR displays");
 
     try {
         // Get the VRDisplay and save it for later.
@@ -65,17 +44,9 @@ function setupVR(sceneCallback) {
 }
 
 function init() {
-    mwLog("Init called");
-
-    try {
-        setupVR(setupScene);
-    } catch (e) {
-        mwLog("Setting up VR failed");
-    }
+    setupVR(setupScene);
 
     var vrEnabled = true;
-
-    mwLog("Setting up VR2");
 
     function modeSelected(mode) {
         console.log("Mode is", mode);
@@ -94,8 +65,6 @@ function init() {
                 break;
         }
     }
-
-    mwLog("Setting up VR3");
 
     function vrPresentationChange() {
         document.querySelector("about-box").setOverlayVisibility(!vrDisplay.isPresenting);
@@ -162,7 +131,6 @@ function init() {
         }
     }
 
-    mwLog("Starting web components");
     window.addEventListener('WebComponentsReady', webComponentsReady);
 }
 
@@ -204,5 +172,4 @@ function animate() {
     render(delta);
 }
 
-mwLog("About to call init");
 init();

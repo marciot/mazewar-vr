@@ -15,7 +15,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel js/src-ecma6 --out-dir js/dist-ecma5"
   },
   "repository": {
     "type": "git",

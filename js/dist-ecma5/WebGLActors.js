@@ -327,9 +327,9 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
 
         var _this3 = _possibleConstructorReturn(this, (EyeRepresentation.__proto__ || Object.getPrototypeOf(EyeRepresentation)).call(this));
 
-        var geometry = new THREE.SphereGeometry(eyeRadius, 64, 64);
-        geometry.rotateY(Math.PI);
-        var mesh = new THREE.Mesh(geometry, theme.eyeMaterial);
+        _this3.geometry = new THREE.SphereGeometry(eyeRadius, 64, 64);
+        _this3.geometry.rotateY(Math.PI);
+        var mesh = new THREE.Mesh(_this3.geometry, theme.eyeMaterial);
 
         // Set the fade out distance just shy of the wall on a
         // neighboring corridor. This is important to keep light
@@ -348,7 +348,7 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
         key: "dispose",
         value: function dispose() {
             _get(EyeRepresentation.prototype.__proto__ || Object.getPrototypeOf(EyeRepresentation.prototype), "dispose", this).call(this);
-            this.object.geometry.dispose();
+            this.geometry.dispose();
         }
     }, {
         key: "shotDead",

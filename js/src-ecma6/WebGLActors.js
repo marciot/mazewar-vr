@@ -262,9 +262,9 @@ class EyeRepresentation extends AnimatedRepresentation {
     constructor() {
         super();
 
-        var geometry = new THREE.SphereGeometry( eyeRadius, 64, 64 );
-        geometry.rotateY(Math.PI);
-        var mesh = new THREE.Mesh(geometry, theme.eyeMaterial);
+        this.geometry = new THREE.SphereGeometry( eyeRadius, 64, 64 );
+        this.geometry.rotateY(Math.PI);
+        var mesh = new THREE.Mesh(this.geometry, theme.eyeMaterial);
 
         // Set the fade out distance just shy of the wall on a
         // neighboring corridor. This is important to keep light
@@ -280,7 +280,7 @@ class EyeRepresentation extends AnimatedRepresentation {
 
     dispose() {
         super.dispose();
-        this.object.geometry.dispose();
+        this.geometry.dispose();
     }
 
     shotDead(respawnCallback) {

@@ -25,7 +25,6 @@ var actors = new WebGLActors();
 
 function setupVR(sceneCallback) {
     if(!navigator.getVRDisplays) {
-        console.log("WebVR is not supported");
         mwLog("WebVR is not supported");
         return;
     }
