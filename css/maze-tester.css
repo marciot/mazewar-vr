@@ -1,0 +1,81 @@
+h1 {
+    text-align: center;
+}
+
+#maze {
+    border-collapse: collapse;
+    margin:          2em;
+}
+
+#maze td {
+    position:    relative;
+    width:       30px;
+    height:      30px;
+    border:      1px dotted lightGray;
+}
+
+td.filled {
+    background-color: black;
+}
+
+.sprite {
+    position: absolute;
+    top:      0;
+    bottom:   0;
+    left:     0;
+    right:    0;
+    opacity:  0.75;
+    text-align:  center;
+    font-size:   20px;
+}
+.sprite.robotPlayer {color: red;}
+.sprite.selfPlayer  {color: green;}
+.sprite.netPlayer   {color: blue;}
+.sprite.missile     {color: orange;}
+
+button, input {
+    margin-top:    5px;
+    margin-bottom: 5px;
+}
+
+button:first-child {
+    margin-left: 105px;
+}
+
+label {
+    font-weight: bold;
+    display:     inline-block;
+    width:       100px;
+    text-align:  right;
+    padding-right: 5px;
+}
+
+#controls {
+    display:         -ms-flex;
+    display:         -webkit-flex;
+    display:         flex;
+
+    flex-direction:  row;
+    justify-content: space-around;
+}
+
+#touchControls {
+    text-align: center;
+}
+
+#touchControls TABLE {
+    margin: 0 auto;
+}
+
+#touchControls TD {
+    font-size: 125%;
+    width:     1.25em;
+    height:    1.25em;
+    padding:   5px 5px;
+}
+
+#touchForward, #touchBackward, #touchLeft, #touchRight, #touchCenter, #touchUTurn {
+    border:     1px solid black;
+    background: lightGray;
+    cursor:     pointer;
+}
