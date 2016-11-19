@@ -35,8 +35,10 @@ function setupVR(sceneCallback) {
         navigator.getVRDisplays().then(function (displays) {
             if (displays.length > 0) {
                 vrDisplay = displays[0];
-                sceneCallback();
+            } else {
+                mwLog("WebVR is supported, but no VR displays found");
             }
+            sceneCallback();
         });
     } catch (e) {
         mwLog("Query of VRDisplays failed");
@@ -72,7 +74,7 @@ function init() {
     window.addEventListener('vrdisplaypresentchange', vrPresentationChange);
 
     function startVr() {
-        if (vrEnabled && vrDisplay.capabilities.canPresent && effect.requestPresent) {
+        if (vrEnabled && vrDisplay && vrDisplay.capabilities.canPresent && effect.requestPresent) {
             effect.requestPresent();
         }
         document.querySelector("about-box").setOverlayVisibility(false);

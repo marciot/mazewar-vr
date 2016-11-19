@@ -167,10 +167,7 @@ var PlayerRepresentation = function () {
 
 var self;
 var playerNameField, hostIdField;
-
-var actors = new Actors();
-var maze = new Maze();
-var mazeRep = new MazeRepresentation(document.querySelector("#maze"), maze);
+var actors, maze, mazeRep, gameMaster;
 
 var playerFactory = {
     newSelfPlayer: function () {
@@ -193,9 +190,6 @@ var playerFactory = {
     }
 };
 
-var gameMaster = new SoloGame(playerFactory);
-gameMaster.startGame();
-
 function startGame() {
     var startGameButton = document.getElementById("startGameButton");
     if (!playerNameField.value) {
@@ -217,6 +211,13 @@ function startGame() {
 }
 
 function initMazeTester() {
+    actors = new Actors();
+    maze = new Maze();
+    mazeRep = new MazeRepresentation(document.querySelector("#maze"), maze);
+
+    gameMaster = new SoloGame(playerFactory);
+    gameMaster.startGame();
+
     /* Suggest a random hostId */
     var ETHERNET_ADDR_MIN = 0x01;
     var ETHERNET_ADDR_MAX = 0xFF;

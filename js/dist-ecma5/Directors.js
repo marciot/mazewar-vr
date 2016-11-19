@@ -124,7 +124,7 @@ var RoboticDirector = function (_Director) {
                 return;
             }
 
-            if (mwDebug) {
+            if (typeof mwDebug !== "undefined") {
                 // Check to make sure the WebGL representation
                 // is kept in sync with the state of the actors.
                 this.actor.representation.assertPosition(this.actor.x, this.actor.z);

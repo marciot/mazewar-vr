@@ -17,6 +17,8 @@ var tween = new Tween();
 var lights = [];
 
 function setupScene() {
+    mwLog("Setting up scene");
+
     renderer = new THREE.WebGLRenderer();
 
     effect = new THREE.VREffect(renderer);
@@ -56,7 +58,9 @@ function setupScene() {
     game.startGame();
 
     // Kick off the render loop.
-    vrDisplay.requestAnimationFrame(animate);
+    if (vrDisplay) {
+        vrDisplay.requestAnimationFrame(animate);
+    }
 }
 
 function addSkydome(scene, renderer) {
