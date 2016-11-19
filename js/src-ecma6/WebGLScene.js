@@ -117,11 +117,19 @@ class MazeWalls extends Maze {
     }
 
     addWalls(x,z) {
-        if(this.getAdjacentCell(x,z, Directions.NORTH) != this.getCell(x,z)) {
-            this.addWall(x, z, Directions.NORTH);
-        }
-        if(this.getAdjacentCell(x,z, Directions.EAST) != this.getCell(x,z)) {
-            this.addWall(x, z, Directions.EAST);
+        if(!this.getCell(x,z)) {
+            if(this.getAdjacentCell(x,z, Directions.NORTH)) {
+                this.addWall(x, z, Directions.NORTH);
+            }
+            if(this.getAdjacentCell(x,z, Directions.SOUTH)) {
+                this.addWall(x, z, Directions.SOUTH);
+            }
+            if(this.getAdjacentCell(x,z, Directions.EAST)) {
+                this.addWall(x, z, Directions.EAST);
+            }
+            if(this.getAdjacentCell(x,z, Directions.WEST)) {
+                this.addWall(x, z, Directions.WEST);
+            }
         }
     }
 
@@ -134,11 +142,12 @@ class MazeWalls extends Maze {
                 plane.position.z = -MazeWalls.cellDimension/2;
                 break;
             case 0x2: /* East */
-                plane.rotation.y = Math.PI/2;
+                plane.rotation.y = -Math.PI/2;
                 plane.position.x = MazeWalls.cellDimension/2;
                 break;
             case 0x4: /* South */
                 plane.position.z = MazeWalls.cellDimension/2;
+                plane.rotation.y = Math.PI;
                 break;
             case 0x8: /* West */
                 plane.rotation.y = Math.PI/2;
@@ -158,6 +167,18 @@ class MazeWalls extends Maze {
     static get cellDimension() {
         return 2;
     }
+
+    setIsFalling(isFalling) {
+        // When the character is falling, it will see the maze
+        // from below. Hence, it is necessary to render the
+        // front and backs of walls. When inside the maze,
+        // only the front faces need to be drawn.
+        if(isFalling) {
+            theme.wallMaterial.side = THREE.DoubleSide;
+        } else {
+            theme.wallMaterial.side = THREE.FrontSide;
+        }
+    }
 }
 
 class RetroTheme {
@@ -167,8 +188,8 @@ class RetroTheme {
         this.useGroundPlane = false;
         
         // Materials for the walls
-        this.wallMaterial = new THREE.MeshPhongMaterial( {color: 0xffff55, side: THREE.DoubleSide} );
-        
+        this.wallMaterial = new THREE.MeshPhongMaterial( {color: 0xffff55} );
+
         // Materials for the eyes
         var texture = loader.load('textures/eye.png');
         texture.anisotropy = renderer.getMaxAnisotropy();

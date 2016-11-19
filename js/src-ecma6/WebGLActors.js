@@ -482,6 +482,7 @@ class SelfRepresentation extends AnimatedRepresentation {
         this.turnTowards(Directions.UP);
         this.startFalling(selfFallAcceleration);
         this.body.lockControls();
+        maze.setIsFalling(true);
         
         this.map.hide();
         this.respawnCallback = respawnCallback;
@@ -497,6 +498,7 @@ class SelfRepresentation extends AnimatedRepresentation {
         liftFog();
         this.body.reattachHead();
         this.body.unlockControls();
+        maze.setIsFalling(false);
         this.map.show();
     }
 };
