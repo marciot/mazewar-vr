@@ -201,7 +201,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }
 
         this.followLink = function(link) {
-            this.gotoPage(link.getAttribute("data-page"))
+            var dataPage = link.getAttribute("data-page");
+            if(dataPage) {
+                this.gotoPage(dataPage);
+                return;
+            }
+            var dataHref = link.getAttribute("data-href");
+            if(dataHref) {
+                window.location.href = dataHref;
+            }
         }
 
         this.gotoPage = function(newPage) {

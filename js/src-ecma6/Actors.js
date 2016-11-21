@@ -250,7 +250,7 @@ class Player extends Actor {
     }
 
     wasHit(data) {
-        if(this.isDead) {
+        if(this.isDead || theme.isFading) {
             return;
         }
         this.notifyObservers("wasHit", data.shotBy);

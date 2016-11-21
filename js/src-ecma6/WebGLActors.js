@@ -266,16 +266,18 @@ class EyeRepresentation extends AnimatedRepresentation {
         this.geometry.rotateY(Math.PI);
         var mesh = new THREE.Mesh(this.geometry, theme.eyeMaterial);
 
-        // Set the fade out distance just shy of the wall on a
-        // neighboring corridor. This is important to keep light
-        // from going through walls in a multi-player game.
-        var fadeDistance = MazeWalls.cellDimension * 2;
-        this.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
-
         this.object = new THREE.Object3D();
         this.object.add(mesh);
-        this.object.add(this.headLight);
         this.object.position.y = eyeHeight;
+
+        if(theme.useActorIllumination) {
+            // Set the fade out distance just shy of the wall on a
+            // neighboring corridor. This is important to keep light
+            // from going through walls in a multi-player game.
+            var fadeDistance = MazeWalls.cellDimension * 2;
+            this.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
+            this.object.add(this.headLight);
+        }
     }
 
     dispose() {
@@ -309,18 +311,20 @@ class MissileRepresentation extends AnimatedRepresentation {
 
         // Materials for the missiles
         this.material = new THREE.MeshBasicMaterial( {color: missileColor} );
-
-        // Set the fade out distance just shy of the wall on a
-        // neighboring corridor. This is important to keep light
-        // from going through walls in a multi-player game.
-        var fadeDistance = MazeWalls.cellDimension * 2.45;
         var mesh  = new THREE.Mesh(geometry, this.material);
-        var light = new THREE.PointLight( missileColor, 0.5, fadeDistance);
 
         this.object = new THREE.Object3D();
-        this.object.add(light);
         this.object.add(mesh);
         this.object.position.y = 1.5;
+
+        if(theme.useActorIllumination) {
+            // Set the fade out distance just shy of the wall on a
+            // neighboring corridor. This is important to keep light
+            // from going through walls in a multi-player game.
+            var fadeDistance = MazeWalls.cellDimension * 2.45;
+            var light = new THREE.PointLight( missileColor, 0.5, fadeDistance);
+            this.object.add(light);
+        }
     }
 
     dispose() {
@@ -433,6 +437,33 @@ class MapRepresentation extends VisibleRepresentation {
     }
 };
 
+class CandleLight {
+    constructor(fadeDistance) {
+        this.light = new THREE.PointLight(0xFFAA00, 0.25, fadeDistance, 2);
+        this.nextFlickerTime = 0;
+    }
+
+    get representation() {
+        return this.light;
+    }
+
+    flicker() {
+        const smoothingFactor = 0.25;
+        const flickerInterval = 100;
+        const minIntensity    = 0.3;
+        const maxIntensity    = 0.5;
+
+        if(Date.now() > this.nextFlickerTime) {
+            this.targetIntensity = minIntensity + Math.random() * (maxIntensity - minIntensity);
+            this.nextFlickerTime = Date.now()   + Math.random() * flickerInterval;
+        } else {
+            this.light.intensity =
+                this.light.intensity * (1 - smoothingFactor) +
+                this.targetIntensity * (    smoothingFactor);
+        }
+    }
+}
+
 // The player's own character. It carries the camera and a map around
 class SelfRepresentation extends AnimatedRepresentation {
     constructor(camera) {
@@ -443,6 +474,15 @@ class SelfRepresentation extends AnimatedRepresentation {
         this.body.carry(this.map);
         
         this.object = this.body.getHead();
+
+        if(theme.useActorIllumination) {
+            // Set the fade out distance just shy of the wall on a
+            // neighboring corridor. This is important to keep light
+            // from going through walls in a multi-player game.
+            const fadeDistance = MazeWalls.cellDimension * 7;
+            this.candle = new CandleLight(fadeDistance);
+            this.body.carry(this.candle);
+        }
     }
 
     get representation() {
@@ -476,6 +516,9 @@ class SelfRepresentation extends AnimatedRepresentation {
         } else {
             this.body.update();
         }
+        if(this.candle) {
+            this.candle.flicker();
+        }
     }
 
     shotDead(respawnCallback) {
@@ -495,7 +538,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     }
     
     respawn() {
-        liftFog();
+        theme.fadeEffect();
         this.body.reattachHead();
         this.body.unlockControls();
         maze.setIsFalling(false);
@@ -514,10 +557,10 @@ class SelfRepresentation extends AnimatedRepresentation {
  * direction.
  */
 class SelfBody {
-    constructor(head) {
+    constructor(camera) {
         const handsTilt = 45;
 
-        this.head           = head;
+        this.head           = camera;
         this.body           = new THREE.Object3D();
         this.hands          = new THREE.Object3D();
         this.carriedObjects = new THREE.Object3D();
@@ -625,10 +668,10 @@ class SelfBody {
     }
 }
 
-function getWebGLPlayerFactory(camera) {
+function getWebGLPlayerFactory() {
     var playerFactory = {
         newSelfPlayer: function() {
-            var selfRepresentation = new SelfRepresentation(camera);
+            var selfRepresentation = new SelfRepresentation(overlay.representation);
             var actor = new Player(selfRepresentation);
             actors.placePlayer(actor);
             new HeadsetDirector(actor, container);

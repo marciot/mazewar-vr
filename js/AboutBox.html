@@ -429,10 +429,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div class="header center-text">
                 <h1 class="title">Game Setup</h1>
             </div>
-            <div class="middle flex-grid three-element">
+            <div class="middle flex-grid four-element">
+                <div><div class="clickable grid-button" data-page="pageSetupWizard">Setup Wizard</div></div>
+                <div><div class="clickable grid-button" data-page="pageThemeChoices">Theme Selection</div></div>
                 <div><div class="clickable grid-button" data-page="pageDisplayOptions">Display Options</div></div>
                 <div><div class="clickable grid-button" data-page="pageGamepadConfiguration">Gamepad Options</div></div>
-                <div><div class="clickable grid-button" data-page="pageSetupWizard">Setup Wizard</div></div>
             </div>
             <div class="footer">
             </div>
@@ -682,6 +683,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <li><a href="https://github.com/googlevr/webvr-polyfill">WebVR Polyfill</a>
                 <li><a href="https://www.promisejs.org/">promisejs.org</a>
                 </ul>
+                </p>
+                <p>
+                    <a href="http://fav.me/d4ecxyt">Brick texture</a> by AGF81.
+                </p>
+                <p>
                 Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
                 </p>
             </div>
@@ -747,6 +753,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <center>
                 <div class="page-link clickable centered-button" data-page="page1">Back</div>
+                </center>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageThemeChoices">
+            <div>
+                <h1>Select Theme:</h1>
+                <p>
+                <cite>Maze War VR</cite> comes with two different themes.
+                The day theme is bright and heavenly and is suitable for most
+                devices; the night theme provides a darker and suspenseful
+                atmosphere, but may require a faster device for smooth
+                playback.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-href="?theme=day">Day Theme</div>
+                </center>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-href="?theme=night">Night Theme</div>
                 </center>
             </div>
         </div>

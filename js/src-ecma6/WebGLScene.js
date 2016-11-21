@@ -1,12 +1,9 @@
-const fogNear       = 0.1;
-const fogFar        = 50;
-const fogDuration   = 3;
+const fadeDuration = 5;
 
-var camera, scene, renderer, effect, game;
+var overlay, camera, scene, renderer, effect, game;
 var maze, theme;
 var loader = new THREE.TextureLoader();
 var tween = new Tween();
-var lights = [];
 
 function setupScene() {
     mwLog("Setting up scene");
@@ -17,82 +14,40 @@ function setupScene() {
     effect.setVRDisplay(vrDisplay);
     
     camera    = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.001, 700 );
+    overlay   = new OverlayText(camera);
+
     window.addEventListener('resize', resize, false);
     
     document.body.insertBefore(renderer.domElement, document.body.firstChild);
     
     container = renderer.domElement;
 
-    scene     = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x000000, fogNear, fogFar);
-    theme     = new RetroTheme(renderer);
-    theme.addLightingToScene(scene);
-
-    // Ground plane
-    if(theme.useGroundPlane) {
-        var geometry = new THREE.PlaneGeometry(1000, 1000);
-
-        var mesh = new THREE.Mesh(geometry, theme.groundMaterial);
-        mesh.rotation.x = -Math.PI / 2;
-        scene.add(mesh);
+    query = parseQuery();
+    switch(query.theme) {
+        case "night":
+            theme = new NightTheme(renderer);
+            break;
+        default:
+            theme = new DayTheme(renderer);
+            break;
     }
+    scene     = new THREE.Scene();
+    theme.addLightingToScene(scene);
+    theme.addSky(scene, renderer);
 
     // Maze walls
     
     maze = new MazeWalls();
     scene.add(maze.representation);
-
-    addSkydome(scene, renderer);
     
     // Start a game so we can have something interesting
     // going on in the background
-    game = new SoloGame(getWebGLPlayerFactory(camera));
+    game = new SoloGame(getWebGLPlayerFactory());
     game.startGame();
     
     // Kick off the render loop.
     if(vrDisplay) {
         vrDisplay.requestAnimationFrame(animate);
-    }
-}
-
-function addSkydome(scene, renderer) {
-    /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
-    
-    var texture = loader.load('textures/sky.jpg');
-    texture.anisotropy = renderer.getMaxAnisotropy();
-
-    var geometry = new THREE.SphereGeometry(500, 60, 40);
-    geometry.rotateZ(-Math.PI/2);
-    var uniforms = {  
-        texture: { type: 't', value: texture }
-    };
-
-    var material = new THREE.ShaderMaterial( {
-        uniforms:       uniforms,
-        vertexShader:   document.getElementById('sky-vertex').textContent,
-        fragmentShader: document.getElementById('sky-fragment').textContent
-    });
-
-    skyBox = new THREE.Mesh(geometry, material);  
-    skyBox.scale.set(-1, 1, 1);
-    skyBox.rotation.order = 'XZY';
-    skyBox.renderDepth = 1000.0;
-    scene.add(skyBox);
-}
-
-function animateSkydome() {
-    skyBox.rotation.x += 0.0002
-    skyBox.rotation.z += 0.0001;
-}
-
-function liftFog() {
-    tween.add(fogDuration, tweenFunctions.easeInQuint, t => scene.fog.far   = t, fogNear+0.01, fogFar);
-    for(var i = 0; i < lights.length; i++) {
-        var light = lights[i];
-        function getDimmerFunc(light) {
-            return t => light.intensity = t;
-        }
-        tween.add(fogDuration, tweenFunctions.easeInCubic, getDimmerFunc(light), 0, light.intensity);
     }
 }
 
@@ -110,10 +65,12 @@ class MazeWalls extends Maze {
         this.maze = new THREE.Object3D();
         this.maze.add(walls);
 
-        var edgeGeometry = new THREE.EdgesGeometry(this.geometry, 45);
-        var edgeMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 2});
-        var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
-        this.maze.add(edges);
+        if(theme.strokeMazeEdges) {
+            var edgeGeometry = new THREE.EdgesGeometry(this.geometry, 45);
+            var edgeMaterial = new THREE.LineBasicMaterial({color: 0x000000, linewidth: 2});
+            var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+            this.maze.add(edges);
+        }
     }
 
     addWalls(x,z) {
@@ -181,14 +138,95 @@ class MazeWalls extends Maze {
     }
 }
 
-class RetroTheme {
+class Theme {
+    constructor() {
+        this.isFading = false;
+    }
+
+    addSkydome(scene, renderer, texture, symmetric) {
+        /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
+
+        var texture = loader.load(texture);
+        texture.anisotropy = renderer.getMaxAnisotropy();
+
+        var geometry = new THREE.SphereGeometry(500, 60, 40);
+
+        var uniforms = {
+            texture: { type: 't', value: texture }
+        };
+
+        var material = new THREE.ShaderMaterial( {
+            uniforms:       uniforms,
+            vertexShader:   document.getElementById('sky-vertex').textContent,
+            fragmentShader: document.getElementById(symmetric ? 'sky-fragment-symmetric' : 'sky-fragment').textContent
+        });
+
+        this.skyBox = new THREE.Mesh(geometry, material);
+        this.skyBox.scale.set(-1, 1, 1);
+        this.skyBox.rotation.order = 'XZY';
+        this.skyBox.renderDepth = 1000.0;
+        scene.add(this.skyBox);
+    }
+
+    animate() {
+    }
+
+    fadeEffect(callback) {
+        function getOpacityFunc(material) {
+            material.transparent = true;
+            material.opacity     = 0;
+            material.visible     = false;
+
+            return t => {
+                if(t < 0.05) {
+                    material.transparent = false;
+                    material.visible     = false;
+                    material.opacity     = 1;
+                } else if(t > 0.95) {
+                    material.transparent = false;
+                    material.visible     = true;
+                    material.opacity     = 1;
+                } else {
+                    material.transparent = true;
+                    material.visible     = true;
+                    material.opacity     = t;
+                }
+            }
+        }
+
+        this.isFading = true;
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.eyeMaterial),  0, 1, 0.2, 0.6);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.wallMaterial), 0, 1, 0.6, 1.0);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+        tween.whenDone(() => {
+            overlay.chooseText();
+            this.isFading = false;
+        });
+    }
+}
+
+class NightTheme extends Theme {
     constructor(renderer) {
+        super(renderer);
+
         // Attributes
-        
-        this.useGroundPlane = false;
-        
+        this.useActorIllumination = true;
+        this.strokeMazeEdges      = false;
+
         // Materials for the walls
-        this.wallMaterial = new THREE.MeshPhongMaterial( {color: 0xffff55} );
+        var specularMap = loader.load('textures/brick-texture-8-by-agf81/Brick_D2_Specular.jpg');
+        specularMap.anisotropy = renderer.getMaxAnisotropy();
+
+        var normalTexture = loader.load('textures/brick-texture-8-by-agf81/Brick_D3_Normal.jpg');
+        normalTexture.anisotropy = renderer.getMaxAnisotropy();
+
+        this.wallMaterial = new THREE.MeshPhongMaterial( {
+            color:       0xffff55,
+            normalMap:   normalTexture,
+            normalScale: new THREE.Vector2(3, -3),
+            specularMap: specularMap
+        } );
 
         // Materials for the eyes
         var texture = loader.load('textures/eye.png');
@@ -203,37 +241,79 @@ class RetroTheme {
             emissiveMap: texture,
             map:         texture
         } ) ;
-        
-        // Materials for the ground plane
-        if(this.useGroundPlane) {
-            var texture = loader.load('textures/ground.png');
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat = new THREE.Vector2(50, 50);
-            texture.anisotropy = renderer.getMaxAnisotropy();
-
-            this.groundMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                specular: 0xffffff,
-                shininess: 20,
-                shading: THREE.FlatShading,
-                map: texture
-            });
-        }
 
         // Sky color
         renderer.setClearColor(0x000000);
+
+        // Material for text overlay
+        this.textMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF, visible: false});
     }
-    
+
     addLightingToScene(scene) {
-        var light = new THREE.AmbientLight(0xFFFFFF, 0.07);
-        lights.push(light);
+        // The player carries his own lighting in this theme
+    }
+
+    addSky(scene, renderer) {
+        super.addSkydome(scene, renderer, 'textures/sky-night.jpg');
+    }
+
+    animate() {
+        this.skyBox.rotation.x += 0.0002;
+        this.skyBox.rotation.z += 0.0001;
+    }
+}
+
+class DayTheme extends Theme {
+    constructor(renderer) {
+        super(renderer);
+
+        // Attributes
+        this.useActorIllumination = false;
+        this.strokeMazeEdges      = false;
+
+        // Materials for the walls
+        var texture = loader.load('textures/brick-texture-8-by-agf81/Brick_D1_Diffuse.jpg');
+        texture.anisotropy = renderer.getMaxAnisotropy();
+        this.wallMaterial = new THREE.MeshLambertMaterial( {
+            color:      0xffff55,
+            map:        texture
+        } );
+
+        // Materials for the eyes
+        var texture = loader.load('textures/eye.png');
+        texture.anisotropy = renderer.getMaxAnisotropy();
+
+        this.eyeMaterial = new THREE.MeshPhongMaterial( {
+            color:     0xFFFFFF,
+            specular:  0x333333,
+            shininess: 20,
+            emissive:  0xFFFFFF,
+            emissiveIntensity: 1,
+            emissiveMap: texture,
+            map:         texture
+        } ) ;
+
+        // Sky color
+        renderer.setClearColor(0xADD8E6);
+
+        // Material for text overlay
+        this.textMaterial = new THREE.MeshBasicMaterial({color: 0x000000, visible: false});
+    }
+
+    addLightingToScene(scene) {
+        var light = new THREE.AmbientLight(0xFFFFFF, 0.47);
         scene.add(light);
 
-        var directionalLight = new THREE.DirectionalLight(0xFFFFFF,0.20);
-        directionalLight.position.set( .25, 1, 0.15 );
-        lights.push(directionalLight);
+        var directionalLight = new THREE.DirectionalLight(0xFFFFFF,0.85);
+        directionalLight.position.set(0.25, 1, 0.15);
         scene.add(directionalLight);
+    }
 
+    addSky(scene, renderer) {
+        super.addSkydome(scene, renderer, 'textures/sky-day.jpg', true);
+    }
+
+    animate() {
+        this.skyBox.rotation.y += 0.00025;
     }
 }
