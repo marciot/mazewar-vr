@@ -331,16 +331,18 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
         _this3.geometry.rotateY(Math.PI);
         var mesh = new THREE.Mesh(_this3.geometry, theme.eyeMaterial);
 
-        // Set the fade out distance just shy of the wall on a
-        // neighboring corridor. This is important to keep light
-        // from going through walls in a multi-player game.
-        var fadeDistance = MazeWalls.cellDimension * 2;
-        _this3.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
-
         _this3.object = new THREE.Object3D();
         _this3.object.add(mesh);
-        _this3.object.add(_this3.headLight);
         _this3.object.position.y = eyeHeight;
+
+        if (theme.useActorIllumination) {
+            // Set the fade out distance just shy of the wall on a
+            // neighboring corridor. This is important to keep light
+            // from going through walls in a multi-player game.
+            var fadeDistance = MazeWalls.cellDimension * 2;
+            _this3.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
+            _this3.object.add(_this3.headLight);
+        }
         return _this3;
     }
 
@@ -387,18 +389,20 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
 
         // Materials for the missiles
         _this4.material = new THREE.MeshBasicMaterial({ color: missileColor });
-
-        // Set the fade out distance just shy of the wall on a
-        // neighboring corridor. This is important to keep light
-        // from going through walls in a multi-player game.
-        var fadeDistance = MazeWalls.cellDimension * 2.45;
         var mesh = new THREE.Mesh(geometry, _this4.material);
-        var light = new THREE.PointLight(missileColor, 0.5, fadeDistance);
 
         _this4.object = new THREE.Object3D();
-        _this4.object.add(light);
         _this4.object.add(mesh);
         _this4.object.position.y = 1.5;
+
+        if (theme.useActorIllumination) {
+            // Set the fade out distance just shy of the wall on a
+            // neighboring corridor. This is important to keep light
+            // from going through walls in a multi-player game.
+            var fadeDistance = MazeWalls.cellDimension * 2.45;
+            var light = new THREE.PointLight(missileColor, 0.5, fadeDistance);
+            _this4.object.add(light);
+        }
         return _this4;
     }
 
@@ -541,7 +545,41 @@ var MapRepresentation = function (_VisibleRepresentatio2) {
 
 ;
 
+var CandleLight = function () {
+    function CandleLight(fadeDistance) {
+        _classCallCheck(this, CandleLight);
+
+        this.light = new THREE.PointLight(0xFFAA00, 0.25, fadeDistance, 2);
+        this.nextFlickerTime = 0;
+    }
+
+    _createClass(CandleLight, [{
+        key: "flicker",
+        value: function flicker() {
+            var smoothingFactor = 0.25;
+            var flickerInterval = 100;
+            var minIntensity = 0.3;
+            var maxIntensity = 0.5;
+
+            if (Date.now() > this.nextFlickerTime) {
+                this.targetIntensity = minIntensity + Math.random() * (maxIntensity - minIntensity);
+                this.nextFlickerTime = Date.now() + Math.random() * flickerInterval;
+            } else {
+                this.light.intensity = this.light.intensity * (1 - smoothingFactor) + this.targetIntensity * smoothingFactor;
+            }
+        }
+    }, {
+        key: "representation",
+        get: function () {
+            return this.light;
+        }
+    }]);
+
+    return CandleLight;
+}();
+
 // The player's own character. It carries the camera and a map around
+
 
 var SelfRepresentation = function (_AnimatedRepresentati3) {
     _inherits(SelfRepresentation, _AnimatedRepresentati3);
@@ -557,6 +595,15 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
         _this6.body.carry(_this6.map);
 
         _this6.object = _this6.body.getHead();
+
+        if (theme.useActorIllumination) {
+            // Set the fade out distance just shy of the wall on a
+            // neighboring corridor. This is important to keep light
+            // from going through walls in a multi-player game.
+            var fadeDistance = MazeWalls.cellDimension * 7;
+            _this6.candle = new CandleLight(fadeDistance);
+            _this6.body.carry(_this6.candle);
+        }
         return _this6;
     }
 
@@ -593,6 +640,9 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
             } else {
                 this.body.update();
             }
+            if (this.candle) {
+                this.candle.flicker();
+            }
         }
     }, {
         key: "shotDead",
@@ -600,6 +650,7 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
             this.turnTowards(Directions.UP);
             this.startFalling(selfFallAcceleration);
             this.body.lockControls();
+            maze.setIsFalling(true);
 
             this.map.hide();
             this.respawnCallback = respawnCallback;
@@ -614,9 +665,10 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
     }, {
         key: "respawn",
         value: function respawn() {
-            liftFog();
+            theme.fadeEffect();
             this.body.reattachHead();
             this.body.unlockControls();
+            maze.setIsFalling(false);
             this.map.show();
         }
     }, {
@@ -643,12 +695,12 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
  */
 
 var SelfBody = function () {
-    function SelfBody(head) {
+    function SelfBody(camera) {
         _classCallCheck(this, SelfBody);
 
         var handsTilt = 45;
 
-        this.head = head;
+        this.head = camera;
         this.body = new THREE.Object3D();
         this.hands = new THREE.Object3D();
         this.carriedObjects = new THREE.Object3D();
@@ -769,10 +821,10 @@ var SelfBody = function () {
     return SelfBody;
 }();
 
-function getWebGLPlayerFactory(camera) {
+function getWebGLPlayerFactory() {
     var playerFactory = {
         newSelfPlayer: function () {
-            var selfRepresentation = new SelfRepresentation(camera);
+            var selfRepresentation = new SelfRepresentation(overlay.representation);
             var actor = new Player(selfRepresentation);
             actors.placePlayer(actor);
             new HeadsetDirector(actor, container);

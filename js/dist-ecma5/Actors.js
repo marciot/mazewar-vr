@@ -323,7 +323,7 @@ var Player = function (_Actor2) {
     }, {
         key: "wasHit",
         value: function wasHit(data) {
-            if (this.isDead) {
+            if (this.isDead || theme.isFading) {
                 return;
             }
             this.notifyObservers("wasHit", data.shotBy);

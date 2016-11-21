@@ -84,6 +84,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- We use YConsole to help debugging on mobile devices -->
         <script type="text/javascript" src="js/third-party/yconsole-compiled.js"></script>
+    </head>
     <body>
         <span id="statusAndError"></span>
         <script type="text/javascript">
@@ -154,7 +155,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </script>
 
         <script type="application/x-glsl" id="sky-fragment">  
-            uniform sampler2D texture;  
+            uniform sampler2D texture;
             varying vec2 vUV;
 
             void main() {  

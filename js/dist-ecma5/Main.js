@@ -23,6 +23,18 @@ var vrDisplay, gpClicker;
 var clock = new THREE.Clock();
 var actors = new WebGLActors();
 
+/* Decode the query variable
+ */
+function parseQuery(url) {
+    var vars = (url || window.location.search).substring(1).split("&");
+    var query = {};
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        query[pair[0]] = pair[1];
+    }
+    return query;
+}
+
 function setupVR(sceneCallback) {
     if (!navigator.getVRDisplays) {
         mwLog("WebVR is not supported");
@@ -90,6 +102,7 @@ function init() {
     function startNetworkGame() {
         var name = prompt("Please enter your name");
         startVr();
+        theme.fadeEffect();
 
         function stateChangedCallback(state, error) {
             switch (state) {
@@ -111,12 +124,13 @@ function init() {
         var ETHERNET_ADDR_MAX = 0xFF;
         var hostId = Math.floor(Math.random() * (ETHERNET_ADDR_MAX - ETHERNET_ADDR_MIN)) + ETHERNET_ADDR_MIN;
 
-        game = new NetworkedGame(getWebGLPlayerFactory(camera));
+        game = new NetworkedGame(getWebGLPlayerFactory());
         game.startGame(hostId, name, stateChangedCallback);
     }
 
     function startSoloGame() {
         startVr();
+        theme.fadeEffect();
     }
 
     // WebComponents initialization
@@ -159,7 +173,7 @@ function update(dt) {
     actors.animate();
     tween.update(dt);
 
-    animateSkydome();
+    theme.animate();
 }
 
 function render(dt) {

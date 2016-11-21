@@ -1,3 +1,5 @@
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6,15 +8,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var fogNear = 0.1;
-var fogFar = 50;
-var fogDuration = 3;
+var fadeDuration = 5;
 
-var camera, scene, renderer, effect, game;
+var overlay, camera, scene, renderer, effect, game;
 var maze, theme;
 var loader = new THREE.TextureLoader();
 var tween = new Tween();
-var lights = [];
 
 function setupScene() {
     mwLog("Setting up scene");
@@ -25,94 +24,40 @@ function setupScene() {
     effect.setVRDisplay(vrDisplay);
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.001, 700);
+    overlay = new OverlayText(camera);
+
     window.addEventListener('resize', resize, false);
 
     document.body.insertBefore(renderer.domElement, document.body.firstChild);
 
     container = renderer.domElement;
 
-    scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x000000, fogNear, fogFar);
-    theme = new RetroTheme(renderer);
-    theme.addLightingToScene(scene);
-
-    // Ground plane
-    if (theme.useGroundPlane) {
-        var geometry = new THREE.PlaneGeometry(1000, 1000);
-
-        var mesh = new THREE.Mesh(geometry, theme.groundMaterial);
-        mesh.rotation.x = -Math.PI / 2;
-        scene.add(mesh);
+    query = parseQuery();
+    switch (query.theme) {
+        case "night":
+            theme = new NightTheme(renderer);
+            break;
+        default:
+            theme = new DayTheme(renderer);
+            break;
     }
+    scene = new THREE.Scene();
+    theme.addLightingToScene(scene);
+    theme.addSky(scene, renderer);
 
     // Maze walls
 
     maze = new MazeWalls();
     scene.add(maze.representation);
 
-    addSkydome(scene, renderer);
-
     // Start a game so we can have something interesting
     // going on in the background
-    game = new SoloGame(getWebGLPlayerFactory(camera));
+    game = new SoloGame(getWebGLPlayerFactory());
     game.startGame();
 
     // Kick off the render loop.
     if (vrDisplay) {
         vrDisplay.requestAnimationFrame(animate);
-    }
-}
-
-function addSkydome(scene, renderer) {
-    /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
-
-    var texture = loader.load('textures/sky.jpg');
-    texture.anisotropy = renderer.getMaxAnisotropy();
-
-    var geometry = new THREE.SphereGeometry(500, 60, 40);
-    geometry.rotateZ(-Math.PI / 2);
-    var uniforms = {
-        texture: { type: 't', value: texture }
-    };
-
-    var material = new THREE.ShaderMaterial({
-        uniforms: uniforms,
-        vertexShader: document.getElementById('sky-vertex').textContent,
-        fragmentShader: document.getElementById('sky-fragment').textContent
-    });
-
-    skyBox = new THREE.Mesh(geometry, material);
-    skyBox.scale.set(-1, 1, 1);
-    skyBox.rotation.order = 'XZY';
-    skyBox.renderDepth = 1000.0;
-    scene.add(skyBox);
-}
-
-function animateSkydome() {
-    skyBox.rotation.x += 0.0002;
-    skyBox.rotation.z += 0.0001;
-}
-
-function liftFog() {
-    tween.add(fogDuration, tweenFunctions.easeInQuint, function (t) {
-        return scene.fog.far = t;
-    }, fogNear + 0.01, fogFar);
-
-    var _loop = function () {
-        light = lights[i];
-
-        function getDimmerFunc(light) {
-            return function (t) {
-                return light.intensity = t;
-            };
-        }
-        tween.add(fogDuration, tweenFunctions.easeInCubic, getDimmerFunc(light), 0, light.intensity);
-    };
-
-    for (var i = 0; i < lights.length; i++) {
-        var light;
-
-        _loop();
     }
 }
 
@@ -134,25 +79,35 @@ var MazeWalls = function (_Maze) {
         _this.maze = new THREE.Object3D();
         _this.maze.add(walls);
 
-        var edgeGeometry = new THREE.EdgesGeometry(_this.geometry, 45);
-        var edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
-        var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
-        _this.maze.add(edges);
+        if (theme.strokeMazeEdges) {
+            var edgeGeometry = new THREE.EdgesGeometry(_this.geometry, 45);
+            var edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+            var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+            _this.maze.add(edges);
+        }
         return _this;
     }
 
     _createClass(MazeWalls, [{
-        key: 'addWalls',
+        key: "addWalls",
         value: function addWalls(x, z) {
-            if (this.getAdjacentCell(x, z, Directions.NORTH) != this.getCell(x, z)) {
-                this.addWall(x, z, Directions.NORTH);
-            }
-            if (this.getAdjacentCell(x, z, Directions.EAST) != this.getCell(x, z)) {
-                this.addWall(x, z, Directions.EAST);
+            if (!this.getCell(x, z)) {
+                if (this.getAdjacentCell(x, z, Directions.NORTH)) {
+                    this.addWall(x, z, Directions.NORTH);
+                }
+                if (this.getAdjacentCell(x, z, Directions.SOUTH)) {
+                    this.addWall(x, z, Directions.SOUTH);
+                }
+                if (this.getAdjacentCell(x, z, Directions.EAST)) {
+                    this.addWall(x, z, Directions.EAST);
+                }
+                if (this.getAdjacentCell(x, z, Directions.WEST)) {
+                    this.addWall(x, z, Directions.WEST);
+                }
             }
         }
     }, {
-        key: 'addWall',
+        key: "addWall",
         value: function addWall(x, z, direction) {
             var geometry = new THREE.PlaneGeometry(MazeWalls.cellDimension, this.wallHeight);
             var plane = new THREE.Mesh(geometry, theme.wallMaterial);
@@ -164,12 +119,13 @@ var MazeWalls = function (_Maze) {
                     break;
                 case 0x2:
                     /* East */
-                    plane.rotation.y = Math.PI / 2;
+                    plane.rotation.y = -Math.PI / 2;
                     plane.position.x = MazeWalls.cellDimension / 2;
                     break;
                 case 0x4:
                     /* South */
                     plane.position.z = MazeWalls.cellDimension / 2;
+                    plane.rotation.y = Math.PI;
                     break;
                 case 0x8:
                     /* West */
@@ -183,12 +139,25 @@ var MazeWalls = function (_Maze) {
             this.geometry.merge(plane.geometry, plane.matrix);
         }
     }, {
-        key: 'representation',
+        key: "setIsFalling",
+        value: function setIsFalling(isFalling) {
+            // When the character is falling, it will see the maze
+            // from below. Hence, it is necessary to render the
+            // front and backs of walls. When inside the maze,
+            // only the front faces need to be drawn.
+            if (isFalling) {
+                theme.wallMaterial.side = THREE.DoubleSide;
+            } else {
+                theme.wallMaterial.side = THREE.FrontSide;
+            }
+        }
+    }, {
+        key: "representation",
         get: function () {
             return this.maze;
         }
     }], [{
-        key: 'cellDimension',
+        key: "cellDimension",
         get: function () {
             return 2;
         }
@@ -197,22 +166,115 @@ var MazeWalls = function (_Maze) {
     return MazeWalls;
 }(Maze);
 
-var RetroTheme = function () {
-    function RetroTheme(renderer) {
-        _classCallCheck(this, RetroTheme);
+var Theme = function () {
+    function Theme() {
+        _classCallCheck(this, Theme);
+
+        this.isFading = false;
+    }
+
+    _createClass(Theme, [{
+        key: "addSkydome",
+        value: function addSkydome(scene, renderer, texture, symmetric) {
+            /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
+
+            var texture = loader.load(texture);
+            texture.anisotropy = renderer.getMaxAnisotropy();
+
+            var geometry = new THREE.SphereGeometry(500, 60, 40);
+
+            var uniforms = {
+                texture: { type: 't', value: texture }
+            };
+
+            var material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: document.getElementById('sky-vertex').textContent,
+                fragmentShader: document.getElementById(symmetric ? 'sky-fragment-symmetric' : 'sky-fragment').textContent
+            });
+
+            this.skyBox = new THREE.Mesh(geometry, material);
+            this.skyBox.scale.set(-1, 1, 1);
+            this.skyBox.rotation.order = 'XZY';
+            this.skyBox.renderDepth = 1000.0;
+            scene.add(this.skyBox);
+        }
+    }, {
+        key: "animate",
+        value: function animate() {}
+    }, {
+        key: "fadeEffect",
+        value: function fadeEffect(callback) {
+            var _this2 = this;
+
+            function getOpacityFunc(material) {
+                material.transparent = true;
+                material.opacity = 0;
+                material.visible = false;
+
+                return function (t) {
+                    if (t < 0.05) {
+                        material.transparent = false;
+                        material.visible = false;
+                        material.opacity = 1;
+                    } else if (t > 0.95) {
+                        material.transparent = false;
+                        material.visible = true;
+                        material.opacity = 1;
+                    } else {
+                        material.transparent = true;
+                        material.visible = true;
+                        material.opacity = t;
+                    }
+                };
+            }
+
+            this.isFading = true;
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.eyeMaterial), 0, 1, 0.2, 0.6);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.wallMaterial), 0, 1, 0.6, 1.0);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+            tween.whenDone(function () {
+                overlay.chooseText();
+                _this2.isFading = false;
+            });
+        }
+    }]);
+
+    return Theme;
+}();
+
+var NightTheme = function (_Theme) {
+    _inherits(NightTheme, _Theme);
+
+    function NightTheme(renderer) {
+        _classCallCheck(this, NightTheme);
 
         // Attributes
+        var _this3 = _possibleConstructorReturn(this, (NightTheme.__proto__ || Object.getPrototypeOf(NightTheme)).call(this, renderer));
 
-        this.useGroundPlane = false;
+        _this3.useActorIllumination = true;
+        _this3.strokeMazeEdges = false;
 
         // Materials for the walls
-        this.wallMaterial = new THREE.MeshPhongMaterial({ color: 0xffff55, side: THREE.DoubleSide });
+        var specularMap = loader.load('textures/brick-texture-8-by-agf81/Brick_D2_Specular.jpg');
+        specularMap.anisotropy = renderer.getMaxAnisotropy();
+
+        var normalTexture = loader.load('textures/brick-texture-8-by-agf81/Brick_D3_Normal.jpg');
+        normalTexture.anisotropy = renderer.getMaxAnisotropy();
+
+        _this3.wallMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffff55,
+            normalMap: normalTexture,
+            normalScale: new THREE.Vector2(3, -3),
+            specularMap: specularMap
+        });
 
         // Materials for the eyes
         var texture = loader.load('textures/eye.png');
         texture.anisotropy = renderer.getMaxAnisotropy();
 
-        this.eyeMaterial = new THREE.MeshPhongMaterial({
+        _this3.eyeMaterial = new THREE.MeshPhongMaterial({
             color: 0xFFFFFF,
             specular: 0x333333,
             shininess: 20,
@@ -222,40 +284,98 @@ var RetroTheme = function () {
             map: texture
         });
 
-        // Materials for the ground plane
-        if (this.useGroundPlane) {
-            var texture = loader.load('textures/ground.png');
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat = new THREE.Vector2(50, 50);
-            texture.anisotropy = renderer.getMaxAnisotropy();
-
-            this.groundMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                specular: 0xffffff,
-                shininess: 20,
-                shading: THREE.FlatShading,
-                map: texture
-            });
-        }
-
         // Sky color
         renderer.setClearColor(0x000000);
+
+        // Material for text overlay
+        _this3.textMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, visible: false });
+        return _this3;
     }
 
-    _createClass(RetroTheme, [{
-        key: 'addLightingToScene',
+    _createClass(NightTheme, [{
+        key: "addLightingToScene",
         value: function addLightingToScene(scene) {
-            var light = new THREE.AmbientLight(0xFFFFFF, 0.07);
-            lights.push(light);
-            scene.add(light);
-
-            var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.20);
-            directionalLight.position.set(.25, 1, 0.15);
-            lights.push(directionalLight);
-            scene.add(directionalLight);
+            // The player carries his own lighting in this theme
+        }
+    }, {
+        key: "addSky",
+        value: function addSky(scene, renderer) {
+            _get(NightTheme.prototype.__proto__ || Object.getPrototypeOf(NightTheme.prototype), "addSkydome", this).call(this, scene, renderer, 'textures/sky-night.jpg');
+        }
+    }, {
+        key: "animate",
+        value: function animate() {
+            this.skyBox.rotation.x += 0.0002;
+            this.skyBox.rotation.z += 0.0001;
         }
     }]);
 
-    return RetroTheme;
-}();
+    return NightTheme;
+}(Theme);
+
+var DayTheme = function (_Theme2) {
+    _inherits(DayTheme, _Theme2);
+
+    function DayTheme(renderer) {
+        _classCallCheck(this, DayTheme);
+
+        // Attributes
+        var _this4 = _possibleConstructorReturn(this, (DayTheme.__proto__ || Object.getPrototypeOf(DayTheme)).call(this, renderer));
+
+        _this4.useActorIllumination = false;
+        _this4.strokeMazeEdges = false;
+
+        // Materials for the walls
+        var texture = loader.load('textures/brick-texture-8-by-agf81/Brick_D1_Diffuse.jpg');
+        texture.anisotropy = renderer.getMaxAnisotropy();
+        _this4.wallMaterial = new THREE.MeshLambertMaterial({
+            color: 0xffff55,
+            map: texture
+        });
+
+        // Materials for the eyes
+        var texture = loader.load('textures/eye.png');
+        texture.anisotropy = renderer.getMaxAnisotropy();
+
+        _this4.eyeMaterial = new THREE.MeshPhongMaterial({
+            color: 0xFFFFFF,
+            specular: 0x333333,
+            shininess: 20,
+            emissive: 0xFFFFFF,
+            emissiveIntensity: 1,
+            emissiveMap: texture,
+            map: texture
+        });
+
+        // Sky color
+        renderer.setClearColor(0xADD8E6);
+
+        // Material for text overlay
+        _this4.textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
+        return _this4;
+    }
+
+    _createClass(DayTheme, [{
+        key: "addLightingToScene",
+        value: function addLightingToScene(scene) {
+            var light = new THREE.AmbientLight(0xFFFFFF, 0.47);
+            scene.add(light);
+
+            var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.85);
+            directionalLight.position.set(0.25, 1, 0.15);
+            scene.add(directionalLight);
+        }
+    }, {
+        key: "addSky",
+        value: function addSky(scene, renderer) {
+            _get(DayTheme.prototype.__proto__ || Object.getPrototypeOf(DayTheme.prototype), "addSkydome", this).call(this, scene, renderer, 'textures/sky-day.jpg', true);
+        }
+    }, {
+        key: "animate",
+        value: function animate() {
+            this.skyBox.rotation.y += 0.00025;
+        }
+    }]);
+
+    return DayTheme;
+}(Theme);
