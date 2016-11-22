@@ -129,7 +129,7 @@ class NetworkedGame {
     }
 
     endGame() {
-        actors.removeAll();
+        actors.disposeAll();
     }
 }
 
@@ -151,6 +151,6 @@ class SoloGame {
     }
 
     endGame() {
-        actors.removeAll();
+        actors.disposeAll();
     }
 }

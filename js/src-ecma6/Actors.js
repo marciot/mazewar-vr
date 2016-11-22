@@ -32,14 +32,21 @@ class Actors {
         if (index > -1) {
             this.actors.splice(index, 1);
         }
-        actor.dispose();
     }
 
-    removeAll() {
+    removeAll(dispose) {
         console.log("Removing all actors");
         while(this.actors.length) {
-            this.remove(this.actors[this.actors.length-1]);
+            var actor = this.actors[this.actors.length-1];
+            this.remove(actor);
+            if(dispose) {
+                actor.dispose();
+            }
         }
+    }
+
+    disposeAll() {
+        this.removeAll(true);
     }
     
     isOccupied(x, z, except) {
@@ -171,27 +178,33 @@ class Actor {
 };
 
 class MissileActor extends Actor {
-    constructor(representation, fromPlayer, data) {
-        super(representation)
-        this.x      = fromPlayer.x;
-        this.z      = fromPlayer.z;
-        this.facing = fromPlayer.representation.cardinalDirection;
-        this.data   = data;
+    constructor(representation, owner) {
+        super(representation);
 
+        this.owner = owner;
         this.ricochet = false;
-
-        super.setPosition(this.x, this.z);
-        this.orientTowards(this.facing);
 
         representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
     }
 
+    launch(data) {
+        this.x      = this.owner.x;
+        this.z      = this.owner.z;
+        this.facing = this.owner.representation.cardinalDirection;
+        this.data   = data;
+
+        this.setPosition(this.x, this.z);
+        this.orientTowards(this.facing);
+    }
+
     dispose() {
-        this.data = null;
+        this.owner = null;
+        this.data  = null;
     }
 
     explode() {
         actors.remove(this);
+        this.owner.recycleMissile(this);
     }
 
     animationFinished() {
@@ -233,6 +246,29 @@ class Player extends Actor {
         // The player always sees its own missiles as green.
         this.enemyMissileColor = 0xFF0000 + (Math.floor(Math.random()*256) << 8);
         this.selfMissileColor  = 0x00FF00;
+        this.recycledMissiles  = [];
+    }
+
+    dispose() {
+        for(var i = 0; i < this.recycledMissiles.length; i++) {
+            this.recycledMissiles[i].dispose();
+            this.recycledMissiles[i] = null;
+        }
+        this.recycledMissiles = null;
+    }
+
+    makeMissile() {
+        if(this.recycledMissiles.length) {
+            return this.recycledMissiles.pop();
+        } else {
+            var missileRep = this.representation.getMissileRepresentation(this.missileColor);
+            var missile = new MissileActor(missileRep, this);
+            return missile;
+        }
+    }
+
+    recycleMissile(missile) {
+        this.recycledMissiles.push(missile);
     }
 
     get missileColor() {
@@ -242,15 +278,15 @@ class Player extends Actor {
     shoot() {
         this.notifyObservers("shoot");
 
-        var facing = this.representation.cardinalDirection;
-        var missileRep = this.representation.getMissileRepresentation(this.missileColor);
-        var missile = new MissileActor(missileRep, this, {shotBy: this});
+        var missile = this.makeMissile();
+        missile.launch({shotBy: this});
+        actors.add(missile);
         missile.startAnimation();
-        return actors.add(missile);
+        return missile;
     }
 
     wasHit(data) {
-        if(this.isDead || theme.isFading) {
+        if(this.isDead || (theme && theme.isFading)) {
             return;
         }
         this.notifyObservers("wasHit", data.shotBy);
