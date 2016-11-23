@@ -1,5 +1,3 @@
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -47,15 +45,23 @@ var Actors = function () {
             if (index > -1) {
                 this.actors.splice(index, 1);
             }
-            actor.dispose();
         }
     }, {
         key: "removeAll",
-        value: function removeAll() {
+        value: function removeAll(dispose) {
             console.log("Removing all actors");
             while (this.actors.length) {
-                this.remove(this.actors[this.actors.length - 1]);
+                var actor = this.actors[this.actors.length - 1];
+                this.remove(actor);
+                if (dispose) {
+                    actor.dispose();
+                }
             }
+        }
+    }, {
+        key: "disposeAll",
+        value: function disposeAll() {
+            this.removeAll(true);
         }
     }, {
         key: "isOccupied",
@@ -227,34 +233,40 @@ var Actor = function () {
 var MissileActor = function (_Actor) {
     _inherits(MissileActor, _Actor);
 
-    function MissileActor(representation, fromPlayer, data) {
+    function MissileActor(representation, owner) {
         _classCallCheck(this, MissileActor);
 
         var _this = _possibleConstructorReturn(this, (MissileActor.__proto__ || Object.getPrototypeOf(MissileActor)).call(this, representation));
 
-        _this.x = fromPlayer.x;
-        _this.z = fromPlayer.z;
-        _this.facing = fromPlayer.representation.cardinalDirection;
-        _this.data = data;
-
+        _this.owner = owner;
         _this.ricochet = false;
-
-        _get(MissileActor.prototype.__proto__ || Object.getPrototypeOf(MissileActor.prototype), "setPosition", _this).call(_this, _this.x, _this.z);
-        _this.orientTowards(_this.facing);
 
         representation.setAnimationFinishedCallback(_this.animationFinished.bind(_this));
         return _this;
     }
 
     _createClass(MissileActor, [{
+        key: "launch",
+        value: function launch(data) {
+            this.x = this.owner.x;
+            this.z = this.owner.z;
+            this.facing = this.owner.representation.cardinalDirection;
+            this.data = data;
+
+            this.setPosition(this.x, this.z);
+            this.orientTowards(this.facing);
+        }
+    }, {
         key: "dispose",
         value: function dispose() {
+            this.owner = null;
             this.data = null;
         }
     }, {
         key: "explode",
         value: function explode() {
             actors.remove(this);
+            this.owner.recycleMissile(this);
         }
     }, {
         key: "animationFinished",
@@ -306,24 +318,50 @@ var Player = function (_Actor2) {
         // The player always sees its own missiles as green.
         _this2.enemyMissileColor = 0xFF0000 + (Math.floor(Math.random() * 256) << 8);
         _this2.selfMissileColor = 0x00FF00;
+        _this2.recycledMissiles = [];
         return _this2;
     }
 
     _createClass(Player, [{
+        key: "dispose",
+        value: function dispose() {
+            for (var i = 0; i < this.recycledMissiles.length; i++) {
+                this.recycledMissiles[i].dispose();
+                this.recycledMissiles[i] = null;
+            }
+            this.recycledMissiles = null;
+        }
+    }, {
+        key: "makeMissile",
+        value: function makeMissile() {
+            if (this.recycledMissiles.length) {
+                return this.recycledMissiles.pop();
+            } else {
+                var missileRep = this.representation.getMissileRepresentation(this.missileColor);
+                var missile = new MissileActor(missileRep, this);
+                return missile;
+            }
+        }
+    }, {
+        key: "recycleMissile",
+        value: function recycleMissile(missile) {
+            this.recycledMissiles.push(missile);
+        }
+    }, {
         key: "shoot",
         value: function shoot() {
             this.notifyObservers("shoot");
 
-            var facing = this.representation.cardinalDirection;
-            var missileRep = this.representation.getMissileRepresentation(this.missileColor);
-            var missile = new MissileActor(missileRep, this, { shotBy: this });
+            var missile = this.makeMissile();
+            missile.launch({ shotBy: this });
+            actors.add(missile);
             missile.startAnimation();
-            return actors.add(missile);
+            return missile;
         }
     }, {
         key: "wasHit",
         value: function wasHit(data) {
-            if (this.isDead || theme.isFading) {
+            if (this.isDead || theme && theme.isFading) {
                 return;
             }
             this.notifyObservers("wasHit", data.shotBy);

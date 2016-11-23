@@ -155,7 +155,7 @@ var NetworkedGame = function () {
     }, {
         key: "endGame",
         value: function endGame() {
-            actors.removeAll();
+            actors.disposeAll();
         }
     }]);
 
@@ -185,7 +185,7 @@ var SoloGame = function () {
     }, {
         key: "endGame",
         value: function endGame() {
-            actors.removeAll();
+            actors.disposeAll();
         }
     }]);
 

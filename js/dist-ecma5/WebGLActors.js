@@ -36,6 +36,8 @@ var distanceOfHeldObjectsFromChest = 0.2;
 var selfFallAcceleration = 2;
 var enemyFallAcceleration = 1.7;
 
+var staticGeometry = {};
+
 var WebGLActors = function (_Actors) {
     _inherits(WebGLActors, _Actors);
 
@@ -190,6 +192,26 @@ var VisibleRepresentation = function () {
     return VisibleRepresentation;
 }();
 
+/* The follow function keeps a global cache of missile materials
+   indexed by color. This allows new missiles to be instantiated
+   without duplicating materials. */
+
+
+function getMissileMaterial(missileColor) {
+    var material,
+        key = missileColor.toString();
+    if (!this.missileMaterials) {
+        this.missileMaterials = {};
+    }
+    if (this.missileMaterials.hasOwnProperty(key)) {
+        material = this.missileMaterials[key];
+    } else {
+        material = MissileRepresentation.getMissileMaterial(missileColor);
+        this.missileMaterials[key] = material;
+    }
+    return material;
+}
+
 var AnimatedRepresentation = function (_VisibleRepresentatio) {
     _inherits(AnimatedRepresentation, _VisibleRepresentatio);
 
@@ -307,7 +329,7 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
     }, {
         key: "getMissileRepresentation",
         value: function getMissileRepresentation(missileColor) {
-            return new MissileRepresentation(missileColor);
+            return new MissileRepresentation(getMissileMaterial(missileColor));
         }
     }, {
         key: "isStopped",
@@ -327,13 +349,19 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
 
         var _this3 = _possibleConstructorReturn(this, (EyeRepresentation.__proto__ || Object.getPrototypeOf(EyeRepresentation)).call(this));
 
-        _this3.geometry = new THREE.SphereGeometry(eyeRadius, 64, 64);
-        _this3.geometry.rotateY(Math.PI);
-        var mesh = new THREE.Mesh(_this3.geometry, theme.eyeMaterial);
+        if (!staticGeometry.eye) {
+            staticGeometry.eye = new THREE.SphereGeometry(eyeRadius, 32, 32);
+            staticGeometry.eye.rotateY(Math.PI);
+        }
+        var mesh = new THREE.Mesh(staticGeometry.eye, theme.eyeMaterial);
+
+        _this3.sound = new ActorSounds();
+        _this3.sound.startWalking();
 
         _this3.object = new THREE.Object3D();
         _this3.object.add(mesh);
         _this3.object.position.y = eyeHeight;
+        _this3.object.add(_this3.sound.representation);
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
@@ -351,6 +379,8 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
         value: function dispose() {
             _get(EyeRepresentation.prototype.__proto__ || Object.getPrototypeOf(EyeRepresentation.prototype), "dispose", this).call(this);
             this.geometry.dispose();
+            this.sound.dispose();
+            this.sound = null;
         }
     }, {
         key: "shotDead",
@@ -358,6 +388,7 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
             this.turnTowards(Directions.UP);
             this.startFalling(enemyFallAcceleration);
             this.respawnCallback = respawnCallback;
+            this.sound.scream();
         }
     }, {
         key: "fallFinished",
@@ -370,6 +401,12 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
         key: "respawn",
         value: function respawn() {
             this.object.position.y = eyeHeight;
+            this.sound.startWalking();
+        }
+    }, {
+        key: "shoot",
+        value: function shoot() {
+            this.sound.bang();
         }
     }]);
 
@@ -379,17 +416,16 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
 var MissileRepresentation = function (_AnimatedRepresentati2) {
     _inherits(MissileRepresentation, _AnimatedRepresentati2);
 
-    function MissileRepresentation(missileColor) {
+    function MissileRepresentation(material) {
         _classCallCheck(this, MissileRepresentation);
 
         var _this4 = _possibleConstructorReturn(this, (MissileRepresentation.__proto__ || Object.getPrototypeOf(MissileRepresentation)).call(this, 10));
 
-        var geometry = new THREE.TorusKnotGeometry(0.1, 0.02, 18);
-        geometry.rotateZ(-Math.PI / 2);
-
-        // Materials for the missiles
-        _this4.material = new THREE.MeshBasicMaterial({ color: missileColor });
-        var mesh = new THREE.Mesh(geometry, _this4.material);
+        if (!staticGeometry.missile) {
+            staticGeometry.missile = new THREE.TorusKnotGeometry(0.1, 0.02, 18);
+            staticGeometry.missile.rotateZ(-Math.PI / 2);
+        }
+        var mesh = new THREE.Mesh(staticGeometry.missile, material);
 
         _this4.object = new THREE.Object3D();
         _this4.object.add(mesh);
@@ -400,7 +436,7 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
             // neighboring corridor. This is important to keep light
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 2.45;
-            var light = new THREE.PointLight(missileColor, 0.5, fadeDistance);
+            var light = new THREE.PointLight(material.color, 0.5, fadeDistance);
             _this4.object.add(light);
         }
         return _this4;
@@ -418,6 +454,11 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
         value: function animate() {
             _get(MissileRepresentation.prototype.__proto__ || Object.getPrototypeOf(MissileRepresentation.prototype), "animate", this).call(this);
             this.object.rotation.x += 0.1;
+        }
+    }], [{
+        key: "getMissileMaterial",
+        value: function getMissileMaterial(missileColor) {
+            return new THREE.MeshBasicMaterial({ color: missileColor });
         }
     }]);
 

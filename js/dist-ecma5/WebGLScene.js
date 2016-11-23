@@ -26,6 +26,9 @@ function setupScene() {
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.001, 700);
     overlay = new OverlayText(camera);
 
+    var soundManager = new AudioManager();
+    camera.add(soundManager.audioListener);
+
     window.addEventListener('resize', resize, false);
 
     document.body.insertBefore(renderer.domElement, document.body.firstChild);
