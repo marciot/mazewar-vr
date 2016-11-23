@@ -36,7 +36,7 @@ class OverlayText {
             "'Twas not a twinkle in your eye,\nbut a rapidly approaching missile.",
             "The walls are closing\nin on you. You panic.",
             "They encircle you, like\nvultures circle roadkill.",
-            "Your eyes are bloodshot;\nYou body will be bloody.",
+            "Your eyes are bloodshot;\nYour body will be bloody.",
             "When the devil looks you in the\neye, an evil eye looks back.",
             "An eye for an eye;\nthat's quite nice.",
             "The eye is the window to the soul;\nyour window's gonna get busted.",
