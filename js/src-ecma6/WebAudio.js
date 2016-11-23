@@ -27,9 +27,9 @@ class AudioManager {
             });
         }
 
-        loadSound("walking", '../sounds/169762__nhaudio__steps-amped.mp3', true);
-        loadSound("scream",  '../sounds/13797__sweetneo85__wilhelm.mp3',   false);
-        loadSound("pow",     '../sounds/183467__snapper4298__pow1.mp3',   false);
+        loadSound("walking", 'sounds/169762__nhaudio__steps-amped.mp3', true);
+        loadSound("scream",  'sounds/13797__sweetneo85__wilhelm.mp3',   false);
+        loadSound("pow",     'sounds/183467__snapper4298__pow1.mp3',   false);
 
         this.audioListener = new THREE.AudioListener();
     }
