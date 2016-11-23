@@ -287,9 +287,13 @@ class EyeRepresentation extends AnimatedRepresentation {
         }
         var mesh = new THREE.Mesh(staticGeometry.eye, theme.eyeMaterial);
 
+        this.sound = new ActorSounds();
+        this.sound.startWalking();
+
         this.object = new THREE.Object3D();
         this.object.add(mesh);
         this.object.position.y = eyeHeight;
+        this.object.add(this.sound.representation);
 
         if(theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
@@ -304,12 +308,15 @@ class EyeRepresentation extends AnimatedRepresentation {
     dispose() {
         super.dispose();
         this.geometry.dispose();
+        this.sound.dispose();
+        this.sound = null;
     }
 
     shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(enemyFallAcceleration);
         this.respawnCallback = respawnCallback;
+        this.sound.scream();
     }
 
     fallFinished() {
@@ -320,6 +327,11 @@ class EyeRepresentation extends AnimatedRepresentation {
 
     respawn() {
         this.object.position.y = eyeHeight;
+        this.sound.startWalking();
+    }
+
+    shoot() {
+        this.sound.bang();
     }
 }
 
