@@ -21,11 +21,6 @@ const eyeHeight                      = 1.6;
 const chestHeight                    = 1.3;
 const distanceOfHeldObjectsFromChest = 0.2;
 
-/* Having the enemy fall slightly slower than ourselves makes it so we can see
- * if we killed whomever shot us */
-const selfFallAcceleration           = 2;
-const enemyFallAcceleration          = 1.7;
-
 var staticGeometry = {};
 
 class WebGLActors extends Actors {
@@ -40,10 +35,10 @@ class WebGLActors extends Actors {
         super.remove(actor);
     }
     
-    animate() {
+    animate(dt) {
         for(var i = 0; i < this.actors.length; i++) {
             if(this.actors[i].representation) {
-                this.actors[i].representation.animate(i);
+                this.actors[i].representation.animate(dt);
             } else {
                 console.log("WARNING: Actor has no representation");
             }
@@ -71,10 +66,6 @@ class VisibleRepresentation {
     set position(v) {
         // Ignore change in y
         this.object.position.set(v.x, this.object.position.y, v.z);
-    }
-
-    displace(displacement) {
-        this.object.position.add(displacement);
     }
 
     assertPosition(x, z) {
@@ -170,98 +161,91 @@ function getMissileMaterial(missileColor) {
 class AnimatedRepresentation extends VisibleRepresentation {
     constructor(speedUp) {
         super();
-        this.animationFrames = 0;        
-        this.fallSpeed = 0;
         this.animationFinishedCallback = null;
-        this.animationStep = 0.05 * (speedUp ? speedUp : 1);
+        this.animationDuration         = 0.33 / (speedUp || 1);
+        this.tween = new Tween();
+        this.tween.whenDone(this.animationFinished.bind(this));
     }
     
     dispose() {
         super.dispose();
         this.animationFinishedCallback = null;
+        this.tween = null;
     }
 
     walkTo(x, z, direction) {
         var u = Directions.toUnitVector(direction);
-        this.doAnimation(u.multiplyScalar(MazeWalls.cellDimension));
+        this.animateDisplacement(u.multiplyScalar(MazeWalls.cellDimension));
     }
     
     /* Animated turn until the Actor faces the direction indicated by the unit vector  */
     turnTowards(direction) {
-        this.doAnimation(null, Directions.toUnitVector(direction));
+        var quaternion = new THREE.Quaternion();
+        quaternion.setFromUnitVectors(
+            Directions.toUnitVector(Directions.NORTH),
+            Directions.toUnitVector(direction)
+        );
+        this.animateRoll(quaternion);
     }
 
-    doAnimation(displacement, direction) {
-        this.animationTween = 0;
-        if(displacement) {
-            this.animationDisplacement = displacement;
-        }
-        if(direction) {
-            this.animationQuaternionStart = new THREE.Quaternion().copy(this.quaternion);
-            this.animationQuaternionEnd   = new THREE.Quaternion();
-            this.animationQuaternionEnd.setFromUnitVectors(
-                Directions.toUnitVector(Directions.NORTH),
-                direction
-            );
-        }
-    }
-
-    animate() {
-        if(this.animationTween !== null) {
-            if(this.animationTween < 1.0) {
-                this.animationTween += this.animationStep;
-                if(this.animationDisplacement) {
-                    var displacement = new THREE.Vector3().copy(this.animationDisplacement);
-                    displacement.multiplyScalar(this.animationStep);
-                    this.displace(displacement);
-                }
-                if(this.animationQuaternionEnd) {
-                    var q = new THREE.Quaternion();
-                    q.copy(this.animationQuaternionStart);
-                    q.slerp(this.animationQuaternionEnd,this.animationTween);
-                    this.quaternion = q;
-                }
-            } else {
-                this.animationTween = null;
-                this.animationDisplacement = null;
-                this.animationQuaternionEnd = null;
-                this.animationFinished();
+    animateDisplacement(displacement, easing, duration) {
+        var startPosition = new THREE.Vector3().copy(this.object.position);
+        this.tween.add(duration || this.animationDuration, easing,
+            t => {
+                this.object.position.copy(startPosition);
+                this.object.position.addScaledVector(displacement, t);
             }
-        }
+        );
+    }
+
+    animateRoll(finalQuaternion) {
+        var startQ = new THREE.Quaternion().copy(this.quaternion);
+        this.tween.add(this.animationDuration, null,
+            t => THREE.Quaternion.slerp(startQ, finalQuaternion, this.quaternion, t)
+        );
+    }
+
+    animateFall(isEnemy) {
+        const spinTurns    = 3;
+        const spinEasing   = tweenFunctions.linear;
+        /* The use of separate easing functions for enemy vs self
+         * allows us to see enemies when they fall with us */
+        const fallEasing   = isEnemy ? tweenFunctions.easeInQuart : tweenFunctions.easeInSine;
+        const fallDistance = 200;
+        const fallDuration = 5;
+        this.animateDisplacement(
+            Directions.toUnitVector(Directions.DOWN).multiplyScalar(fallDistance),
+            fallEasing,
+            fallDuration
+        );
+        this.tween.add(fallDuration, spinEasing,
+            t => this.object.rotation.z = t * spinTurns
+        );
+    }
+
+    animate(dt) {
+        this.tween.update(dt);
     }
 
     animationFinished() {
-        if(this.fallAcceleration) {
-            this.fallSpeed += this.fallAcceleration;
-            if(this.fallSpeed < 30) {
-                this.doAnimation(
-                    new THREE.Vector3(0, -this.fallSpeed, 0)
-                );
-            } else {
-                this.fallSpeed        = 0;
-                this.fallAcceleration = 0;
-                this.fallFinished();
-            }
+        if(this.isFalling) {
+            this.isFalling = false;
+            this.fallFinished();
         }
         if(this.animationFinishedCallback) {
             this.animationFinishedCallback();
         }
     }
     
-    startFalling(acceleration) {
-        if(!this.fallAcceleration) {
-            this.fallSpeed = 0;
-            this.fallAcceleration = acceleration;
-            this.animationFinished();
+    startFalling(isEnemy) {
+        if(!this.isFalling) {
+            this.isFalling = true;
+            this.animateFall(isEnemy);
         }
     }
     
-    isFalling() {
-        return this.fallAcceleration;
-    }
-    
     get isStopped() {
-        return this.animationTween === null;
+        return !this.tween.isAnimating;
     }
     
     setAnimationFinishedCallback(callback) {
@@ -314,7 +298,7 @@ class EyeRepresentation extends AnimatedRepresentation {
 
     shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
-        this.startFalling(enemyFallAcceleration);
+        this.startFalling(true);
         this.respawnCallback = respawnCallback;
         this.sound.scream();
     }
@@ -369,8 +353,8 @@ class MissileRepresentation extends AnimatedRepresentation {
         this.object.geometry.dispose();
     }
 
-    animate() {
-        super.animate();
+    animate(dt) {
+        super.animate(dt);
         this.object.rotation.x += 0.1;
     }
 };
@@ -545,13 +529,13 @@ class SelfRepresentation extends AnimatedRepresentation {
         // via the SelfBody object
     }
     
-    animate() {
-        super.animate();
-        if(this.isFalling()) {
-            this.object.rotation.z += 0.01;
-        } else {
-            this.body.update();
+    animate(dt) {
+        super.animate(dt);
+        if(this.isFalling) {
+            return;
         }
+
+        this.body.update();
         if(this.candle) {
             this.candle.flicker();
         }
@@ -559,7 +543,7 @@ class SelfRepresentation extends AnimatedRepresentation {
 
     shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
-        this.startFalling(selfFallAcceleration);
+        this.startFalling(false);
         this.body.lockControls();
         maze.setIsFalling(true);
         
@@ -709,14 +693,14 @@ function getWebGLPlayerFactory() {
         newSelfPlayer: function() {
             var selfRepresentation = new SelfRepresentation(overlay.representation);
             var actor = new Player(selfRepresentation);
-            actors.placePlayer(actor);
             new HeadsetDirector(actor, container);
+            actors.placePlayer(actor);
             return actor;
         },
         newRobotPlayer: function() {
             var actor = new Player(new EyeRepresentation());
-            actors.placePlayer(actor);
             new RoboticDirector(actor);
+            actors.placePlayer(actor);
             return actor;
         },
         newOtherPlayer: function() {

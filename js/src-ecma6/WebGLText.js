@@ -31,7 +31,7 @@ class OverlayText {
             "Whatever you do,\ndon't look down.",
             "If you feel trapped,\nyou feel correctly.",
             "This is a dream;\nyou will never awaken.",
-            "I can see your house.\nDown there yonder.",
+            "I can see your house.\nDown yonder.",
             "You are a looker.",
             "'Twas not a twinkle in your eye,\nbut a rapidly approaching missile.",
             "The walls are closing\nin on you. You panic.",

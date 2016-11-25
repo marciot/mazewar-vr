@@ -18,6 +18,8 @@ class Tween {
     }
 
     update(dt) {
+        var lastTaskRan = false;
+
         for(var i = 0; i < this.tasks.length; i++) {
             var t = this.tasks[i];
             t.value += dt / t.duration;
@@ -27,8 +29,8 @@ class Tween {
             if(t.value > 1) {
                 this.tasks.splice(i,1);
                 t.value = 1;
-                if(this.tasks.length === 0 && this.callback) {
-                    this.callback();
+                if(this.tasks.length === 0) {
+                    lastTaskRan = true;
                 }
             }
 
@@ -39,6 +41,14 @@ class Tween {
                 t.task((t.max - t.min)*t0 + t.min);
             }
         }
+
+        if(lastTaskRan && this.callback) {
+            this.callback();
+        }
+    }
+
+    get isAnimating() {
+        return this.tasks.length !== 0;
     }
 
     whenDone(callback) {

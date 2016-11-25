@@ -172,7 +172,7 @@ function update(dt) {
         gpClicker.poll();
     }
     
-    actors.animate();
+    actors.animate(dt);
     tween.update(dt);
 
     theme.animate();
