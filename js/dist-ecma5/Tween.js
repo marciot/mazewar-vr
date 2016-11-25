@@ -29,6 +29,8 @@ var Tween = function () {
     }, {
         key: "update",
         value: function update(dt) {
+            var lastTaskRan = false;
+
             for (var i = 0; i < this.tasks.length; i++) {
                 var t = this.tasks[i];
                 t.value += dt / t.duration;
@@ -38,8 +40,8 @@ var Tween = function () {
                 if (t.value > 1) {
                     this.tasks.splice(i, 1);
                     t.value = 1;
-                    if (this.tasks.length === 0 && this.callback) {
-                        this.callback();
+                    if (this.tasks.length === 0) {
+                        lastTaskRan = true;
                     }
                 }
 
@@ -50,11 +52,20 @@ var Tween = function () {
                     t.task((t.max - t.min) * t0 + t.min);
                 }
             }
+
+            if (lastTaskRan && this.callback) {
+                this.callback();
+            }
         }
     }, {
         key: "whenDone",
         value: function whenDone(callback) {
             this.callback = callback;
+        }
+    }, {
+        key: "isAnimating",
+        get: function () {
+            return this.tasks.length !== 0;
         }
     }]);
 
