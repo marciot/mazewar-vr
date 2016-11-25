@@ -31,9 +31,16 @@ the recommended web browser for that platform:
 * __Android__: Should work with the latest version of Google Chrome.
 * __iOS__: Single player mode is supported, but multi-player is not currently supported under Safari; multi-player capability is planned via an app.
 * __Samsung Gear VR__: Should be supported using the [Samsung Internet Browser for Gear VR] from the Oculus store.
-* __Oculus Rift and HTC Vive__: Should be supported using special [WebVR] builds of [Chrome] and [Firefox].
+* __Oculus Rift and HTC Vive__: Support coming soon using special [WebVR] builds of [Chrome] and [Firefox].
 
 See the project [wiki page] for compatibility notes for specific devices that have been tested.
+
+## Technologies Used:
+
+Aside from being fun (I hope), this game is a technology demo in its own right, pulling together
+[ECMAScript 2015] (6th Edition) and the latest and emerging browser technologies such as
+[WebComponents], [WebGL], [WebVR], [WebAudio], [WebRTC] and the [Gamepad API]. Polyfills and
+[Babel] are use to maintain compatibility with the widest range of devices.
 
 ## Licensing:
 
@@ -67,13 +74,19 @@ Testing service provided by:
 [Xerox Alto Emulator]: https://github.com/sethm/ContrAltoJS
 [THREE.js]: https://threejs.org
 [peerjs]: http://peerjs.com
+[ECMAScript 2015]: http://www.ecma-international.org/ecma-262/6.0
 [WebComponents]: http://webcomponents.org
+[WebGL]: https://www.khronos.org/webgl
+[WebVR]: https://webvr.info
+[WebAudio]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+[WebRTC]: https://webrtc.org
+[Gamepad API]: https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
+[Babel]: https://babeljs.io/
 [mesh networking code]: https://github.com/marciot/retroweb-networking
 [RetroWeb Vintage Computer Museum]: http://retroweb.maclab.org
 [Living Computers: Museum+Labs]: http://www.livingcomputers.org
 [Contralto]: https://github.com/livingcomputermuseum/ContrAlto
 [Samsung Internet Browser for Gear VR]: https://www.oculus.com/experiences/gear-vr/849609821813454/
-[WebVR]: https://webvr.info
 [Chrome]:https://webvr.info/get-chrome/
 [Firefox]:https://mozvr.com/
 [wiki page]: https://github.com/marciot/mazewar-vr/wiki
