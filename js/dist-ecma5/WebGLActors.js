@@ -256,17 +256,16 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
         value: function animateRoll(finalQuaternion) {
             var _this4 = this;
 
-            var startQ = new THREE.Quaternion().copy(this.quaternion);
-            this.tween.add(this.animationDuration, null, function (t) {
-                return THREE.Quaternion.slerp(startQ, finalQuaternion, _this4.quaternion, t);
-            });
+            this.tween.add(this.animationDuration, null, Tween.deltaT(function (t, dt) {
+                _this4.quaternion.slerp(finalQuaternion, Math.min(1, dt / (1 - t)));
+            }));
         }
     }, {
         key: "animateFall",
         value: function animateFall(isEnemy) {
             var _this5 = this;
 
-            var spinTurns = 3;
+            var spinVelocity = 2;
             var spinEasing = tweenFunctions.linear;
             /* The use of separate easing functions for enemy vs self
              * allows us to see enemies when they fall with us */
@@ -274,9 +273,14 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
             var fallDistance = 200;
             var fallDuration = 5;
             this.animateDisplacement(Directions.toUnitVector(Directions.DOWN).multiplyScalar(fallDistance), fallEasing, fallDuration);
-            this.tween.add(fallDuration, spinEasing, function (t) {
-                return _this5.object.rotation.z = t * spinTurns;
-            });
+            this.tween.add(fallDuration, spinEasing, Tween.deltaT(function (t, dt) {
+                return _this5.object.rotation.z += dt * spinVelocity;
+            }));
+        }
+    }, {
+        key: "stopAnimating",
+        value: function stopAnimating() {
+            this.tween.stop();
         }
     }, {
         key: "animate",
@@ -371,6 +375,7 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
     }, {
         key: "shotDead",
         value: function shotDead(respawnCallback) {
+            this.stopAnimating();
             this.turnTowards(Directions.UP);
             this.startFalling(true);
             this.respawnCallback = respawnCallback;

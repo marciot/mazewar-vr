@@ -108,7 +108,7 @@ class VisibleRepresentation {
             Directions.toUnitVector(direction)
         );
     }
-    
+
     get directionVector() {
         var u = Directions.toUnitVector(Directions.NORTH);
         u.applyEuler(this.rotation);
@@ -199,14 +199,17 @@ class AnimatedRepresentation extends VisibleRepresentation {
     }
 
     animateRoll(finalQuaternion) {
-        var startQ = new THREE.Quaternion().copy(this.quaternion);
         this.tween.add(this.animationDuration, null,
-            t => THREE.Quaternion.slerp(startQ, finalQuaternion, this.quaternion, t)
+            Tween.deltaT(
+                (t, dt) => {
+                    this.quaternion.slerp(finalQuaternion, Math.min(1, dt/(1-t)));
+                }
+            )
         );
     }
 
     animateFall(isEnemy) {
-        const spinTurns    = 3;
+        const spinVelocity = 2;
         const spinEasing   = tweenFunctions.linear;
         /* The use of separate easing functions for enemy vs self
          * allows us to see enemies when they fall with us */
@@ -219,8 +222,14 @@ class AnimatedRepresentation extends VisibleRepresentation {
             fallDuration
         );
         this.tween.add(fallDuration, spinEasing,
-            t => this.object.rotation.z = t * spinTurns
+            Tween.deltaT(
+                (t, dt) => this.object.rotation.z += dt * spinVelocity
+            )
         );
+    }
+
+    stopAnimating() {
+        this.tween.stop();
     }
 
     animate(dt) {
@@ -297,6 +306,7 @@ class EyeRepresentation extends AnimatedRepresentation {
     }
 
     shotDead(respawnCallback) {
+        this.stopAnimating();
         this.turnTowards(Directions.UP);
         this.startFalling(true);
         this.respawnCallback = respawnCallback;

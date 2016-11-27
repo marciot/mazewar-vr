@@ -47,11 +47,23 @@ class Tween {
         }
     }
 
+    stop() {
+        this.tasks = [];
+    }
+
     get isAnimating() {
         return this.tasks.length !== 0;
     }
 
     whenDone(callback) {
         this.callback = callback;
+    }
+
+    static deltaT(task) {
+        var lastT = 0;
+        return t => {
+            task(t, t - lastT);
+            lastT = t;
+        }
     }
 };

@@ -58,6 +58,11 @@ var Tween = function () {
             }
         }
     }, {
+        key: "stop",
+        value: function stop() {
+            this.tasks = [];
+        }
+    }, {
         key: "whenDone",
         value: function whenDone(callback) {
             this.callback = callback;
@@ -66,6 +71,15 @@ var Tween = function () {
         key: "isAnimating",
         get: function () {
             return this.tasks.length !== 0;
+        }
+    }], [{
+        key: "deltaT",
+        value: function deltaT(task) {
+            var lastT = 0;
+            return function (t) {
+                task(t, t - lastT);
+                lastT = t;
+            };
         }
     }]);
 
