@@ -394,6 +394,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             font-size: small;
             padding: 2px 0;
         }
+
+        #headphoneInstructions2 {
+            visibility: hidden;
+        }
     </style>
     <div class="darken" id="overlay">
     <swipe-pages>
@@ -811,6 +815,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
+        <div class="flex-distribute" id="pageHeadphoneTest">
+            <div>
+                <h1>Headphone Test:</h1>
+                <p>
+                    <cite>Maze War VR</cite> uses 3D directional audio. If you wear headphones
+                    or earbuds, you'll be able to find your opponents by moving your head
+                    around and listening carefully.
+                </p>
+                <p id="headphoneInstructions1">
+                    Use the test below to make sure your headphones or earbuds are working and
+                    not reversed!
+                </p>
+                <p id="headphoneInstructions2">
+                    You should have heard the word "left" in your left ear; and the word
+                    "right" in your right ear. If this was reversed, turn your headphones
+                    around or swap your earbuds from ear to ear.
+                </p>
+            </div>
+            <div>
+                <center>
+                <div id="stereoTest" class="clickable centered-button">Test Headphones</div>
+                </center>
+            </div>
+            <div>
+                <center>
+                <div id="postHeadphoneTest" class="clickable centered-button">Skip Test</div>
+                </center>
+            </div>
+        </div>
+
         <div class="flex-distribute" id="pageHeadsets">
             <div>
                 <h2>Starter Headset</h2>
@@ -1026,13 +1060,30 @@ function gotoRecommendedHeadsets() {
         shadowRoot.querySelector("#monitor").addEventListener("click", selectExperience.bind(this, "monitor"));
         shadowRoot.querySelector("#anaglyph").addEventListener("click", selectExperience.bind(this, "anaglyph"));
 
+        var afterHeadphoneTest;
+        function postHeadphoneTest() {
+            console.log(afterHeadphoneTest);
+            switch(afterHeadphoneTest) {
+                case "Solo":
+                    shadowRoot.dispatchCallback("startSoloGame");
+                    break;
+                case "Net":
+                    shadowRoot.dispatchCallback("startNetworkGame");
+                    break;
+            }
+        }
+        shadowRoot.querySelector("#postHeadphoneTest").addEventListener("click", postHeadphoneTest);
+
+        var me = this;
         function startSoloGame() {
-            shadowRoot.dispatchCallback("startSoloGame");
+            afterHeadphoneTest = "Solo";
+            me.swipePages.gotoPage("pageHeadphoneTest");
         }
         shadowRoot.querySelector("#playSolo").addEventListener("click", startSoloGame);
 
         function startNetworkGame() {
-            shadowRoot.dispatchCallback("startNetworkGame");
+            afterHeadphoneTest = "Net";
+            me.swipePages.gotoPage("pageHeadphoneTest");
         }
         shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
 
@@ -1179,6 +1230,17 @@ function gotoRecommendedHeadsets() {
             gpClicker.captureButton(shadowRoot.querySelector("#configureGamepad"));
         }
         shadowRoot.querySelector("#configureGamepad").addEventListener("click", configureGamepad);
+
+        // Sound test
+        function testStereo() {
+            var audio = new Audio('sounds/left-right.mp3');
+            audio.play();
+            shadowRoot.querySelector("#stereoTest").innerText = "Test Headphones Again";
+            shadowRoot.querySelector("#postHeadphoneTest").innerText = "Okay, start the game!";
+            shadowRoot.querySelector("#headphoneInstructions1").style.visibility = "hidden";
+            shadowRoot.querySelector("#headphoneInstructions2").style.visibility = "visible";
+        }
+        shadowRoot.querySelector("#stereoTest").addEventListener("click", testStereo);
     };
 
     AboutBoxProto.showPage = function(page) {
