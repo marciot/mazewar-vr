@@ -194,6 +194,36 @@
             runTest("WebVR getVRDevices",
                 function(info) {return typeof navigator.getVRDevices !== 'undefined'}
             );
+
+            function testHTMLToTexture(info) {
+                var img = new Image();
+                var canvas = document.createElement("canvas");
+                var ctx =  canvas.getContext("2d");
+                img.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'>" +
+                    "<rect width='10' height='10' style='fill:rgb(255,128,64);' /></svg>";
+
+                try {
+                    ctx.drawImage(img, 0, 0);
+                    var data = canvas.toDataURL();
+                    if(!data) {
+                        return false;
+                    }
+
+                    var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    if(!(data.data[0] === 255 && data.data[1] === 128 && data.data[2] === 64)) {
+                        info.str =
+                            data.data[0].toString() + "," +
+                            data.data[1].toString() + "," +
+                            data.data[2].toString();
+                        return false;
+                    }
+                } catch(e) {
+                    return false;
+                }
+                return true;
+            }
+
+            runTest("HTML to Texture", testHTMLToTexture);
         </script>
 
         <!-- Vulcanized component -->
