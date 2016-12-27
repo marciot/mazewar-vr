@@ -52,7 +52,11 @@ binary form in the app store under a non-free license (see this link for an expl
 [apps are incompatible with the GPL]). This will be done to fund further development of this project and to
 expand the network of players.
 
-## Contributions:
+## How can you help this project?
+
+Please visit my [Patreon page] to learn how you can support this open-source project!
+
+### Contributing source code:
 
 Code contributions or fixes to <cite>Maze War VR</cite> are welcome, although for the licensing reasons
 stated above I will not be able to incorporate it into the main-line distribution unless you dual license
@@ -70,6 +74,7 @@ Testing service provided by:
 [![BrowserStack](https://github.com/marciot/mazewar-vr/raw/master/artwork/browserstack.png)](http://www.browserstack.com)
 
 [logo]: https://github.com/marciot/mazewar-vr/raw/master/artwork/fb-share.jpg "A screenshot from MazeWar VR"
+[Patreon page]: https://www.patreon.com/marciot
 [Mattel ViewMaster VR]: https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072
 [Xerox Alto Emulator]: https://github.com/sethm/ContrAltoJS
 [THREE.js]: https://threejs.org
