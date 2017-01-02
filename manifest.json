@@ -1,0 +1,16 @@
+{
+  "short_name": "Maze War VR",
+  "name": "Maze War VR",
+  "icons": [
+    {
+         "src": "artwork/icon-512px.png",
+         "sizes": "72x72 192x192",
+         "type": "image/png"
+    }
+  ],
+  "xwalk_app_version": "0.1",
+  "xwalk_package_id": "com.marciot.mazewar_vr",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "landscape"
+}
