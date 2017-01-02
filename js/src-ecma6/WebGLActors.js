@@ -503,7 +503,7 @@ class SelfRepresentation extends AnimatedRepresentation {
         this.body = new SelfBody(camera);
         this.body.carry(this.map);
         
-        this.object = this.body.getHead();
+        this.object = this.body.getNeck();
 
         if(theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
@@ -513,6 +513,12 @@ class SelfRepresentation extends AnimatedRepresentation {
             this.candle = new CandleLight(fadeDistance);
             this.body.carry(this.candle);
         }
+    }
+
+    get directionVector() {
+        var u = Directions.toUnitVector(Directions.NORTH);
+        u.applyEuler(this.body.getHead().rotation);
+        return u;
     }
 
     get representation() {
@@ -554,7 +560,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     shotDead(respawnCallback) {
         this.turnTowards(Directions.UP);
         this.startFalling(false);
-        this.body.lockControls();
+        //this.body.lockControls();
         maze.setIsFalling(true);
         
         this.map.hide();
@@ -570,7 +576,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     respawn() {
         theme.fadeEffect();
         this.body.reattachHead();
-        this.body.unlockControls();
+        //this.body.unlockControls();
         maze.setIsFalling(false);
         this.map.show();
     }
@@ -591,25 +597,29 @@ class SelfBody {
         const handsTilt = 45;
 
         this.head           = camera;
+        this.neck           = new THREE.Object3D();
         this.body           = new THREE.Object3D();
         this.hands          = new THREE.Object3D();
         this.carriedObjects = new THREE.Object3D();
         this.combined       = new THREE.Object3D();
 
-        this.head.position.y  = eyeHeight;
+        this.neck.position.y  = eyeHeight;
         this.hands.position.y = chestHeight;
         this.hands.position.z = -distanceOfHeldObjectsFromChest;
         this.carriedObjects.rotation.x = -handsTilt / 180 * Math.PI;
 
+        this.neck.add(this.head);
         this.body.add(this.hands);
         this.hands.add(this.carriedObjects);
 
         this.combined.add(this.body);
-        this.combined.add(this.head);
+        this.combined.add(this.neck);
 
-        if('VRFrameData' in window) {
-            this.frameData = new VRFrameData();
-        }
+        this.motionTracker = new MotionTracker(this.updateBody.bind(this));
+    }
+
+    getNeck() {
+        return this.neck;
     }
 
     getHead() {
@@ -621,17 +631,16 @@ class SelfBody {
     }
 
     reattachHead() {
+        const tmp = new THREE.Object3D();
         // When the player dies, their head/eyeball falls into the
-        // abbyss. This reattaches the head so that play can continue.
-        this.head.position.y  = eyeHeight;
+        // abyss. This reattaches the head so that play can continue.
+        this.neck.position.y  = eyeHeight;
+        this.neck.rotation.copy(tmp.rotation);
+        console.log("Reset rotation");
     }
 
     carry(object) {
         this.carriedObjects.add(object.representation);
-    }
-
-    getHead() {
-        return this.head;
     }
 
     lockControls() {
@@ -649,19 +658,20 @@ class SelfBody {
          */
         var u = Directions.toUnitVector(Directions.NORTH);
         u.applyQuaternion(headsetOrientation);
-        var projectionMagn = Math.sqrt(u.x*u.x + u.z*u.z);
-        var headsetBearing = Math.atan2(u.x, -u.z);
-        var headsetAzimuth = Math.atan2(u.y, projectionMagn);
+        var projectionMagn   = Math.sqrt(u.x*u.x + u.z*u.z);
+        var headsetBearing   = Math.atan2(u.x, -u.z);
+        var headsetElevation = Math.atan2(u.y, projectionMagn);
 
         // The RigidBody's head orientation is updated to match
-        // the orientation of the VR headset
+        // the orientation and pose of the VR headset
         this.head.rotation.setFromQuaternion(headsetOrientation);
+        this.head.position.copy(headsetPose);
 
-        // Keep the body underneath the head and facing in the
+        // Keep the body underneath the neck and facing in the
         // same direction, except when the player is looking
         // straight up and the direction is indeterminate.
-        this.body.position.x = this.head.position.x;
-        this.body.position.z = this.head.position.z;
+        this.body.position.x = this.neck.position.x;
+        this.body.position.z = this.neck.position.z;
         if(projectionMagn > 0.1) {
             this.body.rotation.y = -headsetBearing;
         }
@@ -674,27 +684,7 @@ class SelfBody {
             // headset.
             return;
         }
-
-        // Get the headset position and orientation.
-        var headsetPose        = new THREE.Vector3();
-        var headsetOrientation = new THREE.Quaternion();
-
-        var pose;
-        if (vrDisplay.getFrameData) {
-            vrDisplay.getFrameData(this.frameData);
-            pose = this.frameData.pose;
-        } else if (vrDisplay.getPose) {
-            pose = vrDisplay.getPose();
-        }
-        if (pose.position !== null) {
-            headsetPose.fromArray(pose.position);
-        }
-        if (pose.orientation !== null ) {
-            headsetOrientation.fromArray(pose.orientation);
-        }
-
-        // Update body representation
-        this.updateBody(headsetPose, headsetOrientation);
+        this.motionTracker.update();
     }
 }
 

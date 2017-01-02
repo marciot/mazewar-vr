@@ -191,8 +191,14 @@
             );
             runTest("WebGL", testWebGL);
             runTest("WebRTC RTCPeerConnection", testWebRTC);
-            runTest("WebVR getVRDevices",
-                function(info) {return typeof navigator.getVRDevices !== 'undefined'}
+            runTest("WebVR navigator.getVRDisplays",
+                function(info) {return typeof navigator.getVRDisplays !== 'undefined'}
+            );
+            runTest("WebVR navigator.vr.getDisplays",
+                function(info) {return typeof navigator.vr.getDisplays !== 'undefined'}
+            );
+            runTest("WebVR navigator.onvrdisplayactivate",
+                function(info) {return typeof navigator.onvrdisplayactivate !== 'undefined'}
             );
 
             function testHTMLToTexture(info) {
