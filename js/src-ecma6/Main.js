@@ -98,8 +98,17 @@ function init() {
         if(effect.endPresent) {
             effect.endPresent();
         }
-        document.querySelector("about-box").setOverlayVisibility(true);
+        document.querySelector("about-box").showPage("page1");
     }
+
+    function onVisibilityChange() {
+        if (document.hidden || event.target.webkitHidden) {
+            endVr();
+        }
+    }
+
+    document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
+    document.addEventListener("visibilitychange",       onVisibilityChange, false);
 
     function startNetworkGame() {
         var name = prompt("Please enter your name");

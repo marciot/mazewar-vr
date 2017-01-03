@@ -94,7 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 width:      100%;
             }
 
-            .grid-button, .centered-button {
+            .grid-button, .centered-button, .button {
                 font-size:  7vh;
             }
 
@@ -128,7 +128,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 max-height: 49%;
             }
 
-            .grid-button, .centered-button {
+            .grid-button, .centered-button, .button {
                 font-size:  7vw;
             }
 
@@ -398,6 +398,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         #headphoneInstructions2 {
             visibility: hidden;
         }
+
+        .button {
+            display: inline-block;
+        }
     </style>
     <div class="darken" id="overlay">
     <swipe-pages>
@@ -437,7 +441,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <div><div class="clickable grid-button" data-page="pageSetupWizard">Setup Wizard</div></div>
                 <div><div class="clickable grid-button" data-page="pageThemeChoices">Theme Selection</div></div>
                 <div><div class="clickable grid-button" data-page="pageDisplayOptions">Display Options</div></div>
-                <div><div class="clickable grid-button" data-page="pageGamepadConfiguration">Gamepad Options</div></div>
+                <div><div class="clickable grid-button" data-page="pageControlOptions">Control Options</div></div>
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+
+        <div class="flex-layout" id="pageControlOptions">
+            <div class="header center-text">
+                <h1 class="title">Control Options</h1>
+            </div>
+            <div class="middle flex-grid two-element">
+                <div><div class="clickable grid-button" data-page="pageTurnAmplification">Turn Amplification</div></div>
+                <div><div class="clickable grid-button" data-page="pageGamepadOptions">Gamepad Options</div></div>
             </div>
             <div class="footer">
             </div>
@@ -795,6 +811,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
+        <div class="flex-distribute" id="pageTurnAmplification">
+            <div>
+                <h1>Turn Amplification:</h1>
+                <p>
+                Turn amplification allows you to play <cite>Maze Wars VR</cite> while seated.
+                </p>When it is enabled, turning motions are amplified so that you can look directly behind you without having to get up. This increase in turning motion may cause discomfort for some people.
+                </p>
+                <p>When playing standing up, disable &quot;Turn Amplification&quot; for a more natural turning motion.
+                <div class="side-by-side">
+                <div id="enableTurnAmplification"  class="button clickable">Enabled (Default)</div>
+                <div id="disableTurnAmplification" class="button clickable">Disabled</div>
+                </div>
+                </p>
+            </div>
+            <div>
+                <center>
+                <div class="page-link clickable centered-button" data-page="page1">Go Back</div>
+                </center>
+            </div>
+        </div>
+
+
         <div class="flex-distribute" id="pageGamepadConfiguration">
             <div>
                 <h1>Gamepad Configuration:</h1>
@@ -1121,6 +1159,13 @@ function gotoRecommendedHeadsets() {
             me.swipePages.gotoPage("pageHeadphoneTest");
         }
         shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
+
+        function configureTurnAmplification(enabled) {
+            motionTracker.motionScaling = enabled ? 2.0 : 1.0;
+            me.swipePages.gotoPage("page1");
+        }
+        shadowRoot.querySelector("#enableTurnAmplification").addEventListener("click", configureTurnAmplification.bind(true));
+        shadowRoot.querySelector("#disableTurnAmplification").addEventListener("click", configureTurnAmplification.bind(false));
 
         var swipePages    = shadowRoot.querySelector("swipe-pages");
         var emulator      = shadowRoot.querySelector("alto-emulator");

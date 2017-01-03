@@ -21,6 +21,8 @@ const eyeHeight                      = 1.6;
 const chestHeight                    = 1.3;
 const distanceOfHeldObjectsFromChest = 0.2;
 
+var motionTracker;
+
 var staticGeometry = {};
 
 class WebGLActors extends Actors {
@@ -616,6 +618,7 @@ class SelfBody {
         this.combined.add(this.neck);
 
         this.motionTracker = new MotionTracker(this.updateBody.bind(this));
+        motionTracker = this.motionTracker;
     }
 
     getNeck() {
