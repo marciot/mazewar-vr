@@ -1135,7 +1135,6 @@ function gotoRecommendedHeadsets() {
 
         var afterHeadphoneTest;
         function postHeadphoneTest() {
-            console.log(afterHeadphoneTest);
             switch(afterHeadphoneTest) {
                 case "Solo":
                     shadowRoot.dispatchCallback("startSoloGame");
@@ -1284,12 +1283,17 @@ function gotoRecommendedHeadsets() {
         function shareInviteOnFacebook(e) {
             e.preventDefault();
             e.stopPropagation();
-            if(typeof FB !== "undefined") {
+            if(window.isCrosswalk || typeof FB === "undefined") {
+                const url = "https://www.facebook.com/sharer/sharer.php?u=http%3A//www.marciot.com/mazewar-vr/";
+                console.log("Opening url", url);
+                window.open(url, '_blank');
+            } else {
+                console.log("Opening FB share dialog");
                 FB.ui({
-                    method: 'share',
-                    mobile_iframe: true,
-                    href: 'http://www.marciot.com/mazewar-vr',
-                }, function(response){});
+                        method: 'share',
+                        mobile_iframe: true,
+                        href: 'http://www.marciot.com/mazewar-vr',
+                    }, function(response){});
             }
         }
         shadowRoot.querySelector("#inviteFriends").addEventListener("click", shareInviteOnFacebook);
