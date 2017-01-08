@@ -107,6 +107,12 @@ class ActorSounds {
     }
 
     dispose() {
+        /* There is a bug in THREE.JS PositionalAudio where releaseAudioNode fails if
+         * the sound isn't playing, so we start it in order to be able to release it */
+        if(!this.walkSoundNode.isPlaying) this.walkSoundNode.play();
+        if(!this.fallSoundNode.isPlaying) this.fallSoundNode.play();
+        if(!this.bangSoundNode.isPlaying) this.bangSoundNode.play();
+
         audioManager.releaseAudioNode(this.walkSoundNode);
         audioManager.releaseAudioNode(this.fallSoundNode);
         audioManager.releaseAudioNode(this.bangSoundNode);

@@ -35,7 +35,6 @@ class Actors {
     }
 
     removeAll(dispose) {
-        console.log("Removing all actors");
         while(this.actors.length) {
             var actor = this.actors[this.actors.length-1];
             this.remove(actor);
@@ -80,7 +79,6 @@ class Actor {
     dispose() {
         this.notifyObservers("dispose");
         this.observers.length = 0;
-        this.representation.dispose();
         this.representation = null;
     }
 
@@ -198,6 +196,8 @@ class MissileActor extends Actor {
     }
 
     dispose() {
+        super.dispose();
+
         this.owner = null;
         this.data  = null;
     }
@@ -250,6 +250,7 @@ class Player extends Actor {
     }
 
     dispose() {
+        super.dispose();
         for(var i = 0; i < this.recycledMissiles.length; i++) {
             this.recycledMissiles[i].dispose();
             this.recycledMissiles[i] = null;
@@ -268,7 +269,9 @@ class Player extends Actor {
     }
 
     recycleMissile(missile) {
-        this.recycledMissiles.push(missile);
+        if(this.recycledMissiles) {
+            this.recycledMissiles.push(missile);
+        }
     }
 
     get missileColor() {

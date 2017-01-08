@@ -247,7 +247,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
             this.animationFinishedCallback();
         }
     }
-    
+
     startFalling(isEnemy) {
         if(!this.isFalling) {
             this.isFalling = true;
@@ -302,7 +302,6 @@ class EyeRepresentation extends AnimatedRepresentation {
 
     dispose() {
         super.dispose();
-        this.geometry.dispose();
         this.sound.dispose();
         this.sound = null;
     }
@@ -361,7 +360,6 @@ class MissileRepresentation extends AnimatedRepresentation {
 
     dispose() {
         super.dispose();
-        this.material.dispose();
         this.object.geometry.dispose();
     }
 
@@ -639,7 +637,6 @@ class SelfBody {
         // abyss. This reattaches the head so that play can continue.
         this.neck.position.y  = eyeHeight;
         this.neck.rotation.copy(tmp.rotation);
-        console.log("Reset rotation");
     }
 
     carry(object) {
