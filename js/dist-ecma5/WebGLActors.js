@@ -370,7 +370,6 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
         key: "dispose",
         value: function dispose() {
             _get(EyeRepresentation.prototype.__proto__ || Object.getPrototypeOf(EyeRepresentation.prototype), "dispose", this).call(this);
-            this.geometry.dispose();
             this.sound.dispose();
             this.sound = null;
         }
@@ -439,7 +438,6 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
         key: "dispose",
         value: function dispose() {
             _get(MissileRepresentation.prototype.__proto__ || Object.getPrototypeOf(MissileRepresentation.prototype), "dispose", this).call(this);
-            this.material.dispose();
             this.object.geometry.dispose();
         }
     }, {
@@ -782,7 +780,6 @@ var SelfBody = function () {
             // abyss. This reattaches the head so that play can continue.
             this.neck.position.y = eyeHeight;
             this.neck.rotation.copy(tmp.rotation);
-            console.log("Reset rotation");
         }
     }, {
         key: "carry",

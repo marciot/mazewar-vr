@@ -109,7 +109,8 @@ function init() {
     document.addEventListener("visibilitychange", onVisibilityChange, false);
 
     function startNetworkGame() {
-        var name = prompt("Please enter your name");
+        //var name = prompt("Please enter your name");
+        var name = "Hunter";
         startVr();
         theme.fadeEffect();
 
@@ -156,7 +157,12 @@ function init() {
         }
     }
 
-    window.addEventListener('WebComponentsReady', webComponentsReady);
+    if (typeof HTMLImports !== "undefined") {
+        window.addEventListener('WebComponentsReady', webComponentsReady);
+    } else {
+        // It appears as if the polyfill is not loaded.
+        webComponentsReady();
+    }
 }
 
 function resize() {

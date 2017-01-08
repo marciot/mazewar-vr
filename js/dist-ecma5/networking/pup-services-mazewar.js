@@ -263,7 +263,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     namespace.PupMazeWarServices = function (_namespace$PupService) {
         _inherits(_class, _namespace$PupService);
 
-        function _class(initialPlayer) {
+        function _class(initialPlayer, useRealNames) {
             _classCallCheck(this, _class);
 
             var _this = _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this));
@@ -297,6 +297,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             _this.state = ParticipantState.waitingForNetwork;
             _this.initialPlayer = initialPlayer;
+
+            // If useRealNames is set to false, then players will be assigned
+            // ficticious names based on their ratId.
+            _this.useRealNames = useRealNames;
+            _this.ficticiousRatNames = ["Bomber", "Killer", "Sniper", "Blaster", "Gunner", "Slasher", "Crusher", "Bruiser"];
 
             // Initialize message buffers
             _this.initRatStatus();
@@ -529,6 +534,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                 function ifNoReply() {
                     if (this.state === ParticipantState.waitingForBroadcastReply) {
+                        if (!this.useRealNames) {
+                            this.initialPlayer.name = this.getFicticiousRatName(0);
+                        }
+
                         var rat = this.ratStatus.rats[0];
                         rat.playing = 1;
                         rat.addr = this.server.pupServerAddr;
@@ -560,6 +569,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 if (ratId === -1) {
                     console.log("Ignoring offer, game is full");
                     return;
+                }
+
+                if (!this.useRealNames) {
+                    this.initialPlayer.name = this.getFicticiousRatName(ratId);
                 }
 
                 console.log("Requesting to join available game");
@@ -644,6 +657,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 var _this3 = this;
 
                 this.forAllRats(function (rat, ratId) {
+                    if (!_this3.useRealNames) {
+                        rat.name = _this3.getFicticiousRatName(ratId);
+                    }
                     if (rat.playing && rat.addr !== _this3.server.pupServerAddr) {
                         _this3.dispatchEvent("ratUpdate", ratId, rat);
                     }
@@ -741,6 +757,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 var frameWriter = this.newMazeWarFrame(this.MazeWarRatStatus, this.MazeWarRatStatusSize);
                 PupMazeWarPackets.encodeRatStatus(frameWriter, this.ratStatus);
                 this.multicastFrame(frameWriter.frame, address ? [address] : this.multicastAddresses);
+            }
+        }, {
+            key: "getFicticiousRatName",
+            value: function getFicticiousRatName(ratId) {
+                return this.ficticiousRatNames[ratId];
             }
         }, {
             key: "multicastAddresses",
