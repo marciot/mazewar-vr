@@ -17,7 +17,7 @@ function setupScene() {
     overlay   = new OverlayText(camera);
 
     var soundManager = new AudioManager();
-    camera.add( soundManager.audioListener );
+    camera.add( soundManager.listener );
 
     window.addEventListener('resize', resize, false);
     
