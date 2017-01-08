@@ -71,7 +71,7 @@ class NetworkedGame {
             dir:  Directions.toAltoDir(this.selfPlayer.facing)
         };
 
-        this.mazeService = new RetroWeb.PupMazeWarServices(initialPlayer);
+        this.mazeService = new RetroWeb.PupMazeWarServices(initialPlayer, false);
 
         this.mazeService.addEventListener("newGame",   this.newGameCallback.bind(this));
         this.mazeService.addEventListener("ratUpdate", this.ratUpdateCallback.bind(this));
@@ -86,6 +86,7 @@ class NetworkedGame {
     newGameCallback(myId, rat) {
         console.log("New game, my rat id is", myId);
         this.selfPlayer.addObserver(new NetworkTransmitter(this.mazeService, this, myId));
+        this.selfPlayer.name = rat.name;
 
         if(this.players[myId]) {
             console.log("WARNING: This slot is already occupied");
