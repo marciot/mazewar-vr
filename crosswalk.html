@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<!--
+MazeWars VR
+Copyright (C) 2016 Marcio Teixeira
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU Affero General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<html lang="en">
+    <head>
+        <title>MazeWar VR</title>
+        <meta name="Description" content="Hide, seek and destroy in this multi-player virtual reality chase game. For smartphones and desktop VR, including Cardboard, GearVR, Oculus Rift and Vive.">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- iOS Webapp Configuration -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <link rel="apple-touch-icon" href="artwork/icon.png">
+
+        <!-- Facebook Open Graph Markup -->
+        <meta property="og:url"                content="http://www.marciot.com/mazewar-vr" />
+        <meta property="og:type"               content="article" />
+        <meta property="og:title"              content="Maze War VR" />
+        <meta property="og:description"        content="Hide, seek and destroy in this virtual reality remake of a 1974 chase game that originated at NASA." />
+        <meta property="og:image"              content="artwork/fb-share.jpg" />
+        <meta property="og:image:width"        content="1200" />
+        <meta property="og:image:height"       content="630" />
+        <!-- End of Facebook Open Graph Markup -->
+
+        <!-- During development, the code is changing often and it may be useful not to cache things -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Expires" content="0"/>
+
+        <style>
+            body {
+                position:      fixed;
+                top:           0;
+                bottom:        0;
+                left:          0;
+                right:         0;
+                margin:        0;
+                padding        0;
+                overflow:      hidden;
+            }
+
+            * {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -moz-user-select: none;
+                user-select: none;
+
+                -webkit-touch-callout: none;
+                -moz-touch-callout: none;
+                -ms-touch-callout: none;
+                touch-callout: none;
+
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+            }
+
+            .allow-selection {
+                -webkit-user-select: text;
+                -ms-user-select: text;
+                -moz-user-select: text;
+                user-select: text;
+
+                -webkit-touch-callout: default;
+                -moz-touch-callout: default;
+                -ms-touch-callout: default;
+                touch-callout: default;
+            }
+        </style>
+
+        <!-- We use YConsole to help debugging on mobile devices -->
+        <script type="text/javascript" src="js/third-party/yconsole-compiled.js"></script>
+    </head>
+    <body>
+        <span id="statusAndError"></span>
+        <script type="text/javascript">
+            function mwLog(str) {
+                document.querySelector("#statusAndError").innerHTML += str + "<br>";
+                console.log(str);
+            }
+            /*window.onerror = function(error) {
+                YConsole.show();
+            }*/
+            YConsole.activate();
+            YConsole.docking="bottom";
+        </script>
+        <script>
+            function onTouch(e) {
+                if(e.touches && e.touches.length === 4) {
+                    YConsole.show();
+                    e.preventDefault();
+                }
+            }
+            document.body.addEventListener("touchstart", onTouch);
+        </script>
+        <about-box></about-box>
+
+        <!-- Cordova CSP Configuration:
+             Note: This normally goes in the head, but when running under PhoneGap App, the meta tag in head
+             appears to get overwritten. Placing it here seems to be a workaround.
+        -->
+        <!--
+        <meta http-equiv="Content-Security-Policy" content="default-src * gap://ready file:; script-src 'unsafe-inline' 'unsafe-eval' * data: file:; style-src 'self' 'unsafe-inline'; connect-src *">
+        <script type="text/javascript" src="cordova.js"></script>
+        -->
+
+        <!-- For some reason using the full webcomponents library breaks WebGL on iOS -->
+        <!--<script type="text/javascript" src="js/third-party/webcomponents/webcomponents-lite.min.js"></script>-->
+
+        <link rel="import" href="js/SwipePages.html?v=1"></link>
+        <link rel="import" href="js/AboutBox.html?v=1"></link>
+
+        <!-- Library Code -->
+        <script>
+            WebVRConfig = {
+                ROTATE_INSTRUCTIONS_DISABLED: true
+            };
+        </script>
+        <script type="text/javascript" src="js/third-party/promise-7.0.4.min.js"></script>
+        <script type="text/javascript" src="js/third-party/webvr-polyfill.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/three.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/VREffect.js"></script>
+
+        <!-- Library Code -->
+        <script type="text/javascript" src="js/third-party/fastclick.js"></script>
+        <script type="text/javascript" src="js/third-party/tween-functions.js"></script>
+        <script type="text/javascript" src="js/third-party/threejs/AnaglyphEffect.js"></script>
+
+        <!-- Networking Code -->
+        <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
+
+        <!-- Shader programs for skydome -->
+        <script type="application/x-glsl" id="sky-vertex">  
+            varying vec2 vUV;
+
+            void main() {  
+              vUV = uv;
+              vec4 pos = vec4(position, 1.0);
+              gl_Position = projectionMatrix * modelViewMatrix * pos;
+            }
+        </script>
+
+        <script type="application/x-glsl" id="sky-fragment">  
+            uniform sampler2D texture;
+            varying vec2 vUV;
+
+            void main() {  
+              vec4 sample = texture2D(texture, vUV);
+              gl_FragColor = vec4(sample.xyz, sample.w);
+            }
+        </script>
+
+        <script type="application/x-glsl" id="sky-fragment-symmetric">
+            uniform sampler2D texture;
+            varying vec2 vUV;
+
+            void main() {
+              vec2 vUVreflected = (vUV.y < 0.5)
+                ? vec2(      vUV.x,  1.0 - (vUV.y * 2.0))
+                : vec2(1.0 - vUV.x, -1.0 + (vUV.y * 2.0));
+              vec4 sample = texture2D(texture, vUVreflected);
+              gl_FragColor = vec4(sample.xyz, sample.w);
+            }
+        </script>
+
+        <!-- Main Program -->
+
+        <script type="text/javascript" src="js/src-ecma6/networking/cordova-setup.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/networking/frame-utilities.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/networking/pup-services.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/networking/pup-services-mazewar.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/networking/retroweb-network.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/Directions.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/Maze.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/Actors.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/Directors.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/Tween.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/MotionTracker.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/WebAudio.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/WebGLText.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/WebGLActors.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/WebGLScene.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/GameMaster.js?v=1"></script>
+        <script type="text/javascript" src="js/src-ecma6/Main.js?v=1"></script>
+
+        <!-- Note: Something in here conflicts with ioswebrtc, disable when compiling for iOS -->
+        <link rel="import" href="extras/contralto-js/alto-emulator.html?v=1"></link>
+
+        <!--
+            I host SDK keys in a separate web server so they don't end up on GitHub.
+            If you forked this project, you should generate your own API keys.
+        -->
+        <script type="text/javascript" src="private/sdk-keys-mazewar-vr.js?v=1"></script>
+        <!--<script crossorigin="anonymous" type="text/javascript" src="http://marciot.freeshell.org/sdk-keys/sdk-keys-mazewar-vr.js?v=1"></script>
+        <script>
+            if(typeof fbAsyncInit === "undefined" || typeof RetroWeb.peerJSConfig === "undefined") {
+                alert("For full functionality, provide your own API keys for Facebook and Peer.js");
+            }
+        </script>-->
+        <!-- Google Analytics -->
+        <!--<script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-47856782-3', 'auto');
+            ga('send', 'pageview');
+        </script>-->
+    </body>
+</html>
