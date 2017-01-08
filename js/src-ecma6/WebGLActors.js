@@ -360,7 +360,6 @@ class MissileRepresentation extends AnimatedRepresentation {
 
     dispose() {
         super.dispose();
-        this.object.geometry.dispose();
     }
 
     animate(dt) {

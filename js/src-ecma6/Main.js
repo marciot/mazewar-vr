@@ -91,6 +91,7 @@ function init() {
         if(vrEnabled && vrDisplay && vrDisplay.capabilities.canPresent && effect.requestPresent) {
             effect.requestPresent();
         }
+        document.querySelector("about-box").showPage("page1");
         document.querySelector("about-box").setOverlayVisibility(false);
     }
 
