@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const mwDebug = true;
 
-var vrDisplay, gpClicker;
+var vrDisplay;
 
 var clock  = new THREE.Clock();
 var actors = new WebGLActors();
@@ -102,7 +102,7 @@ function init() {
         document.querySelector("about-box").showPage("page1");
     }
 
-    function onVisibilityChange() {
+    function onVisibilityChange(event) {
         if (document.hidden || event.target.webkitHidden) {
             endVr();
         }
@@ -139,9 +139,11 @@ function init() {
 
         game = new NetworkedGame(getWebGLPlayerFactory());
         game.startGame(hostId, name, stateChangedCallback);
+        gpClicker.gameStarting();
     }
 
     function startSoloGame() {
+        gpClicker.gameStarting();
         startVr();
         theme.fadeEffect();
     }

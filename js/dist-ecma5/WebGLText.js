@@ -33,7 +33,7 @@ var OverlayText = function () {
     _createClass(OverlayText, [{
         key: "createText",
         value: function createText(str) {
-            var strLines = this.text.split('\n');
+            var strLines = str || this.text.split('\n');
 
             var lines = [];
             for (var i = 0; i < strLines.length; i++) {
@@ -98,11 +98,16 @@ var OverlayText = function () {
             this.meshes = [];
         }
     }, {
+        key: "setText",
+        value: function setText(str) {
+            this.disposeText();
+            this.text = str;
+            this.createText();
+        }
+    }, {
         key: "chooseText",
         value: function chooseText() {
-            this.disposeText();
-            this.text = this.textList[Math.floor(Math.random() * this.textList.length)];
-            this.createText();
+            this.setText(this.textList[Math.floor(Math.random() * this.textList.length)]);
         }
     }, {
         key: "representation",

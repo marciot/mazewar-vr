@@ -65,7 +65,7 @@ class OverlayText {
     }
 
     createText(str) {
-        var strLines = this.text.split('\n');
+        var strLines = str || this.text.split('\n');
 
         var lines = [];
         for(var i = 0; i < strLines.length; i++) {
@@ -129,10 +129,14 @@ class OverlayText {
         this.meshes = [];
     }
 
-    chooseText() {
+    setText(str) {
         this.disposeText();
-        this.text = this.textList[Math.floor(Math.random() * this.textList.length)];
+        this.text = str;
         this.createText();
+    }
+
+    chooseText() {
+        this.setText(this.textList[Math.floor(Math.random() * this.textList.length)]);
     }
 
     get representation() {

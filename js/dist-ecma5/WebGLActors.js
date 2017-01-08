@@ -438,7 +438,6 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
         key: "dispose",
         value: function dispose() {
             _get(MissileRepresentation.prototype.__proto__ || Object.getPrototypeOf(MissileRepresentation.prototype), "dispose", this).call(this);
-            this.object.geometry.dispose();
         }
     }, {
         key: "animate",
@@ -677,13 +676,19 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
             }
         }
     }, {
+        key: "turnTowards",
+        value: function turnTowards(direction) {
+            var quaternion = new THREE.Quaternion();
+            quaternion.setFromUnitVectors(this.directionVector, Directions.toUnitVector(direction));
+            this.animateRoll(quaternion);
+        }
+    }, {
         key: "shotDead",
         value: function shotDead(respawnCallback) {
-            this.turnTowards(Directions.UP);
             this.startFalling(false);
-            //this.body.lockControls();
+            this.body.lockControls();
             maze.setIsFalling(true);
-
+            this.turnTowards(Directions.UP);
             this.map.hide();
             this.respawnCallback = respawnCallback;
         }
@@ -699,7 +704,7 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
         value: function respawn() {
             theme.fadeEffect();
             this.body.reattachHead();
-            //this.body.unlockControls();
+            this.body.unlockControls();
             maze.setIsFalling(false);
             this.map.show();
         }
@@ -758,7 +763,10 @@ var SelfBody = function () {
         this.combined.add(this.body);
         this.combined.add(this.neck);
 
-        this.motionTracker = new MotionTracker(this.updateBody.bind(this));
+        function recenterCallback() {
+            theme.showStatusMessage("Recentered view.");
+        }
+        this.motionTracker = new MotionTracker(this.updateBody.bind(this), recenterCallback);
         motionTracker = this.motionTracker;
     }
 
@@ -817,21 +825,23 @@ var SelfBody = function () {
             // Keep the body underneath the neck and facing in the
             // same direction, except when the player is looking
             // straight up and the direction is indeterminate.
-            this.body.position.x = this.neck.position.x;
-            this.body.position.z = this.neck.position.z;
-            if (projectionMagn > 0.1) {
-                this.body.rotation.y = -headsetBearing;
+            if (!this.locked) {
+                this.body.position.x = this.neck.position.x;
+                this.body.position.z = this.neck.position.z;
+                if (projectionMagn > 0.1) {
+                    this.body.rotation.y = -headsetBearing;
+                }
             }
         }
     }, {
         key: "update",
         value: function update() {
-            if (this.locked) {
+            /*if(this.locked) {
                 // While the player dies and is falling through the
                 // abbyss, stop updating the position from the
                 // headset.
                 return;
-            }
+            }*/
             this.motionTracker.update();
         }
     }, {

@@ -24,6 +24,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var gpClicker;
+
 var Director = function Director(actor) {
     _classCallCheck(this, Director);
 
@@ -248,9 +250,8 @@ var HeadsetDirector = function (_Director3) {
 
         if (!gpClicker) {
             // Create an object for monitoring the gamepad controllers
-            gpClicker = new GamePadClicker();
+            gpClicker = new GamePadControllerWithTimer(_this3.triggerPressed.bind(_this3), _this3.triggerReleased.bind(_this3));
         }
-        gpClicker.setCallbacks(_this3.triggerPressed.bind(_this3), _this3.triggerReleased.bind(_this3));
         return _this3;
     }
 
@@ -335,87 +336,3 @@ var HeadsetDirector = function (_Director3) {
 
     return HeadsetDirector;
 }(Director);
-
-var GamePadClicker = function () {
-    function GamePadClicker() {
-        _classCallCheck(this, GamePadClicker);
-
-        this.buttonCaptured = false;
-        this.lastButtonState = false;
-        this.captureTries = 0;
-    }
-
-    _createClass(GamePadClicker, [{
-        key: 'waitForButton',
-        value: function waitForButton() {
-            var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : [];
-            if (gamepads && gamepads.length) {
-                for (var gpIndex = 0; gpIndex < gamepads.length; gpIndex++) {
-                    var gp = gamepads[gpIndex];
-                    if (gp && gp.connected) {
-                        for (var btnIndex = 0; btnIndex < gp.buttons.length; btnIndex++) {
-                            if (gp.buttons[btnIndex].pressed) {
-                                console.log("Button", btnIndex, "on controller", gpIndex, "pressed");
-                                this.buttonCaptured = true;
-                                this.gpIndex = gpIndex;
-                                this.btnIndex = btnIndex;
-                                this.statusDom.innerHTML = "Button set! (click again to reset)";
-                                return;
-                            }
-                        }
-                    }
-                }
-            } else {
-                this.statusDom.innerHTML = "Cannot find gamepads";
-                return;
-            }
-
-            var captureTime = 10000;
-            if (this.captureTries < captureTime / 250) {
-                this.captureTries++;
-                setTimeout(this.waitForButton.bind(this), 250);
-            } else {
-                this.statusDom.innerHTML = "Not buttons detected (click to try again)";
-            }
-        }
-    }, {
-        key: 'setCallbacks',
-        value: function setCallbacks(pressedCallback, releasedCallback) {
-            this.pressedCallback = pressedCallback;
-            this.releasedCallback = releasedCallback;
-        }
-    }, {
-        key: 'captureButton',
-        value: function captureButton(statusDom) {
-            this.tries = 0;
-            this.statusDom = statusDom;
-            this.statusDom.innerHTML = "Press and hold down a button";
-            this.waitForButton();
-        }
-    }, {
-        key: 'poll',
-        value: function poll() {
-            if (this.buttonCaptured) {
-                var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : [];
-                var gp = gamepads[this.gpIndex];
-                if (gp.buttons[this.btnIndex].pressed) {
-                    if (this.lastButtonState === false) {
-                        this.lastButtonState = true;
-                        if (this.pressedCallback) {
-                            this.pressedCallback();
-                        }
-                    }
-                } else {
-                    if (this.lastButtonState === true) {
-                        this.lastButtonState = false;
-                        if (this.releasedCallback) {
-                            this.releasedCallback();
-                        }
-                    }
-                }
-            }
-        }
-    }]);
-
-    return GamePadClicker;
-}();

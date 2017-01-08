@@ -6,8 +6,9 @@ var AudioManager = function () {
     function AudioManager() {
         _classCallCheck(this, AudioManager);
 
-        this.activeNodes = [];
-        this.inactiveNodes = [];
+        this.inactiveSoundSets = {
+            playerSounds: []
+        };
 
         this.sounds = {};
         this.pendingSounds = 0;
@@ -37,32 +38,20 @@ var AudioManager = function () {
         loadSound("scream", 'sounds/13797__sweetneo85__wilhelm.mp3', false);
         loadSound("pow", 'sounds/183467__snapper4298__pow1.mp3', false);
 
-        this.audioListener = new THREE.AudioListener();
+        this.listener = new THREE.AudioListener();
     }
 
     _createClass(AudioManager, [{
-        key: "getAudioNode",
-        value: function getAudioNode() {
-            if (this.inactiveNodes.length) {
-                return this.inactiveNodes.pop();
-            } else {
-                var node = new THREE.PositionalAudio(this.audioListener);
-                this.activeNodes.push(node);
-                return node;
-            }
+        key: "saveSoundSet",
+        value: function saveSoundSet(label, soundSet) {
+            this.inactiveSoundSets[label].push(soundSet);
         }
     }, {
-        key: "releaseAudioNode",
-        value: function releaseAudioNode(node) {
-            node.stop();
-
-            // Remove from the active node lists and
-            // push into the inactive list
-            var index = this.activeNodes.indexOf(node);
-            if (index > -1) {
-                this.activeNodes.splice(index, 1);
+        key: "reuseSoundSet",
+        value: function reuseSoundSet(label) {
+            if (this.inactiveSoundSets[label].length) {
+                return this.inactiveSoundSets[label].pop();
             }
-            this.inactiveNodes.push(node);
         }
     }, {
         key: "attachBufferToNode",
@@ -97,65 +86,57 @@ var ActorSounds = function () {
     function ActorSounds() {
         _classCallCheck(this, ActorSounds);
 
-        this.walkSoundNode = audioManager.getAudioNode();
-        this.fallSoundNode = audioManager.getAudioNode();
-        this.bangSoundNode = audioManager.getAudioNode();
-        this.setNodeParams(this.walkSoundNode);
-        this.setNodeParams(this.fallSoundNode);
-        this.setNodeParams(this.bangSoundNode);
-        audioManager.attachBufferToNode("walking", this.walkSoundNode);
-        audioManager.attachBufferToNode("scream", this.fallSoundNode);
-        audioManager.attachBufferToNode("pow", this.bangSoundNode);
+        var fadeDistance = MazeWalls.cellDimension * 1;
+        var maxDistance = MazeWalls.cellDimension * 64;
 
-        this.representation = new THREE.Object3D();
-        this.representation.add(this.walkSoundNode);
-        this.representation.add(this.fallSoundNode);
-        this.representation.add(this.bangSoundNode);
-    }
-
-    _createClass(ActorSounds, [{
-        key: "setNodeParams",
-        value: function setNodeParams(node) {
-            var fadeDistance = MazeWalls.cellDimension * 1;
-            var maxDistance = MazeWalls.cellDimension * 64;
-
+        function getSoundNode(bufferLabel) {
+            var node = new THREE.PositionalAudio(audioManager.listener);
             node.setRefDistance(fadeDistance);
             node.setMaxDistance(maxDistance);
             node.setRolloffFactor(15);
+            audioManager.attachBufferToNode(bufferLabel, node);
+            return node;
         }
-    }, {
+        this.soundSet = audioManager.reuseSoundSet("playerSounds");
+        if (!this.soundSet) {
+            this.soundSet = {
+                walk: getSoundNode("walking"),
+                fall: getSoundNode("scream"),
+                bang: getSoundNode("pow")
+            };
+        }
+        this.representation = new THREE.Object3D();
+        this.representation.add(this.soundSet.walk);
+        this.representation.add(this.soundSet.fall);
+        this.representation.add(this.soundSet.bang);
+    }
+
+    _createClass(ActorSounds, [{
         key: "dispose",
         value: function dispose() {
-            /* There is a bug in THREE.JS PositionalAudio where releaseAudioNode fails if
-             * the sound isn't playing, so we start it in order to be able to release it */
-            if (!this.walkSoundNode.isPlaying) this.walkSoundNode.play();
-            if (!this.fallSoundNode.isPlaying) this.fallSoundNode.play();
-            if (!this.bangSoundNode.isPlaying) this.bangSoundNode.play();
-
-            audioManager.releaseAudioNode(this.walkSoundNode);
-            audioManager.releaseAudioNode(this.fallSoundNode);
-            audioManager.releaseAudioNode(this.bangSoundNode);
+            audioManager.saveSoundSet("playerSounds", this.soundSet);
+            this.representation.children.length = 0;
         }
     }, {
         key: "startWalking",
         value: function startWalking() {
             if (audioManager.isReady) {
-                this.walkSoundNode.play();
+                this.soundSet.walk.play();
             }
         }
     }, {
         key: "scream",
         value: function scream() {
             if (audioManager.isReady) {
-                this.walkSoundNode.stop();
-                this.fallSoundNode.play();
+                this.soundSet.walk.stop();
+                this.soundSet.fall.play();
             }
         }
     }, {
         key: "bang",
         value: function bang() {
             if (audioManager.isReady) {
-                this.bangSoundNode.play();
+                this.soundSet.bang.play();
             }
         }
     }]);

@@ -453,7 +453,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="middle flex-grid two-element">
                 <div><div class="clickable grid-button" data-page="pageTurnAmplification">Turn Amplification</div></div>
-                <div><div class="clickable grid-button" data-page="pageGamepadOptions">Gamepad Options</div></div>
+                <div><div class="clickable grid-button" data-page="pageGamepadConfiguration">Gamepad Configuration</div></div>
             </div>
             <div class="footer">
             </div>
@@ -577,7 +577,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <h2>Using a Bluetooth Gamepad:</h2>
                 <p>
                 If your headset came with a Bluetooth gamepad, you will need to pair the headset to your phone.
-                Then go to the "Game Setup" screen to configure a button on it as the trigger.
+                Then go to "Game Setup -> Control Options -> Gamepad Configuration" screen to configure a button on it as the trigger.
                 </p>
             </div>
             <div>
@@ -631,11 +631,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 from the <cite>Oculus Store Android</cite> app. This is not the same as the <cite>Samsung Internet for Android</cite> from the <cite>Galaxy App</cite> store.
                 </p>
                 <p>
-                The most recent version of <cite>Samsung Internet for Android</cite> will automatically prompt you to enable WebVR,
-                but if you are using an older version, you must type the following into the URL bar while in VR mode:
-                <ul>
-                    <li class="allow-selection">internet://webvr-enable
-                </ul>
+                    You may then play <cite>Maze War VR</cite> online by going to <a href="http://marciot.com/mazewar-vr" target="_blank">http://marciot.com/mazewar-vr</a>
                 </p>
             </div>
             <div>
@@ -653,16 +649,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <a href="https://mozvr.com/" target="_blank">Firefox</a> to play <cite>Maze War VR</cite>.
                 </p>
                 <p>
-                Once you have these browsers setup, you need to copy and paste the following links into your URL bar to enable the experimental
-                WebVR and the Gamepad extensions:
-                <ul>
-                    <li class="allow-selection">chrome://flags/#enable-webvr
-                    <li class="allow-selection">chrome://flags/#enable-gamepad-extensions
-                </ul>
+                Once you have these browsers setup, follow the instructions at <a href="https://webvr.info">https://webvr.info</a>
+                to enable the experimental WebVR and the Gamepad extensions.
                 </p>
                 <p>
-                You must then configure a trigger button on your gamepad or controller from the "Game Setup" screen prior to
-                starting a game.
+                As a last step, you must configure a trigger button on your gamepad or controller from the
+                "Game Setup -> Control Options -> Gamepad Configuration" screen prior to starting a game.
                 </p>
             </div>
             <div>
@@ -1311,7 +1303,7 @@ function gotoRecommendedHeadsets() {
 
         // Gamepad Configuration
         function configureGamepad() {
-            gpClicker.captureButton(shadowRoot.querySelector("#configureGamepad"));
+            gpClicker.beginTimedCapture(10000, shadowRoot.querySelector("#configureGamepad"));
         }
         shadowRoot.querySelector("#configureGamepad").addEventListener("click", configureGamepad);
 

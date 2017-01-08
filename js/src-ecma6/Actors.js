@@ -239,7 +239,7 @@ class Player extends Actor {
     constructor(representation) {
         super(representation);
         this.isDead      = false;
-        this.myName      = "no name";
+        this.myName      = "";
         this.localPlayer = false;
 
         // The player always sees enemy missiles as yellow-red.
@@ -289,7 +289,7 @@ class Player extends Actor {
     }
 
     wasHit(data) {
-        if(this.isDead || (theme && theme.isFading)) {
+        if(this.isDead) {
             return;
         }
         this.notifyObservers("wasHit", data.shotBy);
@@ -304,6 +304,7 @@ class Player extends Actor {
     shotDead(killedBy) {
         this.isDead = true;
         this.notifyObservers("shotDead", () => {this.respawn()});
+        killedBy.killedPlayer(this);
     }
 
     respawn() {
@@ -313,8 +314,8 @@ class Player extends Actor {
             this.setPosition(maze.getRandomPosition());
             this.orientTowardsPassage();
         }
-        this.isDead = false;
         this.notifyObservers("respawn");
+        this.isDead = false;
     }
 
     set name(name) {
@@ -323,11 +324,25 @@ class Player extends Actor {
     }
 
     get name() {
-        return this.myName;
+        return this.myName || "";
     }
 
     setLocalPlayer(isSelf) {
         this.localPlayer = true;
         this.isSelf      = isSelf;
+    }
+
+    killedPlayer(whichPlayer) {
+        /* This method is called when a kill by this player is confirmed */
+        if(this.isSelf) {
+            const verbs = [
+                "killed", "anihilated", "destroyed", "assassinated", "squashed",
+                "obliterated", "knocked out", "vanquished", "snuffed out",
+                "eliminated", "crushed", "terminated", "smothered"];
+            const verb = verbs[Math.floor(Math.random() * verbs.length)];
+
+            const extraStr = whichPlayer.name === "" ? "" : ("\nYou've " + verb + " " + whichPlayer.name);
+            theme.showStatusMessage("Nice shot!" + extraStr);
+        }
     }
 }

@@ -1,5 +1,5 @@
 class MotionTracker {
-    constructor(callback) {
+    constructor(callback, recenterCallback) {
         if('VRFrameData' in window) {
             if(!this.frameData) {
                 this.frameData = new VRFrameData();
@@ -27,6 +27,7 @@ class MotionTracker {
         this.tapDetector.addEventListener("doubletap", function() {
             me.resetPose();
             me.resetOrientation();
+            recenterCallback();
         });
 
         this.rotationalBoost = new RotationalBoost();
@@ -198,20 +199,20 @@ class TapDetector {
     }
 
     timerAction(tapDetected) {
-        const doubleTapTime = 0.3;
+        const minDoubleTapTime = 0.15;
+        const doubleTapTime    = 0.50;
 
         if(tapDetected) {
             if(!this.tapClock.running) {
                 // Click event will be dispatched when timer runs down.
                 this.tapClock.start();
-            } else {
-                if(this.tapClock.elapsedTime < doubleTapTime) {
-                    this.dispatchEvent("doubletap");
-                }
+            } else if(this.tapClock.getElapsedTime() > minDoubleTapTime) {
+                console.log("Double tap time", this.tapClock.getElapsedTime());
                 this.tapClock.stop();
+                this.dispatchEvent("doubletap");
             }
         } else {
-            if(this.tapClock.running && this.tapClock.elapsedTime > doubleTapTime) {
+            if(this.tapClock.running && this.tapClock.getElapsedTime() > doubleTapTime) {
                 this.tapClock.stop();
                 this.dispatchEvent("tap");
             }

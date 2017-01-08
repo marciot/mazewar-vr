@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+var gpClicker;
+
 class Director {
     constructor(actor) {
         this.actor = actor;
@@ -194,9 +196,8 @@ class HeadsetDirector extends Director {
 
         if(!gpClicker) {
             // Create an object for monitoring the gamepad controllers
-            gpClicker = new GamePadClicker();
+            gpClicker = new GamePadControllerWithTimer(this.triggerPressed.bind(this), this.triggerReleased.bind(this));
         }
-        gpClicker.setCallbacks(this.triggerPressed.bind(this), this.triggerReleased.bind(this));
     }
 
     dispose() {
@@ -264,80 +265,6 @@ class HeadsetDirector extends Director {
             if(this.autoWalk && this.actor.representation.isStopped) {
                 // Walk in new direction if trigger is being held
                 this.animationFinished();
-            }
-        }
-    }
-}
-
-class GamePadClicker {
-    constructor() {
-        this.buttonCaptured  = false;
-        this.lastButtonState = false;
-        this.captureTries = 0;
-    }
-
-    waitForButton() {
-        var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-        if(gamepads && gamepads.length) {
-            for(var gpIndex = 0; gpIndex < gamepads.length; gpIndex++) {
-                var gp = gamepads[gpIndex];
-                if(gp && gp.connected) {
-                    for(var btnIndex = 0; btnIndex < gp.buttons.length; btnIndex++) {
-                        if(gp.buttons[btnIndex].pressed) {
-                            console.log("Button", btnIndex, "on controller", gpIndex, "pressed");
-                            this.buttonCaptured = true;
-                            this.gpIndex        = gpIndex;
-                            this.btnIndex       = btnIndex;
-                            this.statusDom.innerHTML = "Button set! (click again to reset)";
-                            return;
-                        }
-                    }
-                }
-            }
-        } else {
-            this.statusDom.innerHTML = "Cannot find gamepads";
-            return;
-        }
-
-        const captureTime = 10000;
-        if(this.captureTries < captureTime/250) {
-            this.captureTries++;
-            setTimeout(this.waitForButton.bind(this), 250);
-        } else {
-            this.statusDom.innerHTML = "Not buttons detected (click to try again)";
-        }
-    }
-
-    setCallbacks(pressedCallback, releasedCallback) {
-        this.pressedCallback  = pressedCallback;
-        this.releasedCallback = releasedCallback;
-    }
-
-    captureButton(statusDom) {
-        this.tries = 0;
-        this.statusDom = statusDom;
-        this.statusDom.innerHTML = "Press and hold down a button";
-        this.waitForButton();
-    }
-
-    poll() {
-        if(this.buttonCaptured) {
-            var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);            
-            var gp = gamepads[this.gpIndex];
-            if(gp.buttons[this.btnIndex].pressed) {
-                if(this.lastButtonState === false) {
-                    this.lastButtonState = true;
-                    if(this.pressedCallback) {
-                        this.pressedCallback();
-                    }
-                }
-            } else {
-                if(this.lastButtonState === true) {
-                    this.lastButtonState = false;
-                    if(this.releasedCallback) {
-                        this.releasedCallback();
-                    }
-                }
             }
         }
     }

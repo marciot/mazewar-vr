@@ -179,7 +179,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
         var u = Directions.toUnitVector(direction);
         this.animateDisplacement(u.multiplyScalar(MazeWalls.cellDimension));
     }
-    
+
     /* Animated turn until the Actor faces the direction indicated by the unit vector  */
     turnTowards(direction) {
         var quaternion = new THREE.Quaternion();
@@ -556,12 +556,20 @@ class SelfRepresentation extends AnimatedRepresentation {
         }
     }
 
+    turnTowards(direction) {
+        var quaternion = new THREE.Quaternion();
+        quaternion.setFromUnitVectors(
+            this.directionVector,
+            Directions.toUnitVector(direction)
+        );
+        this.animateRoll(quaternion);
+    }
+
     shotDead(respawnCallback) {
-        this.turnTowards(Directions.UP);
         this.startFalling(false);
-        //this.body.lockControls();
+        this.body.lockControls();
         maze.setIsFalling(true);
-        
+        this.turnTowards(Directions.UP);
         this.map.hide();
         this.respawnCallback = respawnCallback;
     }
@@ -575,7 +583,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     respawn() {
         theme.fadeEffect();
         this.body.reattachHead();
-        //this.body.unlockControls();
+        this.body.unlockControls();
         maze.setIsFalling(false);
         this.map.show();
     }
@@ -614,7 +622,10 @@ class SelfBody {
         this.combined.add(this.body);
         this.combined.add(this.neck);
 
-        this.motionTracker = new MotionTracker(this.updateBody.bind(this));
+        function recenterCallback() {
+            theme.showStatusMessage("Recentered view.");
+        }
+        this.motionTracker = new MotionTracker(this.updateBody.bind(this), recenterCallback);
         motionTracker = this.motionTracker;
     }
 
@@ -669,20 +680,22 @@ class SelfBody {
         // Keep the body underneath the neck and facing in the
         // same direction, except when the player is looking
         // straight up and the direction is indeterminate.
-        this.body.position.x = this.neck.position.x;
-        this.body.position.z = this.neck.position.z;
-        if(projectionMagn > 0.1) {
-            this.body.rotation.y = -headsetBearing;
+        if(!this.locked) {
+            this.body.position.x = this.neck.position.x;
+            this.body.position.z = this.neck.position.z;
+            if(projectionMagn > 0.1) {
+                this.body.rotation.y = -headsetBearing;
+            }
         }
     }
 
     update() {
-        if(this.locked) {
+        /*if(this.locked) {
             // While the player dies and is falling through the
             // abbyss, stop updating the position from the
             // headset.
             return;
-        }
+        }*/
         this.motionTracker.update();
     }
 }

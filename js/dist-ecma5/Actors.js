@@ -313,7 +313,7 @@ var Player = function (_Actor2) {
         var _this2 = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, representation));
 
         _this2.isDead = false;
-        _this2.myName = "no name";
+        _this2.myName = "";
         _this2.localPlayer = false;
 
         // The player always sees enemy missiles as yellow-red.
@@ -366,7 +366,7 @@ var Player = function (_Actor2) {
     }, {
         key: "wasHit",
         value: function wasHit(data) {
-            if (this.isDead || theme && theme.isFading) {
+            if (this.isDead) {
                 return;
             }
             this.notifyObservers("wasHit", data.shotBy);
@@ -386,6 +386,7 @@ var Player = function (_Actor2) {
             this.notifyObservers("shotDead", function () {
                 _this3.respawn();
             });
+            killedBy.killedPlayer(this);
         }
     }, {
         key: "respawn",
@@ -396,14 +397,26 @@ var Player = function (_Actor2) {
                 this.setPosition(maze.getRandomPosition());
                 this.orientTowardsPassage();
             }
-            this.isDead = false;
             this.notifyObservers("respawn");
+            this.isDead = false;
         }
     }, {
         key: "setLocalPlayer",
         value: function setLocalPlayer(isSelf) {
             this.localPlayer = true;
             this.isSelf = isSelf;
+        }
+    }, {
+        key: "killedPlayer",
+        value: function killedPlayer(whichPlayer) {
+            /* This method is called when a kill by this player is confirmed */
+            if (this.isSelf) {
+                var verbs = ["killed", "anihilated", "destroyed", "assassinated", "squashed", "obliterated", "knocked out", "vanquished", "snuffed out", "eliminated", "crushed", "terminated", "smothered"];
+                var verb = verbs[Math.floor(Math.random() * verbs.length)];
+
+                var extraStr = whichPlayer.name === "" ? "" : "\nYou've " + verb + " " + whichPlayer.name;
+                theme.showStatusMessage("Nice shot!" + extraStr);
+            }
         }
     }, {
         key: "missileColor",
@@ -417,7 +430,7 @@ var Player = function (_Actor2) {
             this.myName = name;
         },
         get: function () {
-            return this.myName;
+            return this.myName || "";
         }
     }]);
 

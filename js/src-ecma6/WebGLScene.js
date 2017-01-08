@@ -174,37 +174,46 @@ class Theme {
     animate() {
     }
 
-    fadeEffect(callback) {
-        function getOpacityFunc(material) {
-            material.transparent = true;
-            material.opacity     = 0;
-            material.visible     = false;
+    static getOpacityFunc(material) {
+        material.transparent = true;
+        material.opacity     = 0;
+        material.visible     = false;
 
-            return t => {
-                if(t < 0.05) {
-                    material.transparent = false;
-                    material.visible     = false;
-                    material.opacity     = 1;
-                } else if(t > 0.95) {
-                    material.transparent = false;
-                    material.visible     = true;
-                    material.opacity     = 1;
-                } else {
-                    material.transparent = true;
-                    material.visible     = true;
-                    material.opacity     = t;
-                }
+        return t => {
+            if(t < 0.05) {
+                material.transparent = false;
+                material.visible     = false;
+                material.opacity     = 1;
+            } else if(t > 0.95) {
+                material.transparent = false;
+                material.visible     = true;
+                material.opacity     = 1;
+            } else {
+                material.transparent = true;
+                material.visible     = true;
+                material.opacity     = t;
             }
         }
+    }
 
+    fadeEffect(callback) {
         this.isFading = true;
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.eyeMaterial),  0, 1, 0.2, 0.6);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.wallMaterial), 0, 1, 0.6, 1.0);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.eyeMaterial),  0, 1, 0.2, 0.6);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.wallMaterial), 0, 1, 0.6, 1.0);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
         tween.whenDone(() => {
             overlay.chooseText();
             this.isFading = false;
+        });
+    }
+
+    showStatusMessage(str) {
+        overlay.setText(str);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+        tween.whenDone(() => {
+            overlay.chooseText();
         });
     }
 }
