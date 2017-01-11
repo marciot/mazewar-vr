@@ -175,6 +175,8 @@ class AnimatedRepresentation extends VisibleRepresentation {
         this.animationQuatFinal    = new THREE.Quaternion();
         this.animationDispStart    = new THREE.Vector3();
         this.animationDisplacement = new THREE.Vector3();
+        this.animationSpinAxis     = new THREE.Vector3();
+        this.animationSpinQuat     = new THREE.Quaternion();
 
         this._animationDisplacementTween = function(t) {
             this.object.position.copy(this.animationDispStart);
@@ -236,9 +238,17 @@ class AnimatedRepresentation extends VisibleRepresentation {
             fallEasing,
             fallDuration
         );
+        
+        this.animationSpinAxis.copy(this.directionVector);
+        
         this.tween.add(fallDuration, spinEasing,
             Tween.deltaT(
-                (t, dt) => this.object.rotation.z += dt * spinVelocity
+                (t, dt) => {
+                    this.animationSpinQuat.setFromAxisAngle(
+                        this.animationSpinAxis, dt * spinVelocity
+                    );
+                    this.object.quaternion.multiply(this.animationSpinQuat);
+                }
             )
         );
     }
@@ -559,9 +569,6 @@ class SelfRepresentation extends AnimatedRepresentation {
     
     animate(dt) {
         super.animate(dt);
-        if(this.isFalling) {
-            return;
-        }
 
         this.body.update();
         if(this.candle) {
@@ -705,12 +712,6 @@ class SelfBody {
     }
 
     update() {
-        /*if(this.locked) {
-            // While the player dies and is falling through the
-            // abbyss, stop updating the position from the
-            // headset.
-            return;
-        }*/
         this.motionTracker.update();
     }
 }

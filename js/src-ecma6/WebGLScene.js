@@ -232,7 +232,7 @@ class Theme {
     showStatusMessage(str) {
         overlay.setText(str);
         tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 0, 1, 0.0, 0.2);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(ovarlay.textMaterial), 1, 0, 0.8, 1.0);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 1, 0, 0.8, 1.0);
         tween.whenDone(() => {
             overlay.chooseText();
         });

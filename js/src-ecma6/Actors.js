@@ -180,7 +180,7 @@ class MissileActor extends Actor {
         super(representation);
 
         this.owner = owner;
-        this.ricochet = false;
+        this.ricochet = true;
 
         representation.setAnimationFinishedCallback(this.animationFinished.bind(this));
     }
