@@ -70,28 +70,24 @@ var RoboticDirector = function (_Director) {
     _createClass(RoboticDirector, [{
         key: 'dispose',
         value: function dispose() {}
+    }, {
+        key: 'chooseDirection',
+
 
         // Chooses a direction by considering all possibilities and
         // giving a bias towards moving forwards.
-
-    }, {
-        key: 'chooseDirection',
         value: function chooseDirection() {
-            function flipCoin() {
-                return Math.floor(Math.random() * 2);
-            }
-
             var canGoStraight = this.actor.canWalk(this.actor.facing);
             var canGoLeft = this.actor.canWalk(Directions.leftFrom(this.actor.facing));
             var canGoRight = this.actor.canWalk(Directions.rightFrom(this.actor.facing));
 
             // 1:1 odds of going straight if there is the possibility to turn.
-            if (canGoStraight && (!(canGoLeft || canGoRight) || flipCoin())) {
+            if (canGoStraight && (!(canGoLeft || canGoRight) || RoboticDirector.flipCoin())) {
                 return this.actor.facing;
             }
 
             // 1:1 odds of going left or right, or about-face if no other choice.
-            if (flipCoin()) {
+            if (RoboticDirector.flipCoin()) {
                 // Try to go right, then left, then reverse
                 if (canGoRight) {
                     return Directions.rightFrom(this.actor.facing);
@@ -139,6 +135,11 @@ var RoboticDirector = function (_Director) {
             } else {
                 this.actor.turnTowards(direction);
             }
+        }
+    }], [{
+        key: 'flipCoin',
+        value: function flipCoin() {
+            return Math.floor(Math.random() * 2);
         }
     }]);
 

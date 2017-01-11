@@ -73,10 +73,8 @@ var MazeWalls = function (_Maze) {
         var _this = _possibleConstructorReturn(this, (MazeWalls.__proto__ || Object.getPrototypeOf(MazeWalls)).call(this, a, b));
 
         _this.wallHeight = 2.5;
-        _this.geometry = new THREE.Geometry();
 
-        _this.forAll(_this.addWalls);
-
+        _this.geometry = _this.buildMazeBufferGeometry();
         var walls = new THREE.Mesh(_this.geometry, theme.wallMaterial);
 
         _this.maze = new THREE.Object3D();
@@ -92,54 +90,75 @@ var MazeWalls = function (_Maze) {
     }
 
     _createClass(MazeWalls, [{
-        key: "addWalls",
-        value: function addWalls(x, z) {
-            if (!this.getCell(x, z)) {
-                if (this.getAdjacentCell(x, z, Directions.NORTH)) {
-                    this.addWall(x, z, Directions.NORTH);
+        key: "buildMazeBufferGeometry",
+        value: function buildMazeBufferGeometry() {
+            var me = this;
+
+            function addWall(x, z, direction) {
+                var plane = new THREE.Mesh(wallGeometry, theme.wallMaterial);
+                plane.position.y = me.wallHeight / 2;
+                switch (direction) {
+                    case 0x1:
+                        /* North */
+                        plane.position.z = -MazeWalls.cellDimension / 2;
+                        break;
+                    case 0x2:
+                        /* East */
+                        plane.rotation.y = -Math.PI / 2;
+                        plane.position.x = MazeWalls.cellDimension / 2;
+                        break;
+                    case 0x4:
+                        /* South */
+                        plane.position.z = MazeWalls.cellDimension / 2;
+                        plane.rotation.y = Math.PI;
+                        break;
+                    case 0x8:
+                        /* West */
+                        plane.rotation.y = Math.PI / 2;
+                        plane.position.x = -MazeWalls.cellDimension / 2;
+                        break;
                 }
-                if (this.getAdjacentCell(x, z, Directions.SOUTH)) {
-                    this.addWall(x, z, Directions.SOUTH);
-                }
-                if (this.getAdjacentCell(x, z, Directions.EAST)) {
-                    this.addWall(x, z, Directions.EAST);
-                }
-                if (this.getAdjacentCell(x, z, Directions.WEST)) {
-                    this.addWall(x, z, Directions.WEST);
+                plane.position.x += MazeWalls.cellDimension * x;
+                plane.position.z += MazeWalls.cellDimension * z;
+                plane.updateMatrix();
+                mazeGeometry.mergeMesh(plane);
+            }
+
+            function addWalls(x, z) {
+                if (!me.getCell(x, z)) {
+                    if (me.getAdjacentCell(x, z, Directions.NORTH)) {
+                        addWall(x, z, Directions.NORTH);
+                    }
+                    if (me.getAdjacentCell(x, z, Directions.SOUTH)) {
+                        addWall(x, z, Directions.SOUTH);
+                    }
+                    if (me.getAdjacentCell(x, z, Directions.EAST)) {
+                        addWall(x, z, Directions.EAST);
+                    }
+                    if (me.getAdjacentCell(x, z, Directions.WEST)) {
+                        addWall(x, z, Directions.WEST);
+                    }
                 }
             }
-        }
-    }, {
-        key: "addWall",
-        value: function addWall(x, z, direction) {
-            var geometry = new THREE.PlaneGeometry(MazeWalls.cellDimension, this.wallHeight);
-            var plane = new THREE.Mesh(geometry, theme.wallMaterial);
-            plane.position.y = this.wallHeight / 2;
-            switch (direction) {
-                case 0x1:
-                    /* North */
-                    plane.position.z = -MazeWalls.cellDimension / 2;
-                    break;
-                case 0x2:
-                    /* East */
-                    plane.rotation.y = -Math.PI / 2;
-                    plane.position.x = MazeWalls.cellDimension / 2;
-                    break;
-                case 0x4:
-                    /* South */
-                    plane.position.z = MazeWalls.cellDimension / 2;
-                    plane.rotation.y = Math.PI;
-                    break;
-                case 0x8:
-                    /* West */
-                    plane.rotation.y = Math.PI / 2;
-                    plane.position.x = -MazeWalls.cellDimension / 2;
-                    break;
-            }
-            plane.position.x += MazeWalls.cellDimension * x;
-            plane.position.z += MazeWalls.cellDimension * z;
-            plane.updateMatrix();
-            this.geometry.merge(plane.geometry, plane.matrix);
+
+            /* We build the maze geometry by positioning and merging wallGeometry (a plane) into
+             * a larger mazeGeometry. We then convert the Geometry into BufferGeometry to save
+             * memory.
+             */
+
+            var wallGeometry = new THREE.PlaneGeometry(MazeWalls.cellDimension, this.wallHeight);
+            var mazeGeometry = new THREE.Geometry();
+            this.forAll(addWalls);
+            mazeGeometry.mergeVertices();
+
+            var bufferGeometry = new THREE.BufferGeometry();
+            bufferGeometry.fromGeometry(mazeGeometry);
+
+            /* Delete the temporary geometry */
+            wallGeometry.dispose();
+            mazeGeometry.dispose();
+
+            return bufferGeometry;
         }
     }, {
         key: "setIsFalling",
@@ -184,7 +203,7 @@ var Theme = function () {
             var texture = loader.load(texture);
             texture.anisotropy = renderer.getMaxAnisotropy();
 
-            var geometry = new THREE.SphereGeometry(500, 60, 40);
+            var geometry = new THREE.SphereBufferGeometry(500, 60, 40);
 
             var uniforms = {
                 texture: { type: 't', value: texture }
@@ -211,10 +230,10 @@ var Theme = function () {
             var _this2 = this;
 
             this.isFading = true;
-            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 0, 1, 0.0, 0.2);
             tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.eyeMaterial), 0, 1, 0.2, 0.6);
             tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.wallMaterial), 0, 1, 0.6, 1.0);
-            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 1, 0, 0.8, 1.0);
             tween.whenDone(function () {
                 overlay.chooseText();
                 _this2.isFading = false;
@@ -224,8 +243,8 @@ var Theme = function () {
         key: "showStatusMessage",
         value: function showStatusMessage(str) {
             overlay.setText(str);
-            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
-            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 0, 1, 0.0, 0.2);
+            tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 1, 0, 0.8, 1.0);
             tween.whenDone(function () {
                 overlay.chooseText();
             });
@@ -233,21 +252,22 @@ var Theme = function () {
     }], [{
         key: "getOpacityFunc",
         value: function getOpacityFunc(material) {
+            var alwaysTransparent = material.hasOwnProperty("map");
             material.transparent = true;
             material.opacity = 0;
             material.visible = false;
 
             return function (t) {
                 if (t < 0.05) {
-                    material.transparent = false;
+                    material.transparent = false || alwaysTransparent;
                     material.visible = false;
                     material.opacity = 1;
                 } else if (t > 0.95) {
-                    material.transparent = false;
+                    material.transparent = false || alwaysTransparent;
                     material.visible = true;
                     material.opacity = 1;
                 } else {
-                    material.transparent = true;
+                    material.transparent = true || alwaysTransparent;
                     material.visible = true;
                     material.opacity = t;
                 }

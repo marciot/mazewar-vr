@@ -79,6 +79,8 @@ var WebGLActors = function (_Actors) {
 var VisibleRepresentation = function () {
     function VisibleRepresentation() {
         _classCallCheck(this, VisibleRepresentation);
+
+        this._directionVector = new THREE.Vector3();
     }
 
     _createClass(VisibleRepresentation, [{
@@ -110,9 +112,7 @@ var VisibleRepresentation = function () {
     }, {
         key: "setPosition",
         value: function setPosition(x, z) {
-            var u = Directions.toUnitVector(Directions.SOUTH).multiplyScalar(z * MazeWalls.cellDimension);
-            var v = Directions.toUnitVector(Directions.EAST).multiplyScalar(x * MazeWalls.cellDimension);
-            this.position = u.add(v);
+            this.position.set(0, this.position.y, 0).addScaledVector(Directions.toUnitVector(Directions.SOUTH), z * MazeWalls.cellDimension).addScaledVector(Directions.toUnitVector(Directions.EAST), x * MazeWalls.cellDimension);
         }
     }, {
         key: "orientTowards",
@@ -149,7 +149,7 @@ var VisibleRepresentation = function () {
     }, {
         key: "directionVector",
         get: function () {
-            var u = Directions.toUnitVector(Directions.NORTH);
+            var u = this._directionVector.copy(Directions.toUnitVector(Directions.NORTH));
             u.applyEuler(this.rotation);
             return u;
         }
@@ -216,6 +216,20 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
         _this2.animationDuration = 0.33 / (speedUp || 1);
         _this2.tween = new Tween();
         _this2.tween.whenDone(_this2.animationFinished.bind(_this2));
+
+        _this2.animationQuatFinal = new THREE.Quaternion();
+        _this2.animationDispStart = new THREE.Vector3();
+        _this2.animationDisplacement = new THREE.Vector3();
+        _this2.animationSpinAxis = new THREE.Vector3();
+        _this2.animationSpinQuat = new THREE.Quaternion();
+
+        _this2._animationDisplacementTween = function (t) {
+            this.object.position.copy(this.animationDispStart);
+            this.object.position.addScaledVector(this.animationDisplacement, t);
+        }.bind(_this2);
+        _this2._animationQuaternionTween = Tween.deltaT(function (t, dt) {
+            this.quaternion.slerp(this.animationQuatFinal, Math.min(1, dt / (1 - t)));
+        }.bind(_this2));
         return _this2;
     }
 
@@ -229,7 +243,7 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
     }, {
         key: "walkTo",
         value: function walkTo(x, z, direction) {
-            var u = Directions.toUnitVector(direction);
+            var u = this.animationDisplacement.copy(Directions.toUnitVector(direction));
             this.animateDisplacement(u.multiplyScalar(MazeWalls.cellDimension));
         }
 
@@ -238,34 +252,27 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
     }, {
         key: "turnTowards",
         value: function turnTowards(direction) {
-            var quaternion = new THREE.Quaternion();
+            var quaternion = this.animationQuatFinal;
             quaternion.setFromUnitVectors(Directions.toUnitVector(Directions.NORTH), Directions.toUnitVector(direction));
             this.animateRoll(quaternion);
         }
     }, {
         key: "animateDisplacement",
         value: function animateDisplacement(displacement, easing, duration) {
-            var _this3 = this;
-
-            var startPosition = new THREE.Vector3().copy(this.object.position);
-            this.tween.add(duration || this.animationDuration, easing, function (t) {
-                _this3.object.position.copy(startPosition);
-                _this3.object.position.addScaledVector(displacement, t);
-            });
+            this.animationDispStart.copy(this.object.position);
+            this.animationDisplacement.copy(displacement);
+            this.tween.add(duration || this.animationDuration, easing, this._animationDisplacementTween);
         }
     }, {
         key: "animateRoll",
         value: function animateRoll(finalQuaternion) {
-            var _this4 = this;
-
-            this.tween.add(this.animationDuration, null, Tween.deltaT(function (t, dt) {
-                _this4.quaternion.slerp(finalQuaternion, Math.min(1, dt / (1 - t)));
-            }));
+            this.animationQuatFinal.copy(finalQuaternion);
+            this.tween.add(this.animationDuration, null, this._animationQuaternionTween);
         }
     }, {
         key: "animateFall",
         value: function animateFall(isEnemy) {
-            var _this5 = this;
+            var _this3 = this;
 
             var spinVelocity = 2;
             var spinEasing = tweenFunctions.linear;
@@ -274,9 +281,13 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
             var fallEasing = isEnemy ? tweenFunctions.easeInQuart : tweenFunctions.easeInSine;
             var fallDistance = 200;
             var fallDuration = 5;
-            this.animateDisplacement(Directions.toUnitVector(Directions.DOWN).multiplyScalar(fallDistance), fallEasing, fallDuration);
+            this.animateDisplacement(this.animationDisplacement.copy(Directions.toUnitVector(Directions.DOWN)).multiplyScalar(fallDistance), fallEasing, fallDuration);
+
+            this.animationSpinAxis.copy(this.directionVector);
+
             this.tween.add(fallDuration, spinEasing, Tween.deltaT(function (t, dt) {
-                return _this5.object.rotation.z += dt * spinVelocity;
+                _this3.animationSpinQuat.setFromAxisAngle(_this3.animationSpinAxis, dt * spinVelocity);
+                _this3.object.quaternion.multiply(_this3.animationSpinQuat);
             }));
         }
     }, {
@@ -339,31 +350,31 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
     function EyeRepresentation() {
         _classCallCheck(this, EyeRepresentation);
 
-        var _this6 = _possibleConstructorReturn(this, (EyeRepresentation.__proto__ || Object.getPrototypeOf(EyeRepresentation)).call(this));
+        var _this4 = _possibleConstructorReturn(this, (EyeRepresentation.__proto__ || Object.getPrototypeOf(EyeRepresentation)).call(this));
 
         if (!staticGeometry.eye) {
-            staticGeometry.eye = new THREE.SphereGeometry(eyeRadius, 32, 32);
+            staticGeometry.eye = new THREE.SphereBufferGeometry(eyeRadius, 32, 32);
             staticGeometry.eye.rotateY(Math.PI);
         }
         var mesh = new THREE.Mesh(staticGeometry.eye, theme.eyeMaterial);
 
-        _this6.sound = new ActorSounds();
-        _this6.sound.startWalking();
+        _this4.sound = new ActorSounds();
+        _this4.sound.startWalking();
 
-        _this6.object = new THREE.Object3D();
-        _this6.object.add(mesh);
-        _this6.object.position.y = eyeHeight;
-        _this6.object.add(_this6.sound.representation);
+        _this4.object = new THREE.Object3D();
+        _this4.object.add(mesh);
+        _this4.object.position.y = eyeHeight;
+        _this4.object.add(_this4.sound.representation);
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
             // neighboring corridor. This is important to keep light
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 2;
-            _this6.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
-            _this6.object.add(_this6.headLight);
+            _this4.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
+            _this4.object.add(_this4.headLight);
         }
-        return _this6;
+        return _this4;
     }
 
     _createClass(EyeRepresentation, [{
@@ -411,17 +422,17 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
     function MissileRepresentation(material) {
         _classCallCheck(this, MissileRepresentation);
 
-        var _this7 = _possibleConstructorReturn(this, (MissileRepresentation.__proto__ || Object.getPrototypeOf(MissileRepresentation)).call(this, 10));
+        var _this5 = _possibleConstructorReturn(this, (MissileRepresentation.__proto__ || Object.getPrototypeOf(MissileRepresentation)).call(this, 10));
 
         if (!staticGeometry.missile) {
-            staticGeometry.missile = new THREE.TorusKnotGeometry(0.1, 0.02, 18);
+            staticGeometry.missile = new THREE.TorusKnotBufferGeometry(0.1, 0.02, 18);
             staticGeometry.missile.rotateZ(-Math.PI / 2);
         }
         var mesh = new THREE.Mesh(staticGeometry.missile, material);
 
-        _this7.object = new THREE.Object3D();
-        _this7.object.add(mesh);
-        _this7.object.position.y = 1.5;
+        _this5.object = new THREE.Object3D();
+        _this5.object.add(mesh);
+        _this5.object.position.y = 1.5;
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
@@ -429,9 +440,9 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 2.45;
             var light = new THREE.PointLight(material.color, 0.5, fadeDistance);
-            _this7.object.add(light);
+            _this5.object.add(light);
         }
-        return _this7;
+        return _this5;
     }
 
     _createClass(MissileRepresentation, [{
@@ -465,44 +476,44 @@ var MapRepresentation = function (_VisibleRepresentatio2) {
     function MapRepresentation() {
         _classCallCheck(this, MapRepresentation);
 
-        var _this8 = _possibleConstructorReturn(this, (MapRepresentation.__proto__ || Object.getPrototypeOf(MapRepresentation)).call(this));
+        var _this6 = _possibleConstructorReturn(this, (MapRepresentation.__proto__ || Object.getPrototypeOf(MapRepresentation)).call(this));
 
-        _this8.cellSize = 8;
-        _this8.scoreHeight = 16;
+        _this6.cellSize = 8;
+        _this6.scoreHeight = 16;
 
         var maxRats = 8;
 
-        var mazePixelWidth = maze.mazeCols * _this8.cellSize;
-        _this8.mazePixelHeight = maze.mazeRows * _this8.cellSize;
-        var listPixelHeight = maxRats * _this8.scoreHeight;
-        var bothPixelHeight = _this8.mazePixelHeight + listPixelHeight;
+        var mazePixelWidth = maze.mazeCols * _this6.cellSize;
+        _this6.mazePixelHeight = maze.mazeRows * _this6.cellSize;
+        var listPixelHeight = maxRats * _this6.scoreHeight;
+        var bothPixelHeight = _this6.mazePixelHeight + listPixelHeight;
 
-        _this8.mapCanvas = document.createElement("canvas");
-        _this8.mapCanvas.width = mazePixelWidth;
-        _this8.mapCanvas.height = bothPixelHeight;
+        _this6.mapCanvas = document.createElement("canvas");
+        _this6.mapCanvas.width = mazePixelWidth;
+        _this6.mapCanvas.height = bothPixelHeight;
 
-        var mapGlHeight = bothPixelHeight / _this8.mazePixelHeight * 0.1;
+        var mapGlHeight = bothPixelHeight / _this6.mazePixelHeight * 0.1;
         var mapGlWidth = 0.2;
 
-        _this8.mapTexture = new THREE.Texture(_this8.mapCanvas);
+        _this6.mapTexture = new THREE.Texture(_this6.mapCanvas);
 
-        _this8.drawMap();
+        _this6.drawMap();
         //this.drawScores();
 
-        _this8.mapMaterial = new THREE.MeshBasicMaterial({
+        _this6.mapMaterial = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             shading: THREE.FlatShading,
-            map: _this8.mapTexture,
+            map: _this6.mapTexture,
             side: THREE.FrontSide,
             transparent: true,
             opacity: 0.5
         });
 
         var geometry = new THREE.PlaneGeometry(mapGlWidth, mapGlHeight);
-        var plane = new THREE.Mesh(geometry, _this8.mapMaterial);
+        var plane = new THREE.Mesh(geometry, _this6.mapMaterial);
 
-        _this8.object = plane;
-        return _this8;
+        _this6.object = plane;
+        return _this6;
     }
 
     _createClass(MapRepresentation, [{
@@ -582,19 +593,21 @@ var CandleLight = function () {
 
         this.light = new THREE.PointLight(0xFFAA00, 0.25, fadeDistance, 2);
         this.nextFlickerTime = 0;
+        this.targetIntensity = 0;
     }
 
     _createClass(CandleLight, [{
         key: "flicker",
-        value: function flicker() {
+        value: function flicker(dt) {
             var smoothingFactor = 0.25;
-            var flickerInterval = 100;
+            var flickerInterval = 0.1;
             var minIntensity = 0.3;
             var maxIntensity = 0.5;
 
-            if (Date.now() > this.nextFlickerTime) {
-                this.targetIntensity = minIntensity + Math.random() * (maxIntensity - minIntensity);
-                this.nextFlickerTime = Date.now() + Math.random() * flickerInterval;
+            this.nextFlickerTime -= dt;
+            if (this.nextFlickerTime < 0) {
+                this.targetIntensity = Math.random() * (maxIntensity - minIntensity) + minIntensity;
+                this.nextFlickerTime = Math.random() * flickerInterval;
             } else {
                 this.light.intensity = this.light.intensity * (1 - smoothingFactor) + this.targetIntensity * smoothingFactor;
             }
@@ -618,24 +631,24 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
     function SelfRepresentation(camera) {
         _classCallCheck(this, SelfRepresentation);
 
-        var _this9 = _possibleConstructorReturn(this, (SelfRepresentation.__proto__ || Object.getPrototypeOf(SelfRepresentation)).call(this));
+        var _this7 = _possibleConstructorReturn(this, (SelfRepresentation.__proto__ || Object.getPrototypeOf(SelfRepresentation)).call(this));
 
-        _this9.map = new MapRepresentation();
+        _this7.map = new MapRepresentation();
 
-        _this9.body = new SelfBody(camera);
-        _this9.body.carry(_this9.map);
+        _this7.body = new SelfBody(camera);
+        _this7.body.carry(_this7.map);
 
-        _this9.object = _this9.body.getNeck();
+        _this7.object = _this7.body.getNeck();
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
             // neighboring corridor. This is important to keep light
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 7;
-            _this9.candle = new CandleLight(fadeDistance);
-            _this9.body.carry(_this9.candle);
+            _this7.candle = new CandleLight(fadeDistance);
+            _this7.body.carry(_this7.candle);
         }
-        return _this9;
+        return _this7;
     }
 
     _createClass(SelfRepresentation, [{
@@ -666,13 +679,10 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
         key: "animate",
         value: function animate(dt) {
             _get(SelfRepresentation.prototype.__proto__ || Object.getPrototypeOf(SelfRepresentation.prototype), "animate", this).call(this, dt);
-            if (this.isFalling) {
-                return;
-            }
 
             this.body.update();
             if (this.candle) {
-                this.candle.flicker();
+                this.candle.flicker(dt);
             }
         }
     }, {
@@ -711,7 +721,7 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
     }, {
         key: "directionVector",
         get: function () {
-            var u = Directions.toUnitVector(Directions.NORTH);
+            var u = this._directionVector.copy(Directions.toUnitVector(Directions.NORTH));
             u.applyEuler(this.body.getHead().rotation);
             return u;
         }
@@ -768,6 +778,8 @@ var SelfBody = function () {
         }
         this.motionTracker = new MotionTracker(this.updateBody.bind(this), recenterCallback);
         motionTracker = this.motionTracker;
+
+        this.headsetOrientationVector = new THREE.Vector3();
     }
 
     _createClass(SelfBody, [{
@@ -811,7 +823,7 @@ var SelfBody = function () {
              * The bearing is used to set the direction of the
              * body, the azimuth is ignored for now.
              */
-            var u = Directions.toUnitVector(Directions.NORTH);
+            var u = this.headsetOrientationVector.copy(Directions.toUnitVector(Directions.NORTH));
             u.applyQuaternion(headsetOrientation);
             var projectionMagn = Math.sqrt(u.x * u.x + u.z * u.z);
             var headsetBearing = Math.atan2(u.x, -u.z);
@@ -836,12 +848,6 @@ var SelfBody = function () {
     }, {
         key: "update",
         value: function update() {
-            /*if(this.locked) {
-                // While the player dies and is falling through the
-                // abbyss, stop updating the position from the
-                // headset.
-                return;
-            }*/
             this.motionTracker.update();
         }
     }, {
