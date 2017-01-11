@@ -493,21 +493,23 @@ class CandleLight {
     constructor(fadeDistance) {
         this.light = new THREE.PointLight(0xFFAA00, 0.25, fadeDistance, 2);
         this.nextFlickerTime = 0;
+        this.targetIntensity = 0;
     }
 
     get representation() {
         return this.light;
     }
 
-    flicker() {
+    flicker(dt) {
         const smoothingFactor = 0.25;
-        const flickerInterval = 100;
+        const flickerInterval = 0.1;
         const minIntensity    = 0.3;
         const maxIntensity    = 0.5;
 
-        if(Date.now() > this.nextFlickerTime) {
-            this.targetIntensity = minIntensity + Math.random() * (maxIntensity - minIntensity);
-            this.nextFlickerTime = Date.now()   + Math.random() * flickerInterval;
+        this.nextFlickerTime -= dt;
+        if(this.nextFlickerTime < 0) {
+            this.targetIntensity = Math.random() * (maxIntensity - minIntensity) + minIntensity;
+            this.nextFlickerTime = Math.random() * flickerInterval;
         } else {
             this.light.intensity =
                 this.light.intensity * (1 - smoothingFactor) +
@@ -572,7 +574,7 @@ class SelfRepresentation extends AnimatedRepresentation {
 
         this.body.update();
         if(this.candle) {
-            this.candle.flicker();
+            this.candle.flicker(dt);
         }
     }
 
