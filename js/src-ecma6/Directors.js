@@ -45,24 +45,24 @@ class RoboticDirector extends Director {
     dispose() {
     }
 
+    static flipCoin() {
+        return Math.floor(Math.random()*2);
+    }
+
     // Chooses a direction by considering all possibilities and
     // giving a bias towards moving forwards.
     chooseDirection() {
-        function flipCoin() {
-            return Math.floor(Math.random()*2);
-        }
-
         var canGoStraight = this.actor.canWalk(this.actor.facing);
         var canGoLeft     = this.actor.canWalk(Directions.leftFrom(this.actor.facing));
         var canGoRight    = this.actor.canWalk(Directions.rightFrom(this.actor.facing));
 
         // 1:1 odds of going straight if there is the possibility to turn.
-        if(canGoStraight && (!(canGoLeft || canGoRight) || flipCoin())) {
+        if(canGoStraight && (!(canGoLeft || canGoRight) || RoboticDirector.flipCoin())) {
             return this.actor.facing;
         }
 
         // 1:1 odds of going left or right, or about-face if no other choice.
-        if(flipCoin()) {
+        if(RoboticDirector.flipCoin()) {
             // Try to go right, then left, then reverse
             if(canGoRight) {
                 return Directions.rightFrom(this.actor.facing);

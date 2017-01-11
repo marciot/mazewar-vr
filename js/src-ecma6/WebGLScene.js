@@ -58,11 +58,9 @@ class MazeWalls extends Maze {
     constructor(a, b) {
         super(a, b);
 
-        this.wallHeight = 2.5;
-        this.geometry = new THREE.Geometry();
+        this.wallHeight   = 2.5;
 
-        this.forAll(this.addWalls);
-        
+        this.geometry = this.buildMazeBufferGeometry();
         var walls = new THREE.Mesh(this.geometry, theme.wallMaterial);
 
         this.maze = new THREE.Object3D();
@@ -76,48 +74,70 @@ class MazeWalls extends Maze {
         }
     }
 
-    addWalls(x,z) {
-        if(!this.getCell(x,z)) {
-            if(this.getAdjacentCell(x,z, Directions.NORTH)) {
-                this.addWall(x, z, Directions.NORTH);
-            }
-            if(this.getAdjacentCell(x,z, Directions.SOUTH)) {
-                this.addWall(x, z, Directions.SOUTH);
-            }
-            if(this.getAdjacentCell(x,z, Directions.EAST)) {
-                this.addWall(x, z, Directions.EAST);
-            }
-            if(this.getAdjacentCell(x,z, Directions.WEST)) {
-                this.addWall(x, z, Directions.WEST);
-            }
-        }
-    }
+    buildMazeBufferGeometry() {
+        var me = this;
 
-    addWall(x, z, direction) {
-        var geometry = new THREE.PlaneGeometry(MazeWalls.cellDimension, this.wallHeight);
-        var plane = new THREE.Mesh(geometry, theme.wallMaterial);
-        plane.position.y = this.wallHeight/2;
-        switch(direction) {
-            case 0x1: /* North */
-                plane.position.z = -MazeWalls.cellDimension/2;
-                break;
-            case 0x2: /* East */
-                plane.rotation.y = -Math.PI/2;
-                plane.position.x = MazeWalls.cellDimension/2;
-                break;
-            case 0x4: /* South */
-                plane.position.z = MazeWalls.cellDimension/2;
-                plane.rotation.y = Math.PI;
-                break;
-            case 0x8: /* West */
-                plane.rotation.y = Math.PI/2;
-                plane.position.x = -MazeWalls.cellDimension/2;
-                break;
+        function addWall(x, z, direction) {
+            var plane = new THREE.Mesh(wallGeometry, theme.wallMaterial);
+            plane.position.y = me.wallHeight/2;
+            switch(direction) {
+                case 0x1: /* North */
+                    plane.position.z = -MazeWalls.cellDimension/2;
+                    break;
+                case 0x2: /* East */
+                    plane.rotation.y = -Math.PI/2;
+                    plane.position.x = MazeWalls.cellDimension/2;
+                    break;
+                case 0x4: /* South */
+                    plane.position.z = MazeWalls.cellDimension/2;
+                    plane.rotation.y = Math.PI;
+                    break;
+                case 0x8: /* West */
+                    plane.rotation.y = Math.PI/2;
+                    plane.position.x = -MazeWalls.cellDimension/2;
+                    break;
+            }
+            plane.position.x += MazeWalls.cellDimension*x;
+            plane.position.z += MazeWalls.cellDimension*z;
+            plane.updateMatrix();
+            mazeGeometry.mergeMesh(plane);
         }
-        plane.position.x += MazeWalls.cellDimension*x;
-        plane.position.z += MazeWalls.cellDimension*z;
-        plane.updateMatrix();
-        this.geometry.merge(plane.geometry, plane.matrix);
+
+        function addWalls(x,z) {
+            if(!me.getCell(x,z)) {
+                if(me.getAdjacentCell(x,z, Directions.NORTH)) {
+                    addWall(x, z, Directions.NORTH);
+                }
+                if(me.getAdjacentCell(x,z, Directions.SOUTH)) {
+                    addWall(x, z, Directions.SOUTH);
+                }
+                if(me.getAdjacentCell(x,z, Directions.EAST)) {
+                    addWall(x, z, Directions.EAST);
+                }
+                if(me.getAdjacentCell(x,z, Directions.WEST)) {
+                    addWall(x, z, Directions.WEST);
+                }
+            }
+        }
+
+        /* We build the maze geometry by positioning and merging wallGeometry (a plane) into
+         * a larger mazeGeometry. We then convert the Geometry into BufferGeometry to save
+         * memory.
+         */
+
+        const wallGeometry = new THREE.PlaneGeometry(MazeWalls.cellDimension, this.wallHeight);
+        const mazeGeometry = new THREE.Geometry();
+        this.forAll(addWalls);
+        mazeGeometry.mergeVertices();
+
+        const bufferGeometry = new THREE.BufferGeometry();
+        bufferGeometry.fromGeometry(mazeGeometry);
+
+        /* Delete the temporary geometry */
+        wallGeometry.dispose();
+        mazeGeometry.dispose();
+
+        return bufferGeometry;
     }
 
     get representation() {
@@ -152,7 +172,7 @@ class Theme {
         var texture = loader.load(texture);
         texture.anisotropy = renderer.getMaxAnisotropy();
 
-        var geometry = new THREE.SphereGeometry(500, 60, 40);
+        var geometry = new THREE.SphereBufferGeometry(500, 60, 40);
 
         var uniforms = {
             texture: { type: 't', value: texture }

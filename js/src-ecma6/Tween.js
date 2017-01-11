@@ -1,20 +1,36 @@
 class Tween {
     constructor() {
         this.tasks = [];
+        this.recycledTasks = [];
+
+        this.linearEasing = function(x) {return x};
     }
 
     add(duration, easing, task, min, max, start, end) {
-        this.tasks.push({
-            duration: duration,
-            task: task,
-            value: 0,
-            easing: easing ? easing : t => t,
-            min:   (typeof min   !== "undefined") ? min   : 0,
-            max:   (typeof max   !== "undefined") ? max   : 1,
-            start: (typeof start !== "undefined") ? start : 0,
-            end:   (typeof end   !== "undefined") ? end   : 1,
-        });
+        var t = this.getNewTask();
+        t.duration = duration;
+        t.task     = task;
+        t.value    = 0;
+        t.easing   = easing ? easing : this.linearEasing;
+        t.min      = (typeof min   !== "undefined") ? min   : 0;
+        t.max      = (typeof max   !== "undefined") ? max   : 1;
+        t.start    = (typeof start !== "undefined") ? start : 0;
+        t.end      = (typeof end   !== "undefined") ? end   : 1;
+        this.tasks.push(t);
         update(0);
+    }
+
+    getNewTask() {
+        if(this.recycledTasks.length) {
+            return this.recycledTasks.pop();
+        } else {
+            return {};
+        }
+    }
+
+    recycleTask(index) {
+        this.recycledTasks.push(this.tasks[index]);
+        this.tasks.splice(index,1);
     }
 
     update(dt) {
@@ -27,7 +43,7 @@ class Tween {
             // Once t exceeds 1, remove it from task queue, but
             // also run last time with t.value clamped to 1.
             if(t.value > 1) {
-                this.tasks.splice(i,1);
+                this.recycleTask(i);
                 t.value = 1;
                 if(this.tasks.length === 0) {
                     lastTaskRan = true;

@@ -50,6 +50,10 @@ class WebGLActors extends Actors {
 
 // VisibleRepresentations have a visual representation, generally a THREE.Mesh
 class VisibleRepresentation {
+    constructor() {
+        this._directionVector = new THREE.Vector3();
+    }
+
     dispose() {
     }
 
@@ -99,9 +103,9 @@ class VisibleRepresentation {
     }
     
     setPosition(x, z) {
-        var u = Directions.toUnitVector(Directions.SOUTH).multiplyScalar(z * MazeWalls.cellDimension);
-        var v = Directions.toUnitVector(Directions.EAST ).multiplyScalar(x * MazeWalls.cellDimension);
-        this.position = u.add(v);
+        this.position.set(0,this.position.y,0)
+            .addScaledVector(Directions.toUnitVector(Directions.SOUTH), z * MazeWalls.cellDimension)
+            .addScaledVector(Directions.toUnitVector(Directions.EAST),  x * MazeWalls.cellDimension);
     }
     
     orientTowards(direction) {
@@ -112,7 +116,7 @@ class VisibleRepresentation {
     }
 
     get directionVector() {
-        var u = Directions.toUnitVector(Directions.NORTH);
+        var u = this._directionVector.copy(Directions.toUnitVector(Directions.NORTH));
         u.applyEuler(this.rotation);
         return u;
     }
@@ -167,6 +171,19 @@ class AnimatedRepresentation extends VisibleRepresentation {
         this.animationDuration         = 0.33 / (speedUp || 1);
         this.tween = new Tween();
         this.tween.whenDone(this.animationFinished.bind(this));
+
+        this.animationQuatFinal    = new THREE.Quaternion();
+        this.animationDispStart    = new THREE.Vector3();
+        this.animationDisplacement = new THREE.Vector3();
+
+        this._animationDisplacementTween = function(t) {
+            this.object.position.copy(this.animationDispStart);
+            this.object.position.addScaledVector(this.animationDisplacement, t);
+        }.bind(this);
+        this._animationQuaternionTween = Tween.deltaT(
+            (function(t, dt) {
+                this.quaternion.slerp(this.animationQuatFinal, Math.min(1, dt/(1-t)));
+            }).bind(this));
     }
     
     dispose() {
@@ -176,13 +193,13 @@ class AnimatedRepresentation extends VisibleRepresentation {
     }
 
     walkTo(x, z, direction) {
-        var u = Directions.toUnitVector(direction);
+        var u = this.animationDisplacement.copy(Directions.toUnitVector(direction));
         this.animateDisplacement(u.multiplyScalar(MazeWalls.cellDimension));
     }
 
     /* Animated turn until the Actor faces the direction indicated by the unit vector  */
     turnTowards(direction) {
-        var quaternion = new THREE.Quaternion();
+        var quaternion = this.animationQuatFinal;
         quaternion.setFromUnitVectors(
             Directions.toUnitVector(Directions.NORTH),
             Directions.toUnitVector(direction)
@@ -191,22 +208,17 @@ class AnimatedRepresentation extends VisibleRepresentation {
     }
 
     animateDisplacement(displacement, easing, duration) {
-        var startPosition = new THREE.Vector3().copy(this.object.position);
+        this.animationDispStart.copy(this.object.position);
+        this.animationDisplacement.copy(displacement);
         this.tween.add(duration || this.animationDuration, easing,
-            t => {
-                this.object.position.copy(startPosition);
-                this.object.position.addScaledVector(displacement, t);
-            }
+            this._animationDisplacementTween
         );
     }
 
     animateRoll(finalQuaternion) {
+        this.animationQuatFinal.copy(finalQuaternion);
         this.tween.add(this.animationDuration, null,
-            Tween.deltaT(
-                (t, dt) => {
-                    this.quaternion.slerp(finalQuaternion, Math.min(1, dt/(1-t)));
-                }
-            )
+            this._animationQuaternionTween
         );
     }
 
@@ -219,7 +231,8 @@ class AnimatedRepresentation extends VisibleRepresentation {
         const fallDistance = 200;
         const fallDuration = 5;
         this.animateDisplacement(
-            Directions.toUnitVector(Directions.DOWN).multiplyScalar(fallDistance),
+            this.animationDisplacement.copy(Directions.toUnitVector(Directions.DOWN))
+                .multiplyScalar(fallDistance),
             fallEasing,
             fallDuration
         );
@@ -277,7 +290,7 @@ class EyeRepresentation extends AnimatedRepresentation {
         super();
 
         if(!staticGeometry.eye) {
-            staticGeometry.eye = new THREE.SphereGeometry( eyeRadius, 32, 32 );
+            staticGeometry.eye = new THREE.SphereBufferGeometry( eyeRadius, 32, 32 );
             staticGeometry.eye.rotateY(Math.PI);
         }
         var mesh = new THREE.Mesh(staticGeometry.eye, theme.eyeMaterial);
@@ -335,7 +348,7 @@ class MissileRepresentation extends AnimatedRepresentation {
         super(10);
 
         if(!staticGeometry.missile) {
-            staticGeometry.missile = new THREE.TorusKnotGeometry(0.1, 0.02, 18);
+            staticGeometry.missile = new THREE.TorusKnotBufferGeometry(0.1, 0.02, 18);
             staticGeometry.missile.rotateZ(-Math.PI/2);
         }
         var mesh  = new THREE.Mesh(staticGeometry.missile, material);
@@ -515,7 +528,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     }
 
     get directionVector() {
-        var u = Directions.toUnitVector(Directions.NORTH);
+        var u = this._directionVector.copy(Directions.toUnitVector(Directions.NORTH));
         u.applyEuler(this.body.getHead().rotation);
         return u;
     }
@@ -627,6 +640,8 @@ class SelfBody {
         }
         this.motionTracker = new MotionTracker(this.updateBody.bind(this), recenterCallback);
         motionTracker = this.motionTracker;
+
+        this.headsetOrientationVector = new THREE.Vector3();
     }
 
     getNeck() {
@@ -666,7 +681,7 @@ class SelfBody {
          * The bearing is used to set the direction of the
          * body, the azimuth is ignored for now.
          */
-        var u = Directions.toUnitVector(Directions.NORTH);
+        var u = this.headsetOrientationVector.copy(Directions.toUnitVector(Directions.NORTH));
         u.applyQuaternion(headsetOrientation);
         var projectionMagn   = Math.sqrt(u.x*u.x + u.z*u.z);
         var headsetBearing   = Math.atan2(u.x, -u.z);

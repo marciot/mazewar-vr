@@ -23,6 +23,12 @@ Directions = Object.freeze({
     "WEST"  : 0x8,
     "UP"    : 0x10,
     "DOWN"  : 0x20,
+    "NORTH_VECTOR": Object.freeze(new THREE.Vector3(0, 0, -1)),
+    "EAST_VECTOR":  Object.freeze(new THREE.Vector3(1, 0,  0)),
+    "SOUTH_VECTOR": Object.freeze(new THREE.Vector3(0, 0,  1)),
+    "WEST_VECTOR":  Object.freeze(new THREE.Vector3(-1, 0, 0)),
+    "UP_VECTOR":    Object.freeze(new THREE.Vector3(0, 1,  0)),
+    "DOWN_VECTOR":  Object.freeze(new THREE.Vector3(0, -1, 0)),
     fromInteger: function(i) {
         switch(i%4) {
             case 0: return Directions.NORTH;
@@ -41,12 +47,12 @@ Directions = Object.freeze({
     },
     toUnitVector: function(d) {
         switch(d) {
-            case Directions.NORTH: return new THREE.Vector3(0, 0, -1);
-            case Directions.EAST:  return new THREE.Vector3(1, 0,  0);
-            case Directions.SOUTH: return new THREE.Vector3(0, 0,  1);
-            case Directions.WEST:  return new THREE.Vector3(-1, 0, 0);
-            case Directions.UP:    return new THREE.Vector3(0, 1,  0);
-            case Directions.DOWN:  return new THREE.Vector3(0, -1, 0);
+            case Directions.NORTH: return Directions.NORTH_VECTOR;
+            case Directions.EAST:  return Directions.EAST_VECTOR;
+            case Directions.SOUTH: return Directions.SOUTH_VECTOR;
+            case Directions.WEST:  return Directions.WEST_VECTOR;
+            case Directions.UP:    return Directions.UP_VECTOR;
+            case Directions.DOWN:  return Directions.DOWN_VECTOR;
         }
     },
     rightFrom: function(d) {
