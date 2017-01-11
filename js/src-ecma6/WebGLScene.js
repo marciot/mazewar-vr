@@ -195,21 +195,22 @@ class Theme {
     }
 
     static getOpacityFunc(material) {
+        const alwaysTransparent = material.hasOwnProperty("map");
         material.transparent = true;
         material.opacity     = 0;
         material.visible     = false;
 
         return t => {
             if(t < 0.05) {
-                material.transparent = false;
+                material.transparent = false || alwaysTransparent;
                 material.visible     = false;
                 material.opacity     = 1;
             } else if(t > 0.95) {
-                material.transparent = false;
+                material.transparent = false || alwaysTransparent;
                 material.visible     = true;
                 material.opacity     = 1;
             } else {
-                material.transparent = true;
+                material.transparent = true  || alwaysTransparent;
                 material.visible     = true;
                 material.opacity     = t;
             }
@@ -218,10 +219,10 @@ class Theme {
 
     fadeEffect(callback) {
         this.isFading = true;
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 0, 1, 0.0, 0.2);
         tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.eyeMaterial),  0, 1, 0.2, 0.6);
         tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.wallMaterial), 0, 1, 0.6, 1.0);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 1, 0, 0.8, 1.0);
         tween.whenDone(() => {
             overlay.chooseText();
             this.isFading = false;
@@ -230,8 +231,8 @@ class Theme {
 
     showStatusMessage(str) {
         overlay.setText(str);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 0, 1, 0.0, 0.2);
-        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(theme.textMaterial), 1, 0, 0.8, 1.0);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 0, 1, 0.0, 0.2);
+        tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(ovarlay.textMaterial), 1, 0, 0.8, 1.0);
         tween.whenDone(() => {
             overlay.chooseText();
         });

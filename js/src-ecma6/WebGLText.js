@@ -1,20 +1,10 @@
 class OverlayText {
     constructor(camera) {
-        const fontName   = "gentilis";
-        const fontWeight = "regular";
-
-        var loader = new THREE.FontLoader();
-
-        loader.load( 'fonts/' + fontName + '_' + fontWeight + '.typeface.json', response => {
-            this.font = response;
-            this.createText();
-        } );
+        this.fontSizeInPixels = 50;
 
         this.obj = new THREE.Object3D();
         this.obj.add(camera);
         this.camera = camera;
-
-        this.meshes = [];
 
         /* Punish the player for dying with horrible aphorisms */
         this.textList = [
@@ -62,25 +52,45 @@ class OverlayText {
         ];
 
         this.text = this.textList[0];
+
+        this.canvas   = document.createElement("canvas");
+        this.texture  = new THREE.Texture(this.canvas);
+        this.material = new THREE.MeshBasicMaterial({
+            color:       0xffffff,
+            shading:     THREE.FlatShading,
+            map:         this.texture,
+            side:        THREE.FrontSide,
+            transparent: true,
+            opacity:     0,
+            visible:     false
+        });
+
+        var geometry = new THREE.PlaneBufferGeometry(1, 1);
+        this.plane   = new THREE.Mesh(geometry, this.material);
+        this.obj.add(this.plane);
+
+        this.chooseText();
+    }
+
+    getCanvasContext() {
+        var ctx = this.canvas.getContext("2d");
+        ctx.font = this.fontSizeInPixels + "px bold serif";
+        ctx.textBaseline = "bottom";
+        return ctx;
     }
 
     createText(str) {
-        var strLines = str || this.text.split('\n');
+        const strLines = str || this.text.split('\n');
+
+        var ctx = this.getCanvasContext();
 
         var lines = [];
         for(var i = 0; i < strLines.length; i++) {
             var text = strLines[i];
-            var geometry = new THREE.TextGeometry( text, {
-                font: this.font,
-                size: 0.03,
-                height: 0.0001
-                });
-            geometry.computeBoundingBox();            
             var line = {
-                geometry: geometry,
                 text:     text,
-                width:    geometry.boundingBox.max.x - geometry.boundingBox.min.x,
-                height:   geometry.boundingBox.max.y - geometry.boundingBox.min.y,
+                width:    ctx.measureText(text).width,
+                height:   this.fontSizeInPixels
             }
             lines.push(line);
         }
@@ -89,48 +99,38 @@ class OverlayText {
         var summedHeight = 0;
         var maxWidth     = 0;
         for(var i = 0; i < lines.length; i++) {
-            var line = lines[i];
+            const line = lines[i];
             summedHeight += line.height;
             maxWidth     = Math.max(line.width, maxWidth);
         }
 
-        // Compute the distance at which the text spans the indicated
+        // Adjust the canvas to fit the max width
+        this.canvas.width  = maxWidth;
+        this.canvas.height = summedHeight;
+
+        var ctx = this.getCanvasContext();
+
+        // Compute the width at which the text spans the indicated
         // percentage of the view port.
         const coverage = 0.50;
         const halfFovInRadians = this.camera.fov/2 * Math.PI/180;
-        const distance = (maxWidth/coverage) / (2*Math.tan(halfFovInRadians));
+        //const distance = (glWidth/coverage) /(2*Math.tan(halfFovInRadians));
+        const distance = MazeWalls.cellDimension/2 * 0.9;
+        const glWidth = distance * (2*Math.tan(halfFovInRadians)) * coverage;
 
-        // Place the text on the screen
-        var startY = 0.5 * summedHeight;
+        // Paint the text on the canvas
+        var startY = 0;
         for(var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            var textMesh = new THREE.Mesh(line.geometry, theme.textMaterial);
-            textMesh.position.z = -distance;
-            textMesh.position.x = -0.5 * maxWidth;
-            textMesh.position.y = startY;
-            this.obj.add(textMesh);
-            this.meshes.push(textMesh);
-
-            // Delete references so the array can be disposed
-            line.geometry = null;
-            line.text     = null;
-
-            // Advance ti next line
-            startY -= line.height;
+            startY += line.height;
+            ctx.fillText(lines[i].text, 0, startY);
         }
-    }
 
-    disposeText() {
-        for(var i = 0; i < this.meshes.length; i++) {
-            var textMesh = this.meshes[i];
-            this.obj.remove(textMesh);
-            textMesh.geometry.dispose();
-        }
-        this.meshes = [];
+        this.texture.needsUpdate = true;
+        this.plane.scale.set(glWidth, glWidth * summedHeight/maxWidth, 1);
+        this.plane.position.z = -distance;
     }
 
     setText(str) {
-        this.disposeText();
         this.text = str;
         this.createText();
     }
@@ -141,5 +141,9 @@ class OverlayText {
 
     get representation() {
         return this.obj;
+    }
+
+    get textMaterial() {
+            return this.material;
     }
 }
