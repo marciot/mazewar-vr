@@ -402,6 +402,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         .button {
             display: inline-block;
         }
+
+        #version {
+            position:  absolute;
+            bottom:    8px;
+            left:      0px;
+            font-size: small;
+        }
     </style>
     <div class="darken" id="overlay">
     <swipe-pages>
@@ -418,6 +425,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <div><div class="clickable grid-button" data-page="pageHeadsets">Headset Buying Guide</div></div>
             </div>
             <div class="footer">
+                <span id="version">Version 0.1.1</span>
             </div>
         </div>
 
@@ -1277,8 +1285,7 @@ function gotoRecommendedHeadsets() {
             e.stopPropagation();
             if(window.isCrosswalk || typeof FB === "undefined") {
                 const url = "https://www.facebook.com/sharer/sharer.php?u=http%3A//www.marciot.com/mazewar-vr/";
-                console.log("Opening url", url);
-                window.open(url, '_blank');
+                this.openHyperlink(url);
             } else {
                 console.log("Opening FB share dialog");
                 FB.ui({
@@ -1317,6 +1324,21 @@ function gotoRecommendedHeadsets() {
             shadowRoot.querySelector("#headphoneInstructions2").style.visibility = "visible";
         }
         shadowRoot.querySelector("#stereoTest").addEventListener("click", testStereo);
+
+        // Open external hyperlinks in an external browser
+        function openHyperlink(e) {
+            const url = e.target.href;
+            window.open(url, '_blank');
+        }
+        if(window.isCrosswalk) {
+            var links = shadowRoot.querySelectorAll("A");
+            var domainRegex = /^https?:\/\/((?:[\w\d-]+\.)+[\w\d]{2,})/i;
+            for(var i = 0; i < links.length; i++) {
+                if(domainRegex.test(links[i].href)) {
+                    links[i].addEventListener("click", openHyperlink);
+                }
+            }
+        }
     };
 
     AboutBoxProto.showPage = function(page) {
