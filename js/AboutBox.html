@@ -661,8 +661,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 to enable the experimental WebVR and the Gamepad extensions.
                 </p>
                 <p>
-                As a last step, you must configure a trigger button on your gamepad or controller from the
-                "Game Setup -> Control Options -> Gamepad Configuration" screen prior to starting a game.
+                While in the game, double-tap the headset with your finger to reset your view orientation.
                 </p>
             </div>
             <div>
@@ -815,13 +814,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <h1>Turn Amplification:</h1>
                 <p>
-                Turn amplification allows you to play <cite>Maze Wars VR</cite> while seated.
-                </p>When it is enabled, turning motions are amplified so that you can look directly behind you without having to get up. This increase in turning motion may cause discomfort for some people.
+                The best way to play <cite>Maze War VR</cite> is to stand and face your
+                entire body in the direction you want to move.
                 </p>
-                <p>When playing standing up, disable &quot;Turn Amplification&quot; for a more natural turning motion.
+                <p>
+                While it is not recommended, turn amplification allows you to play <cite>Maze
+                Wars VR</cite> while seated.
+                </p>
+                <p>To allow &quot;Turn Amplification&quot;, click the "Allow" button here. Then
+                start a game, put on your headset and sit comfortably and relaxed, looking
+                straight ahead. Double-tap the side of your headset. The message "View recentered.
+                Turn amplification on" will appear in your headset; you may double-tap again at any
+                time to toggle it off.
                 <div class="side-by-side">
-                <div id="enableTurnAmplification"  class="button clickable">Enabled (Default)</div>
-                <div id="disableTurnAmplification" class="button clickable">Disabled</div>
+                <div id="disableTurnAmplification" class="button clickable selected">Disallow</div>
+                <div id="enableTurnAmplification"  class="button clickable">Allow</div>
                 </div>
                 </p>
             </div>
@@ -1160,8 +1167,15 @@ function gotoRecommendedHeadsets() {
         shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
 
         function configureTurnAmplification(enabled) {
-            motionTracker.motionScaling = enabled ? 2.0 : 1.0;
+            motionTracker.turnAmplificationAllowed = enabled;
             me.swipePages.gotoPage("page1");
+            if(enabled) {
+                shadowRoot.querySelector("#enableTurnAmplification").classList.add("selected");
+                shadowRoot.querySelector("#disableTurnAmplification").classList.remove("selected");
+            } else {
+                shadowRoot.querySelector("#enableTurnAmplification").classList.remove("selected");
+                shadowRoot.querySelector("#disableTurnAmplification").classList.add("selected");
+            }
         }
         shadowRoot.querySelector("#enableTurnAmplification").addEventListener("click", configureTurnAmplification.bind(true));
         shadowRoot.querySelector("#disableTurnAmplification").addEventListener("click", configureTurnAmplification.bind(false));

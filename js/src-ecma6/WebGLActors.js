@@ -230,7 +230,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
         /* The use of separate easing functions for enemy vs self
          * allows us to see enemies when they fall with us */
         const fallEasing   = isEnemy ? tweenFunctions.easeInQuart : tweenFunctions.easeInSine;
-        const fallDistance = 200;
+        const fallDistance = 160;
         const fallDuration = 5;
         this.animateDisplacement(
             this.animationDisplacement.copy(Directions.toUnitVector(Directions.DOWN))
@@ -645,7 +645,17 @@ class SelfBody {
         this.combined.add(this.neck);
 
         function recenterCallback() {
-            theme.showStatusMessage("Recentered view.");
+            if(motionTracker.turnAmplificationAllowed) {
+                if(motionTracker.motionScaling > 1.0) {
+                    motionTracker.motionScaling = 1.0;
+                    theme.showStatusMessage("Recentered view.\nTurn amplification off.");
+                } else {
+                    motionTracker.motionScaling = 2.0;
+                    theme.showStatusMessage("Recentered view.\nTurn amplification on.");
+                }
+            } else {
+                theme.showStatusMessage("Recentered view.");
+            }
         }
         this.motionTracker = new MotionTracker(this.updateBody.bind(this), recenterCallback);
         motionTracker = this.motionTracker;

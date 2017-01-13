@@ -20,7 +20,7 @@ class MotionTracker {
 
         this.callback = callback;
 
-        this.motionScaling = 2;
+        this.motionScaling = 1;
 
         var me = this;
         this.tapDetector = new TapDetector();
@@ -207,7 +207,6 @@ class TapDetector {
                 // Click event will be dispatched when timer runs down.
                 this.tapClock.start();
             } else if(this.tapClock.getElapsedTime() > minDoubleTapTime) {
-                console.log("Double tap time", this.tapClock.getElapsedTime());
                 this.tapClock.stop();
                 this.dispatchEvent("doubletap");
             }

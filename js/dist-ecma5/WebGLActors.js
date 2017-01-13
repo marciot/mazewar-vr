@@ -279,7 +279,7 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
             /* The use of separate easing functions for enemy vs self
              * allows us to see enemies when they fall with us */
             var fallEasing = isEnemy ? tweenFunctions.easeInQuart : tweenFunctions.easeInSine;
-            var fallDistance = 200;
+            var fallDistance = 160;
             var fallDuration = 5;
             this.animateDisplacement(this.animationDisplacement.copy(Directions.toUnitVector(Directions.DOWN)).multiplyScalar(fallDistance), fallEasing, fallDuration);
 
@@ -774,7 +774,17 @@ var SelfBody = function () {
         this.combined.add(this.neck);
 
         function recenterCallback() {
-            theme.showStatusMessage("Recentered view.");
+            if (motionTracker.turnAmplificationAllowed) {
+                if (motionTracker.motionScaling > 1.0) {
+                    motionTracker.motionScaling = 1.0;
+                    theme.showStatusMessage("Recentered view.\nTurn amplification off.");
+                } else {
+                    motionTracker.motionScaling = 2.0;
+                    theme.showStatusMessage("Recentered view.\nTurn amplification on.");
+                }
+            } else {
+                theme.showStatusMessage("Recentered view.");
+            }
         }
         this.motionTracker = new MotionTracker(this.updateBody.bind(this), recenterCallback);
         motionTracker = this.motionTracker;
