@@ -16,24 +16,13 @@ var loader = new THREE.TextureLoader();
 var tween = new Tween();
 
 function setupScene() {
-    mwLog("Setting up scene");
-
     renderer = new THREE.WebGLRenderer();
 
     effect = new THREE.VREffect(renderer);
     effect.setVRDisplay(vrDisplay);
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.001, 700);
-    overlay = new OverlayText(camera);
-
-    var soundManager = new AudioManager();
-    camera.add(soundManager.listener);
-
-    window.addEventListener('resize', resize, false);
-
-    document.body.insertBefore(renderer.domElement, document.body.firstChild);
-
-    container = renderer.domElement;
+    scene = new THREE.Scene();
 
     query = parseQuery();
     switch (query.theme) {
@@ -44,9 +33,19 @@ function setupScene() {
             theme = new DayTheme(renderer);
             break;
     }
-    scene = new THREE.Scene();
     theme.addLightingToScene(scene);
     theme.addSky(scene, renderer);
+
+    overlay = new OverlayText(camera);
+
+    var soundManager = new AudioManager();
+    camera.add(soundManager.listener);
+
+    window.addEventListener('resize', resize, false);
+
+    document.body.insertBefore(renderer.domElement, document.body.firstChild);
+
+    container = renderer.domElement;
 
     // Maze walls
 
@@ -90,7 +89,7 @@ var MazeWalls = function (_Maze) {
     }
 
     _createClass(MazeWalls, [{
-        key: "buildMazeBufferGeometry",
+        key: 'buildMazeBufferGeometry',
         value: function buildMazeBufferGeometry() {
             var me = this;
 
@@ -161,7 +160,7 @@ var MazeWalls = function (_Maze) {
             return bufferGeometry;
         }
     }, {
-        key: "setIsFalling",
+        key: 'setIsFalling',
         value: function setIsFalling(isFalling) {
             // When the character is falling, it will see the maze
             // from below. Hence, it is necessary to render the
@@ -174,12 +173,12 @@ var MazeWalls = function (_Maze) {
             }
         }
     }, {
-        key: "representation",
+        key: 'representation',
         get: function () {
             return this.maze;
         }
     }], [{
-        key: "cellDimension",
+        key: 'cellDimension',
         get: function () {
             return 2;
         }
@@ -196,7 +195,7 @@ var Theme = function () {
     }
 
     _createClass(Theme, [{
-        key: "addSkydome",
+        key: 'addSkydome',
         value: function addSkydome(scene, renderer, texture, symmetric) {
             /* Reference: http://www.ianww.com/blog/2014/02/17/making-a-skydome-in-three-dot-js/ */
 
@@ -222,10 +221,10 @@ var Theme = function () {
             scene.add(this.skyBox);
         }
     }, {
-        key: "animate",
+        key: 'animate',
         value: function animate() {}
     }, {
-        key: "fadeEffect",
+        key: 'fadeEffect',
         value: function fadeEffect(callback) {
             var _this2 = this;
 
@@ -240,7 +239,7 @@ var Theme = function () {
             });
         }
     }, {
-        key: "showStatusMessage",
+        key: 'showStatusMessage',
         value: function showStatusMessage(str) {
             overlay.setText(str);
             tween.add(fadeDuration, tweenFunctions.easeInCubic, Theme.getOpacityFunc(overlay.textMaterial), 0, 1, 0.0, 0.2);
@@ -250,7 +249,7 @@ var Theme = function () {
             });
         }
     }], [{
-        key: "getOpacityFunc",
+        key: 'getOpacityFunc',
         value: function getOpacityFunc(material) {
             var alwaysTransparent = material.hasOwnProperty("map");
             material.transparent = true;
@@ -321,23 +320,22 @@ var NightTheme = function (_Theme) {
         // Sky color
         renderer.setClearColor(0x000000);
 
-        // Material for text overlay
-        _this3.textMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, visible: false });
+        _this3.overlayTextColor = "white";
         return _this3;
     }
 
     _createClass(NightTheme, [{
-        key: "addLightingToScene",
+        key: 'addLightingToScene',
         value: function addLightingToScene(scene) {
             // The player carries his own lighting in this theme
         }
     }, {
-        key: "addSky",
+        key: 'addSky',
         value: function addSky(scene, renderer) {
-            _get(NightTheme.prototype.__proto__ || Object.getPrototypeOf(NightTheme.prototype), "addSkydome", this).call(this, scene, renderer, 'textures/sky-night.jpg');
+            _get(NightTheme.prototype.__proto__ || Object.getPrototypeOf(NightTheme.prototype), 'addSkydome', this).call(this, scene, renderer, 'textures/sky-night.jpg');
         }
     }, {
-        key: "animate",
+        key: 'animate',
         value: function animate() {
             this.skyBox.rotation.x += 0.0002;
             this.skyBox.rotation.z += 0.0001;
@@ -384,13 +382,12 @@ var DayTheme = function (_Theme2) {
         // Sky color
         renderer.setClearColor(0xADD8E6);
 
-        // Material for text overlay
-        _this4.textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, visible: false });
+        _this4.overlayTextColor = "black";
         return _this4;
     }
 
     _createClass(DayTheme, [{
-        key: "addLightingToScene",
+        key: 'addLightingToScene',
         value: function addLightingToScene(scene) {
             var light = new THREE.AmbientLight(0xFFFFFF, 0.47);
             scene.add(light);
@@ -400,12 +397,12 @@ var DayTheme = function (_Theme2) {
             scene.add(directionalLight);
         }
     }, {
-        key: "addSky",
+        key: 'addSky',
         value: function addSky(scene, renderer) {
-            _get(DayTheme.prototype.__proto__ || Object.getPrototypeOf(DayTheme.prototype), "addSkydome", this).call(this, scene, renderer, 'textures/sky-day.jpg', true);
+            _get(DayTheme.prototype.__proto__ || Object.getPrototypeOf(DayTheme.prototype), 'addSkydome', this).call(this, scene, renderer, 'textures/sky-day.jpg', true);
         }
     }, {
-        key: "animate",
+        key: 'animate',
         value: function animate() {
             this.skyBox.rotation.y += 0.00025;
         }

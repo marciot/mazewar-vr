@@ -70,7 +70,7 @@ var audioManager = new AudioManager();
 
 class ActorSounds {
     constructor() {
-        const fadeDistance = MazeWalls.cellDimension * 1;
+        const fadeDistance = MazeWalls.cellDimension * 2;
         const maxDistance  = MazeWalls.cellDimension * 64;
 
         function getSoundNode(bufferLabel) {

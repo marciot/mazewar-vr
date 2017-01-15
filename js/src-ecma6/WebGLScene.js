@@ -6,24 +6,13 @@ var loader = new THREE.TextureLoader();
 var tween = new Tween();
 
 function setupScene() {
-    mwLog("Setting up scene");
-
     renderer  = new THREE.WebGLRenderer();
     
     effect    = new THREE.VREffect(renderer);
     effect.setVRDisplay(vrDisplay);
     
     camera    = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.001, 700 );
-    overlay   = new OverlayText(camera);
-
-    var soundManager = new AudioManager();
-    camera.add( soundManager.listener );
-
-    window.addEventListener('resize', resize, false);
-    
-    document.body.insertBefore(renderer.domElement, document.body.firstChild);
-    
-    container = renderer.domElement;
+    scene     = new THREE.Scene();
 
     query = parseQuery();
     switch(query.theme) {
@@ -34,9 +23,19 @@ function setupScene() {
             theme = new DayTheme(renderer);
             break;
     }
-    scene     = new THREE.Scene();
     theme.addLightingToScene(scene);
     theme.addSky(scene, renderer);
+
+    overlay   = new OverlayText(camera);
+
+    var soundManager = new AudioManager();
+    camera.add( soundManager.listener );
+
+    window.addEventListener('resize', resize, false);
+
+    document.body.insertBefore(renderer.domElement, document.body.firstChild);
+
+    container = renderer.domElement;
 
     // Maze walls
     
@@ -278,8 +277,7 @@ class NightTheme extends Theme {
         // Sky color
         renderer.setClearColor(0x000000);
 
-        // Material for text overlay
-        this.textMaterial = new THREE.MeshBasicMaterial({color: 0xFFFFFF, visible: false});
+        this.overlayTextColor = "white";
     }
 
     addLightingToScene(scene) {
@@ -329,8 +327,7 @@ class DayTheme extends Theme {
         // Sky color
         renderer.setClearColor(0xADD8E6);
 
-        // Material for text overlay
-        this.textMaterial = new THREE.MeshBasicMaterial({color: 0x000000, visible: false});
+        this.overlayTextColor = "black";
     }
 
     addLightingToScene(scene) {

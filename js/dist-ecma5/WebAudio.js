@@ -86,7 +86,7 @@ var ActorSounds = function () {
     function ActorSounds() {
         _classCallCheck(this, ActorSounds);
 
-        var fadeDistance = MazeWalls.cellDimension * 1;
+        var fadeDistance = MazeWalls.cellDimension * 2;
         var maxDistance = MazeWalls.cellDimension * 64;
 
         function getSoundNode(bufferLabel) {

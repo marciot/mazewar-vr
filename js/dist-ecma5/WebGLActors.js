@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var eyeRadius = 0.75;
-var eyeHeight = 1.6;
+var eyeHeight = 1.5;
 var chestHeight = 1.3;
 var distanceOfHeldObjectsFromChest = 0.2;
 
@@ -212,6 +212,8 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
 
         var _this2 = _possibleConstructorReturn(this, (AnimatedRepresentation.__proto__ || Object.getPrototypeOf(AnimatedRepresentation)).call(this));
 
+        var fallSpinVelocity = 2;
+
         _this2.animationFinishedCallback = null;
         _this2.animationDuration = 0.33 / (speedUp || 1);
         _this2.tween = new Tween();
@@ -230,6 +232,10 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
         _this2._animationQuaternionTween = Tween.deltaT(function (t, dt) {
             this.quaternion.slerp(this.animationQuatFinal, Math.min(1, dt / (1 - t)));
         }.bind(_this2));
+        _this2._animationFallTween = Tween.deltaT(function (t, dt) {
+            _this2.animationSpinQuat.setFromAxisAngle(_this2.animationSpinAxis, dt * fallSpinVelocity);
+            _this2.object.quaternion.multiply(_this2.animationSpinQuat);
+        });
         return _this2;
     }
 
@@ -272,9 +278,6 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
     }, {
         key: "animateFall",
         value: function animateFall(isEnemy) {
-            var _this3 = this;
-
-            var spinVelocity = 2;
             var spinEasing = tweenFunctions.linear;
             /* The use of separate easing functions for enemy vs self
              * allows us to see enemies when they fall with us */
@@ -284,11 +287,7 @@ var AnimatedRepresentation = function (_VisibleRepresentatio) {
             this.animateDisplacement(this.animationDisplacement.copy(Directions.toUnitVector(Directions.DOWN)).multiplyScalar(fallDistance), fallEasing, fallDuration);
 
             this.animationSpinAxis.copy(this.directionVector);
-
-            this.tween.add(fallDuration, spinEasing, Tween.deltaT(function (t, dt) {
-                _this3.animationSpinQuat.setFromAxisAngle(_this3.animationSpinAxis, dt * spinVelocity);
-                _this3.object.quaternion.multiply(_this3.animationSpinQuat);
-            }));
+            this.tween.add(fallDuration, spinEasing, this._animationFallTween);
         }
     }, {
         key: "stopAnimating",
@@ -350,7 +349,7 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
     function EyeRepresentation() {
         _classCallCheck(this, EyeRepresentation);
 
-        var _this4 = _possibleConstructorReturn(this, (EyeRepresentation.__proto__ || Object.getPrototypeOf(EyeRepresentation)).call(this));
+        var _this3 = _possibleConstructorReturn(this, (EyeRepresentation.__proto__ || Object.getPrototypeOf(EyeRepresentation)).call(this));
 
         if (!staticGeometry.eye) {
             staticGeometry.eye = new THREE.SphereBufferGeometry(eyeRadius, 32, 32);
@@ -358,23 +357,23 @@ var EyeRepresentation = function (_AnimatedRepresentati) {
         }
         var mesh = new THREE.Mesh(staticGeometry.eye, theme.eyeMaterial);
 
-        _this4.sound = new ActorSounds();
-        _this4.sound.startWalking();
+        _this3.sound = new ActorSounds();
+        _this3.sound.startWalking();
 
-        _this4.object = new THREE.Object3D();
-        _this4.object.add(mesh);
-        _this4.object.position.y = eyeHeight;
-        _this4.object.add(_this4.sound.representation);
+        _this3.object = new THREE.Object3D();
+        _this3.object.add(mesh);
+        _this3.object.position.y = eyeHeight;
+        _this3.object.add(_this3.sound.representation);
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
             // neighboring corridor. This is important to keep light
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 2;
-            _this4.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
-            _this4.object.add(_this4.headLight);
+            _this3.headLight = new THREE.PointLight(0xFFFFFF, 0.25, fadeDistance);
+            _this3.object.add(_this3.headLight);
         }
-        return _this4;
+        return _this3;
     }
 
     _createClass(EyeRepresentation, [{
@@ -422,7 +421,7 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
     function MissileRepresentation(material) {
         _classCallCheck(this, MissileRepresentation);
 
-        var _this5 = _possibleConstructorReturn(this, (MissileRepresentation.__proto__ || Object.getPrototypeOf(MissileRepresentation)).call(this, 10));
+        var _this4 = _possibleConstructorReturn(this, (MissileRepresentation.__proto__ || Object.getPrototypeOf(MissileRepresentation)).call(this, 10));
 
         if (!staticGeometry.missile) {
             staticGeometry.missile = new THREE.TorusKnotBufferGeometry(0.1, 0.02, 18);
@@ -430,9 +429,9 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
         }
         var mesh = new THREE.Mesh(staticGeometry.missile, material);
 
-        _this5.object = new THREE.Object3D();
-        _this5.object.add(mesh);
-        _this5.object.position.y = 1.5;
+        _this4.object = new THREE.Object3D();
+        _this4.object.add(mesh);
+        _this4.object.position.y = 1.5;
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
@@ -440,9 +439,9 @@ var MissileRepresentation = function (_AnimatedRepresentati2) {
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 2.45;
             var light = new THREE.PointLight(material.color, 0.5, fadeDistance);
-            _this5.object.add(light);
+            _this4.object.add(light);
         }
-        return _this5;
+        return _this4;
     }
 
     _createClass(MissileRepresentation, [{
@@ -476,44 +475,44 @@ var MapRepresentation = function (_VisibleRepresentatio2) {
     function MapRepresentation() {
         _classCallCheck(this, MapRepresentation);
 
-        var _this6 = _possibleConstructorReturn(this, (MapRepresentation.__proto__ || Object.getPrototypeOf(MapRepresentation)).call(this));
+        var _this5 = _possibleConstructorReturn(this, (MapRepresentation.__proto__ || Object.getPrototypeOf(MapRepresentation)).call(this));
 
-        _this6.cellSize = 8;
-        _this6.scoreHeight = 16;
+        _this5.cellSize = 8;
+        _this5.scoreHeight = 16;
 
         var maxRats = 8;
 
-        var mazePixelWidth = maze.mazeCols * _this6.cellSize;
-        _this6.mazePixelHeight = maze.mazeRows * _this6.cellSize;
-        var listPixelHeight = maxRats * _this6.scoreHeight;
-        var bothPixelHeight = _this6.mazePixelHeight + listPixelHeight;
+        var mazePixelWidth = maze.mazeCols * _this5.cellSize;
+        _this5.mazePixelHeight = maze.mazeRows * _this5.cellSize;
+        var listPixelHeight = maxRats * _this5.scoreHeight;
+        var bothPixelHeight = _this5.mazePixelHeight + listPixelHeight;
 
-        _this6.mapCanvas = document.createElement("canvas");
-        _this6.mapCanvas.width = mazePixelWidth;
-        _this6.mapCanvas.height = bothPixelHeight;
+        _this5.mapCanvas = document.createElement("canvas");
+        _this5.mapCanvas.width = mazePixelWidth;
+        _this5.mapCanvas.height = bothPixelHeight;
 
-        var mapGlHeight = bothPixelHeight / _this6.mazePixelHeight * 0.1;
+        var mapGlHeight = bothPixelHeight / _this5.mazePixelHeight * 0.1;
         var mapGlWidth = 0.2;
 
-        _this6.mapTexture = new THREE.Texture(_this6.mapCanvas);
+        _this5.mapTexture = new THREE.Texture(_this5.mapCanvas);
 
-        _this6.drawMap();
+        _this5.drawMap();
         //this.drawScores();
 
-        _this6.mapMaterial = new THREE.MeshBasicMaterial({
+        _this5.mapMaterial = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             shading: THREE.FlatShading,
-            map: _this6.mapTexture,
+            map: _this5.mapTexture,
             side: THREE.FrontSide,
             transparent: true,
             opacity: 0.5
         });
 
         var geometry = new THREE.PlaneGeometry(mapGlWidth, mapGlHeight);
-        var plane = new THREE.Mesh(geometry, _this6.mapMaterial);
+        var plane = new THREE.Mesh(geometry, _this5.mapMaterial);
 
-        _this6.object = plane;
-        return _this6;
+        _this5.object = plane;
+        return _this5;
     }
 
     _createClass(MapRepresentation, [{
@@ -631,24 +630,24 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
     function SelfRepresentation(camera) {
         _classCallCheck(this, SelfRepresentation);
 
-        var _this7 = _possibleConstructorReturn(this, (SelfRepresentation.__proto__ || Object.getPrototypeOf(SelfRepresentation)).call(this));
+        var _this6 = _possibleConstructorReturn(this, (SelfRepresentation.__proto__ || Object.getPrototypeOf(SelfRepresentation)).call(this));
 
-        _this7.map = new MapRepresentation();
+        _this6.map = new MapRepresentation();
 
-        _this7.body = new SelfBody(camera);
-        _this7.body.carry(_this7.map);
+        _this6.body = new SelfBody(camera);
+        _this6.body.carry(_this6.map);
 
-        _this7.object = _this7.body.getNeck();
+        _this6.object = _this6.body.getNeck();
 
         if (theme.useActorIllumination) {
             // Set the fade out distance just shy of the wall on a
             // neighboring corridor. This is important to keep light
             // from going through walls in a multi-player game.
             var fadeDistance = MazeWalls.cellDimension * 7;
-            _this7.candle = new CandleLight(fadeDistance);
-            _this7.body.carry(_this7.candle);
+            _this6.candle = new CandleLight(fadeDistance);
+            _this6.body.carry(_this6.candle);
         }
-        return _this7;
+        return _this6;
     }
 
     _createClass(SelfRepresentation, [{
@@ -774,13 +773,13 @@ var SelfBody = function () {
         this.combined.add(this.neck);
 
         function recenterCallback() {
-            if (motionTracker.turnAmplificationAllowed) {
+            if (motionTracker.rotationalBoostAllowed) {
                 if (motionTracker.motionScaling > 1.0) {
                     motionTracker.motionScaling = 1.0;
-                    theme.showStatusMessage("Recentered view.\nTurn amplification off.");
+                    theme.showStatusMessage("View centered.\nBoost disabled.");
                 } else {
                     motionTracker.motionScaling = 2.0;
-                    theme.showStatusMessage("Recentered view.\nTurn amplification on.");
+                    theme.showStatusMessage("View centered.\nBoost enabled.");
                 }
             } else {
                 theme.showStatusMessage("Recentered view.");

@@ -32,7 +32,16 @@ class MotionTracker {
 
         this.rotationalBoost = new RotationalBoost();
         this.helper = new SphericalOps();
+
+        this.motionModel = MotionTracker.GEARVR_EMULATION;
+
+        // The following is used with motionModel.GEARVR_EMULATION
+        this.eyeToNeckDistance = new THREE.Vector3(0, 0.075, -0.0805);
     }
+
+    static get IGNORE_POSE()         {return 0;}
+    static get GEARVR_EMULATION()    {return 1;}
+    static get POSITIONAL_TRACKING() {return 2;}
 
     resetPose() {
         this.zeroPose.copy(this.headsetPose);
@@ -75,7 +84,7 @@ class MotionTracker {
         this.callback(this.adjustedPose, this.adjustedOrientation);
     }
 
-    performMotionAdjustments() {
+    riftTracking() {
         this.adjustedPose.copy(this.headsetPose);
         this.adjustedOrientation.copy(this.headsetOrientation);
 
@@ -93,6 +102,34 @@ class MotionTracker {
         if(this.adjustedPose.length() > maxDistanceFromOrigin) {
             this.resetPose();
         }*/
+    }
+
+    gearEmulation() {
+        /* Reference:
+          https://forums.oculus.com/vip/discussion/20885/head-neck-model-extreme
+          https://product-guides.oculus.com/en-us/documentation/dk2/latest/concepts/ug-tray-start-advanced/
+         */
+        this.adjustedPose.copy(this.eyeToNeckDistance).applyQuaternion(this.headsetOrientation);
+        this.adjustedOrientation.copy(this.headsetOrientation);
+    }
+
+    ignorePose() {
+        this.adjustedPose.set(0, 0, 0);
+        this.adjustedOrientation.copy(this.headsetOrientation);
+    }
+
+    performMotionAdjustments() {
+        switch(this.motionModel) {
+            case MotionTracker.IGNORE_POSE:
+                this.ignorePose();
+                break;
+            case MotionTracker.GEARVR_EMULATION:
+                this.gearEmulation();
+                break;
+            case MotionTracker.POSITIONAL_TRACKING:
+                this.riftTracking();
+                break;
+        }
 
         if(this.motionScaling > 1) {
             this.rotationalBoost.apply(

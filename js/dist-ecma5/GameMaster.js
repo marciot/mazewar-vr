@@ -82,6 +82,9 @@ var NetworkedGame = function () {
             this.selfPlayer.name = playerName;
             this.selfPlayer.setLocalPlayer(true);
 
+            this.waitingForOpponent = true;
+            this.stateChangedCallback = stateChangedCallback;
+
             // Start networking
 
             var initialPlayer = {
@@ -119,6 +122,11 @@ var NetworkedGame = function () {
         key: "ratUpdateCallback",
         value: function ratUpdateCallback(ratId, rat) {
             var actor = this.players[ratId];
+
+            if (this.waitingForOpponent) {
+                this.stateChangedCallback("opponentAvailable");
+                this.waitingForOpponent = false;
+            }
 
             if (!actor) {
                 console.log("Creating player", ratId);

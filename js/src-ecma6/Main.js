@@ -99,23 +99,26 @@ function init() {
         if(effect.endPresent) {
             effect.endPresent();
         }
-        document.querySelector("about-box").showPage("page1");
     }
 
     function onVisibilityChange(event) {
         if (document.hidden || event.target.webkitHidden) {
             endVr();
+            document.querySelector("about-box").setOverlayVisibility(true);
         }
     }
 
     document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
     document.addEventListener("visibilitychange",       onVisibilityChange, false);
 
-    function startNetworkGame() {
-        //var name = prompt("Please enter your name");
-        const name = "Hunter";
+    function enterGame() {
         startVr();
         theme.fadeEffect();
+        gpClicker.gameStarting();
+    }
+
+    function joinNetworkGame() {
+        const name = "Hunter";
 
         function stateChangedCallback(state, error) {
             switch(state) {
@@ -125,6 +128,10 @@ function init() {
                     endVr();
                     document.querySelector("about-box").showNetworkError(error);
                     console.log("Error", error);
+                    break;
+                case "opponentAvailable":
+                    console.log("Opponent found");
+                    enterGame();
                     break;
             }
         }
@@ -139,13 +146,6 @@ function init() {
 
         game = new NetworkedGame(getWebGLPlayerFactory());
         game.startGame(hostId, name, stateChangedCallback);
-        gpClicker.gameStarting();
-    }
-
-    function startSoloGame() {
-        gpClicker.gameStarting();
-        startVr();
-        theme.fadeEffect();
     }
 
     // WebComponents initialization
@@ -154,8 +154,8 @@ function init() {
         var about = document.querySelector("about-box");
         if(about) {
             about.addCallback("gfxModeSelected",  modeSelected);
-            about.addCallback("startSoloGame",    startSoloGame);
-            about.addCallback("startNetworkGame", startNetworkGame);
+            about.addCallback("startSoloGame",    enterGame);
+            about.addCallback("startNetworkGame", joinNetworkGame);
             if(FastClick) {
                 FastClick.attach(about);
             }

@@ -178,10 +178,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.pages.classList.add("animationEnabled");
         }
         
-        this.showPage = function(newPage) {
+        this.showPage = function(newPage, referringPage) {
             if(this.currentPage === newPage) {
                 return;
             }
+            this.referringPage = referringPage || this.currentPage;
             var curEl = document.getElementById(this.currentPage);
             var newEl = document.getElementById(newPage);
             if(newEl.classList.contains("hiddenLeft")) {
@@ -203,7 +204,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         this.followLink = function(link) {
             var dataPage = link.getAttribute("data-page");
             if(dataPage) {
-                this.gotoPage(dataPage);
+                if(dataPage === "back") {
+                    this.goBack();
+                } else {
+                    this.gotoPage(dataPage, link.getAttribute("data-referrer"));
+                }
                 return;
             }
             var dataHref = link.getAttribute("data-href");
@@ -212,11 +217,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             }
         }
 
-        this.gotoPage = function(newPage) {
+        this.gotoPage = function(newPage, referrer) {
             if(newPage) {
                 history.pushState({page: newPage}, newPage);
                 this.enablePageSlide();
-                this.showPage(newPage);
+                this.showPage(newPage, referrer);
 
                 // When moving backwards, make sure that all pages
                 // ahead of me get returned to the left side
@@ -292,6 +297,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     SwipePagesProto.followLink = function(element) {
         this.pages.followLink(element);
+    }
+
+    SwipePagesProto.getReferringPage = function() {
+        return this.pages.referringPage;
     }
 
     document.registerElement('swipe-pages', {prototype: SwipePagesProto});

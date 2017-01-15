@@ -56,7 +56,6 @@ class OverlayText {
         this.canvas   = document.createElement("canvas");
         this.texture  = new THREE.Texture(this.canvas);
         this.material = new THREE.MeshBasicMaterial({
-            color:       0xffffff,
             shading:     THREE.FlatShading,
             map:         this.texture,
             side:        THREE.FrontSide,
@@ -117,6 +116,10 @@ class OverlayText {
         //const distance = (glWidth/coverage) /(2*Math.tan(halfFovInRadians));
         const distance = MazeWalls.cellDimension/2 * 0.9;
         const glWidth = distance * (2*Math.tan(halfFovInRadians)) * coverage;
+
+        if(theme) {
+            ctx.fillStyle = theme.overlayTextColor;
+        }
 
         // Paint the text on the canvas
         var startY = 0;

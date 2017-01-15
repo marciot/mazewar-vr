@@ -94,11 +94,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 width:      100%;
             }
 
-            .grid-button, .centered-button, .button {
+            .button {
                 font-size:  7vh;
             }
 
-            h1.title {
+            input {
+                font-size:  6vh;
+            }
+
+            .header h1 {
                 font-size:  10vh;
             }
         }
@@ -128,8 +132,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 max-height: 49%;
             }
 
-            .grid-button, .centered-button, .button {
+            .button {
                 font-size:  7vw;
+            }
+
+            input {
+                font-size:  6vw;
             }
 
             h1.title {
@@ -157,16 +165,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         /* A button */
 
-        .grid-button {
-            padding:    3px;
+        .button {
+            font-weight: bold;
+            color:       rgb(255,255,128);
+            text-shadow: 5px 5px rgba(0,0,0,0.5);
+            text-align:  center;
+            cursor:      pointer;
         }
 
-        .center-text, .grid-button {
-            text-align:      center;
+        .button:active, .button:hover {
+            color:       rgb(255,255,192);
+            text-shadow: 5px 5px rgba(255,255,128,0.25);
+
+            -webkit-text-stroke: 2px rgb(255,255,192);
+            -webkit-text-fill-color: rgb(64,64,32);
+        }
+
+        .side-by-side .button {
+            display: inline-block;
         }
 
         .hidden {
             display: none;
+        }
+
+        input {
+            color:            rgb(255,255,128);
+            border:           none;
+            background-color: transparent;
         }
 
         /* The overlay */
@@ -181,23 +207,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             font-family:   "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
         }
 
-        .clickable {
-            font-weight: bold;
-            color:       rgb(255,255,128);
-            text-shadow: 5px 5px rgba(0,0,0,0.5);
-
-            cursor:      pointer;
-        }
-
-        .clickable:active, .clickable:hover {
-            color:       rgb(255,255,192);
-            text-shadow: 5px 5px rgba(255,255,128,0.25);
-
-            -webkit-text-stroke: 2px rgb(255,255,192);
-            -webkit-text-fill-color: rgb(64,64,32);
-        }
-
-        h1.title {
+        .header h1 {
             color: white;
             text-align: center;
         }
@@ -206,7 +216,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             color:       white;
         }
 
-        h1.title strong {
+        .header h1 strong {
             color: yellow;
         }
 
@@ -284,6 +294,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 width:         30%;
                 height:        30%;
             }
+        }
+
+        .side-by-side.align-top {
+            align-items:     flex-start;
         }
 
         DIV.associate-links {
@@ -369,19 +383,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }
 
         @media (orientation: landscape) {
-            img.float {
-                float: right;
-                height: 25vw;
-                padding: 1em;
+            .float {
+                float:      right;
+                max-height: 25vw;
+                max-width:  30%;
+                padding:    1em;
             }
         }
 
         @media (orientation: portrait) {
-            img.float {
-                display: block;
-                height: 20vh;
-                padding: 0.5em;
-                margin: 0 auto;
+            .float {
+                display:    block;
+                max-height: 20vh;
+                max-width:  30%;
+                padding:    0.5em;
+                margin:     0 auto;
             }
         }
 
@@ -399,464 +415,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             visibility: hidden;
         }
 
-        .button {
-            display: inline-block;
-        }
-
         #version {
             position:  absolute;
             bottom:    8px;
             left:      0px;
             font-size: small;
         }
+
+        .centered {
+            text-align: center;
+        }
     </style>
     <div class="darken" id="overlay">
     <swipe-pages>
         <div class="flex-layout" id="page1">
-            <div class="header center-text">
-                <h1 class="title">Maze War <strong>VR</strong></h1>
+            <div class="header">
+                <h1>Maze War <strong>VR</strong></h1>
             </div>
             <div class="middle flex-grid six-element">
-                <div><div class="clickable grid-button" data-page="pageHelp">Help &amp; History</div></div>
-                <div><div class="clickable grid-button" id="playSolo">Play vs. Computer</div></div>
-                <div><div class="clickable grid-button" id="netPlay">Play with Friends</div></div>
-                <div><div class="clickable grid-button" data-page="pageGameSetup">Game Setup</div></div>
-                <div><div class="clickable grid-button" data-page="pageCredits">Credits</div></div>
-                <div><div class="clickable grid-button" data-page="pageHeadsets">Headset Buying Guide</div></div>
+                <div class="button" data-page="pageHelp">Help &amp; History</div>
+                <div class="button" data-page="pageHeadphoneTest" data-referrer="playSolo">Play vs. Computer</div>
+                <div class="button" id="netPlay">Play with Friends</div>
+                <div class="button" data-page="pageGameSetup">Game Setup</div>
+                <div class="button" data-page="pageCredits">Credits</div>
+                <div class="button" data-page="pageHeadsets">Headset Buying Guide</div>
             </div>
             <div class="footer">
                 <span id="version">Version 0.1.1</span>
-            </div>
-        </div>
-
-        <div class="flex-layout" id="pageNetPlay">
-            <div class="header center-text">
-                <h1 class="title">Play with Friends</h1>
-            </div>
-            <div class="middle flex-grid two-element">
-                <div><div class="clickable grid-button" id="inviteFriends">Invite Friends</div></div>
-                <div><div class="clickable grid-button" id="startNetworkGame">Start Game</div></div>
-            </div>
-            <div class="footer">
-            </div>
-        </div>
-
-        <div class="flex-layout" id="pageGameSetup">
-            <div class="header center-text">
-                <h1 class="title">Game Setup</h1>
-            </div>
-            <div class="middle flex-grid four-element">
-                <div><div class="clickable grid-button" data-page="pageSetupWizard">Setup Wizard</div></div>
-                <div><div class="clickable grid-button" data-page="pageThemeChoices">Theme Selection</div></div>
-                <div><div class="clickable grid-button" data-page="pageDisplayOptions">Display Options</div></div>
-                <div><div class="clickable grid-button" data-page="pageControlOptions">Control Options</div></div>
-            </div>
-            <div class="footer">
-            </div>
-        </div>
-
-        <div class="flex-layout" id="pageControlOptions">
-            <div class="header center-text">
-                <h1 class="title">Control Options</h1>
-            </div>
-            <div class="middle flex-grid two-element">
-                <div><div class="clickable grid-button" data-page="pageTurnAmplification">Turn Amplification</div></div>
-                <div><div class="clickable grid-button" data-page="pageGamepadConfiguration">Gamepad Configuration</div></div>
-            </div>
-            <div class="footer">
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageHelp">
-            <div>
-                <h1>About Maze War</h1>
-                <p>
-                <cite>Maze War VR</cite> is a remake of a game written by Steve Colley and Greg Thompson in 1974 at
-                the NASA Ames Research Center in California. Players would hunt down opponents in a three-dimensional
-                maze, making it the grandfather of first person shooter games.
-                </p>
-                <p>
-                By 1977, the game was taken to MIT, where it was played on the early computer networks
-                of the time.
-                </p>
-            </div>
-            <div>
-                <h1>How to Play</h1>
-                <p>
-                    Find your opponents in the maze and shoot them. Look around and hold down the
-                    trigger to move in the direction you are facing; press and release the trigger
-                    rapidly to shoot.
-                </p>
-                <h2>Let your ears be your guide!</h2>
-                <p>
-                    <cite>Maze War VR</cite> is meant to be played with your ears! There are no game
-                    sounds other than a soft shuffling sound that your enemies make as they move
-                    through the maze. Wear good stereo headphones, listen and with practice you will
-                    find your ears to be a far better guide than your eyes!
-                </p>
-            </div>
-        </div>
-
-        <div class="flex-layout" id="pageSetupWizard">
-            <div>
-                <div class="header center-text">
-                    <h1 class="title">I have...</h1>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageSmartphone">...a smartphone</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageTablet">...a tablet</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageDesktop">...a desktop PC or laptop</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageDesktopVR">...an Oculus Rift or HTC Vive</div>
-                    </center>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex-layout" id="pageSmartphone">
-            <div>
-                <div class="header center-text">
-                    <h1 class="title">I have...</h1>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageCardboardVR">...a Mattel ViewMaster</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageCardboardVR">...a Google Cardboard headset</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageGearVR">...a Samsung Gear VR headset</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageOtherVR">...some other headset</div>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                    <div class="page-link clickable centered-button" data-page="pageTablet">...no headset, just my phone</div>
-                    </center>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageCardboardVR">
-            <div>
-                <h1>Headset Controls:</h1>
-                <p>
-                Hold down the trigger on your headset to move in the direction you are facing; press and release
-                the trigger rapidly to shoot.
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="page1">Back</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageOtherVR">
-            <div>
-                <h1>Simple Headset Controls:</h1>
-                <p>
-                Hold down the trigger on your headset to move in the direction you are facing; press and release
-                the trigger rapidly to shoot.
-                </p>
-            </div>
-            <div>
-                <h2>Using a Bluetooth Gamepad:</h2>
-                <p>
-                If your headset came with a Bluetooth gamepad, you will need to pair the headset to your phone.
-                Then go to "Game Setup -> Control Options -> Gamepad Configuration" screen to configure a button on it as the trigger.
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageGameSetup">Game Setup</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageTablet">
-            <div>
-                <h1>Smartphone or Tablet Users:</h1>
-                <p>
-                Stand and hold the device in front of your face. Turn your body or move the device up and down to look around.
-                Press your finger anywhere on the screen to move in the direction you are facing; tap to shoot.</p>
-                <p>
-                By default, the display will be shown in 2D on your phone or tablet. If you would like, you can enable anaglyph 3D from the "Display Options"
-                screen. This allows you to see 3D using inexpensive red/cyan glasses.
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageDisplayOptions">Display Options</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageDesktop">
-            <div>
-                <h1>Desktop or Laptop Users:</h1>
-                <p>
-                Move the mouse to look around, hold down the mouse button to move in the direction you are facing; click rapidly to shoot.
-                </p>
-                <p>
-                By default, the display will be shown in 2D on your monitor. If you would like, you can enable anaglyph 3D from the "Game Setup"
-                screen. This allows you to see 3D using inexpensive red/cyan glasses.
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageDisplayOptions">Display Options</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageGearVR">
-            <div>
-                <h1>Samsung Gear VR Users:</h1>
-                <p>
-                You must download and view this page in the <a href="https://www.oculus.com/experiences/gear-vr/849609821813454/" target="_blank">Samsung Internet Browser for Gear VR</a>
-                from the <cite>Oculus Store Android</cite> app. This is not the same as the <cite>Samsung Internet for Android</cite> from the <cite>Galaxy App</cite> store.
-                </p>
-                <p>
-                    You may then play <cite>Maze War VR</cite> online by going to <a href="http://marciot.com/mazewar-vr" target="_blank">http://marciot.com/mazewar-vr</a>
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="page1">Back</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageDesktopVR">
-            <div>
-                <h1>Oculus Rift &amp; HTC Vive Users:</h1>
-                <p>
-                At the present time, you must download an experimental version of <a href="https://webvr.info/get-chrome/" target="_blank">Chrome</a> or
-                <a href="https://mozvr.com/" target="_blank">Firefox</a> to play <cite>Maze War VR</cite>.
-                </p>
-                <p>
-                Once you have these browsers setup, follow the instructions at <a href="https://webvr.info">https://webvr.info</a>
-                to enable the experimental WebVR and the Gamepad extensions.
-                </p>
-                <p>
-                While in the game, double-tap the headset with your finger to reset your view orientation.
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageGameSetup">Game Setup</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageNoWebRTC">
-            <div>
-                <h1>Not Available</h1>
-                <p>
-                We are sorry, this web browser does not support the functionality needed for multi-player mode.
-                </p>
-                <p>
-                If you are using an Apple device, multi-player mode will be made available through an app soon. Stay tuned!
-                </p>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageNetworkError">
-            <div>
-                <h1>Network Error</h1>
-                <p>
-                A network error has occured. Please try again later.
-                </p>
-                <p id="networkErrorReason">
-                </p>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageCredits">
-            <div>
-                <h1>Credits</h1>
-                <p>
-                This game may include source code from:
-                <ul>
-                <li><a href="https://threejs.org/">THREE.js</a>
-                <li><a href="http://webcomponents.org">Webcomponents.org</a>
-                <li><a href="https://github.com/chenglou/tween-functions">Tween-Functions</a>
-                <li><a href="http://peerjs.com">Peerjs.com</a>
-                <li><a href="http://www.yorgsite.fr/experiments/YConsole/">YConsole</a>
-                <li><a href="https://github.com/eface2face/cordova-plugin-iosrtc">cordova-plugin-iosrtc</a>
-                <li><a href="https://github.com/googlevr/webvr-polyfill">WebVR Polyfill</a>
-                <li><a href="https://www.promisejs.org/">promisejs.org</a>
-                </ul>
-                </p>
-                <p>
-                This game include media from:
-                    <a href="http://fav.me/d4ecxyt">Brick texture</a> by AGF81.
-                    <a href="https://www.freesound.org/s/169762/">Footstep sounds</a> by nhaudio.
-                    <a href="http://www.freesound.org/people/SweetNeo85/sounds/13797/">Wilhelm scream</a> recorded by SweetNeo85
-                    <a href="https://www.freesound.org/s/183467/">Pow sound</a> by Snapper4298
-                </p>
-                <p>
-                Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
-                </p>
-            </div>
-            <div>
-                <figure class="sponsor">
-                    <figcaption>Testing services provided by:</figcaption>
-                    <a href="https://browserstack.com">
-                    <img src="artwork/browserstack.png">
-                    </a>
-                </figure>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageInspiration">Next</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageInspiration">
-            <div>
-                <h1>The Inspiration:</h1>
-                <img src="artwork/mazewar-alto.png" class="float">
-                <p>
-                This remake was inspired by the Xerox Alto version of Maze War which was developed in 1977 at MIT and was itself a remake
-                of the 1974 version developed at NASA.
-                </p>
-                <p>
-                This playable demo is made possible by:
-                <ul>
-                <li><a href="https://github.com/livingcomputermuseum/ContrAlto">Contralto</a> from <a href="http://www.livingcomputers.org">Living
-                Computers: Museum + Labs</a>
-                <li><a href="http://www.loomcom.com/contraltojs/">ContraltoJS</a> from <a href="http://www.loomcom.com">loomcom.com</a>
-                <li>The preservation efforts of <a href="http://bitsavers.org">Bitsavers.org</a>
-                </ul>
-                </p>
-            </div>
-            <div>
-                <center>
-                <div id="altoLink" class="clickable centered-button" data-page="pageAltoMazeWar">Play the Alto Version!</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageDisplayOptions">
-            <div>
-                <h1>Select your VR Experience:</h1>
-                <p>
-                Click an icon below to choose your VR experience. Click the headset icon if you will be wearing a VR headset;
-                click the middle icon if you are playing without a headset in 2D; or click on the last icon if you will wear
-                red/cyan glasses for 3D.
-                </p>
-                <div id="mode-select">
-                    <p>
-                    <svg id="headset" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 63 58.75" enable-background="new 0 0 63 47" xml:space="preserve"><line x1="87.4" y1="37.2" x2="97.2" y2="37.2"/><g><path d="M42.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S46.4,20,42.9,20z M42.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S40,21,42.9,21s5.2,2.4,5.2,5.2S45.8,31.5,42.9,31.5z"/><path d="M20.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S24.4,20,20.9,20z M20.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S18,21,20.9,21s5.2,2.4,5.2,5.2S23.8,31.5,20.9,31.5z"/><path d="M55.7,9V7.9c0-1.6-1.3-2.9-2.9-2.9H11.3C9.7,5,8.4,6.3,8.4,7.9V9c-2.3,0.7-4,2.8-4,5.3v22.6c0,3,2.5,5.5,5.5,5.5h13.4   c1.8,0,3.4-1,4.1-2.6c0,0,0-0.1,0-0.1l0.2-0.5h8l0.1,0.4c0,0,0,0.1,0,0.1c0.7,1.7,2.3,2.8,4.2,2.8h13.9c3,0,5.5-2.5,5.5-5.5V14.3   C59.4,11.8,57.8,9.8,55.7,9z M10.7,7.9c0-0.3,0.3-0.6,0.6-0.6h41.4c0.3,0,0.6,0.3,0.6,0.6v2H10.7V7.9z M27.3,36.7l2-5   c0.5-1,1.4-1.6,2.5-1.6c0.9,0,2.1,0.5,2.6,1.7l1.7,4.9H27.3z M57.2,36.9c0,1.8-1.5,3.2-3.2,3.2H40c-0.9,0-1.7-0.5-2.1-1.4l-2.6-7.3   c-0.6-1.4-1.9-2.3-3.5-2.3c-1.5,0-2.8,0.8-3.4,2.2l-3,7.5c-0.4,0.8-1.2,1.3-2.1,1.3H9.9c-1.8,0-3.2-1.5-3.2-3.2V14.3   c0-1.8,1.5-3.2,3.2-3.2h44c1.8,0,3.2,1.5,3.2,3.2V36.9z"/></g></svg>
-                    <svg id="monitor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/></svg>
-                    <svg id="anaglyph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/><path d="m 41.3,40.2 c -2.4,0 -4.3,1.9 -4.3,4.3 l 0,17.1 c 0,2.4 1.9,4.3 4.3,4.3 l 21.4,0 c 1,0 1.9,-0.3 2.6,-0.9 l 6.4,-5 c 0.2,-0.1 0.2,-0.1 0.5,-0.2 0.6,-0.2 1.4,-0.3 1.2,-0.3 -0.2,0 0.5,0.1 1,0.3 0.3,0.1 0.3,0.1 0.5,0.2 l 6.6,5.1 c 0.7,0.6 1.7,0.9 2.6,0.9 l 21.4,0 c 2.4,0 4.3,-1.9 4.3,-4.3 l 0,-17.1 c 0,-2.4 -1.9,-4.3 -4.3,-4.3 z" /><path d="m 44.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkRed;"/><path d="m 85.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkCyan;"/></svg>
-                    </p>
-                    <p>
-                    Icons by Nick Bluth from the Noun Project
-                    </p>
-                </div>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="page1">Back</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageThemeChoices">
-            <div>
-                <h1>Select Theme:</h1>
-                <p>
-                <cite>Maze War VR</cite> comes with two different themes.
-                The day theme is bright and heavenly and is suitable for most
-                devices; the night theme provides a darker and suspenseful
-                atmosphere, but may require a faster device for smooth
-                playback.
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-href="?theme=day">Day Theme</div>
-                </center>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-href="?theme=night">Night Theme</div>
-                </center>
-            </div>
-        </div>
-
-        <div class="flex-distribute" id="pageTurnAmplification">
-            <div>
-                <h1>Turn Amplification:</h1>
-                <p>
-                The best way to play <cite>Maze War VR</cite> is to stand and face your
-                entire body in the direction you want to move.
-                </p>
-                <p>
-                While it is not recommended, turn amplification allows you to play <cite>Maze
-                Wars VR</cite> while seated.
-                </p>
-                <p>To allow &quot;Turn Amplification&quot;, click the "Allow" button here. Then
-                start a game, put on your headset and sit comfortably and relaxed, looking
-                straight ahead. Double-tap the side of your headset. The message "View recentered.
-                Turn amplification on" will appear in your headset; you may double-tap again at any
-                time to toggle it off.
-                <div class="side-by-side">
-                <div id="disableTurnAmplification" class="button clickable selected">Disallow</div>
-                <div id="enableTurnAmplification"  class="button clickable">Allow</div>
-                </div>
-                </p>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="page1">Go Back</div>
-                </center>
-            </div>
-        </div>
-
-
-        <div class="flex-distribute" id="pageGamepadConfiguration">
-            <div>
-                <h1>Gamepad Configuration:</h1>
-                <p>
-                    If you have a device with an electronic controller or gamepad, you will need to configure a
-                    game pad button for use with <cite>Maze War VR</cite>:
-                <p>
-            </div>
-            <div>
-                <center>
-                <div id="configureGamepad" class="clickable centered-button">Choose Gamepad Button</div>
-                </center>
-            </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="page1">Go Back</div>
-                </center>
             </div>
         </div>
 
@@ -878,16 +463,404 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     around or swap your earbuds from ear to ear.
                 </p>
             </div>
+            <div id="stereoTest" class="button">Test Headphones</div>
+            <div id="postHeadphoneTest" class="button">Skip Test</div>
+        </div>
+
+        <div class="flex-layout" id="pageNetPlay">
+            <div class="header">
+                <h1>Play with Friends</h1>
+            </div>
+            <div class="middle flex-grid two-element">
+                <div class="button" data-page="pageInviteFriends">Invite Friends</div>
+                <div class="button" data-page="pageHeadphoneTest">Start Game</div>
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+
+        <div class="flex-distribute centered" id="pageNetWaiting">
             <div>
-                <center>
-                <div id="stereoTest" class="clickable centered-button">Test Headphones</div>
-                </center>
+                <h1>All alone...</h1>
+                <p>
+                The game will start once someone else joins you.
+                </p>
+                <p>
+                Invite your friends to play by posting this
+                link on social media or sending it via text:
+                </p>
             </div>
             <div>
-                <center>
-                <div id="postHeadphoneTest" class="clickable centered-button">Skip Test</div>
-                </center>
+                <input type="text" id="inviteUrl1" class="allow-selection" value="http://mazewar.marciot.com" readonly>
             </div>
+            <div>
+                <div class="button" id="copyLink1" data-textarea="inviteUrl1">Copy Link</div>
+            </div>
+        </div>
+
+        <div class="flex-distribute centered" id="pageInviteFriends">
+            <div>
+                <h1>Send Invitation</h1>
+                <p>
+                Invite your friends to play by posting this
+                link on social media or sending it via text:
+                </p>
+            </div>
+            <div>
+                <p>
+                <input type="text" id="inviteUrl2" class="allow-selection" value="http://mazewar.marciot.com" readonly>
+                </p>
+                <div class="button" id="copyLink2" data-textarea="inviteUrl2">Copy Link</div>
+            </div>
+            <div>
+                <div class="button" data-page="back">Go Back</div>
+            </div>
+        </div>
+
+        <div class="flex-distribute centered" id="pageNoWebRTC">
+            <div>
+                <h1>Not Available</h1>
+                <p>
+                We are sorry, this web browser does not support the functionality needed for multi-player mode.
+                </p>
+                <p>
+                If you are using an Apple device, multi-player mode will be made available through an app soon. Stay tuned!
+                </p>
+            </div>
+        </div>
+
+        <div class="flex-distribute centered" id="pageNetworkError">
+            <div>
+                <h1>Network Error</h1>
+            </div>
+            <div>
+                <p>
+                A network error has occured. Please try again later.
+                </p>
+                <p id="networkErrorReason"></p>
+            </div>
+            <div class="button" data-page="page1">Go Back</div>
+        </div>
+
+        <div class="flex-layout" id="pageGameSetup">
+            <div class="header">
+                <h1>Game Setup</h1>
+            </div>
+            <div class="middle flex-grid four-element">
+                <div class="button" data-page="pageSetupWizard1">Setup Wizard</div>
+                <div class="button" data-page="pageThemeChoices">Theme Selection</div>
+                <div class="button" data-page="pageDisplayOptions">Display Options</div>
+                <div class="button" data-page="pageControlOptions">Control Options</div>
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+
+        <div class="flex-layout" id="pageControlOptions">
+            <div class="header">
+                <h1>Control Options</h1>
+            </div>
+            <div class="middle flex-grid two-element">
+                <div class="button" data-page="pageRotationalBoost">Rotational Boost</div>
+                <div class="button" data-page="pageGamepadConfiguration">Gamepad Configuration</div>
+            </div>
+            <div class="footer">
+            </div>
+        </div>
+
+        <div class="flex-layout" id="pageSetupWizard1">
+            <div class="header">
+                <h1>I will play...</h1>
+            </div>
+            <div class="button" data-page="pageSetupWizard2">...standing up</div>
+            <div class="button" data-page="pageSetupWizard2">...on a swivel chair</div>
+            <div class="button" data-page="pageRotationalBoost">...on a stationary chair</div>
+        </div>
+
+        <div class="flex-layout" id="pageSetupWizard2">
+            <div class="header">
+                <h1>I have...</h1>
+            </div>
+            <div class="button" data-page="pageSmartphone">...a smartphone</div>
+            <div class="button" data-page="pageTablet">...a tablet</div>
+            <div class="button" data-page="pageDesktop">...a desktop PC or laptop</div>
+            <div class="button" data-page="pageDesktopVR">...an Oculus Rift or HTC Vive</div>
+        </div>
+
+        <div class="flex-layout" id="pageSmartphone">
+            <div class="header">
+                <h1>I have...</h1>
+            </div>
+            <div class="button" data-page="pageCardboardVR">...a Homido, Merge or ViewMaster</div>
+            <div class="button" data-page="pageCardboardVR">...a Google Cardboard</div>
+            <div class="button" data-page="pageGearVR">...a Samsung Gear VR</div>
+            <div class="button" data-page="pageOtherVR">...some other headset</div>
+            <div class="button" data-page="pageTablet">...no headset, just my phone</div>
+        </div>
+
+        <div class="flex-distribute" id="pageCardboardVR">
+            <div>
+                <h1>Headset Controls:</h1>
+                <p>
+                Hold down the trigger on your headset to move in the direction you are facing; press and release
+                the trigger rapidly to shoot.
+                </p>
+            </div>
+            <div class="button" data-page="page1">Back</div>
+        </div>
+
+        <div class="flex-distribute" id="pageOtherVR">
+            <div>
+                <h1>Simple Headset Controls:</h1>
+                <p>
+                Hold down the trigger on your headset to move in the direction you are facing; press and release
+                the trigger rapidly to shoot.
+                </p>
+            </div>
+            <div>
+                <h2>Using a Bluetooth Gamepad:</h2>
+                <p>
+                If your headset came with a Bluetooth gamepad, you will need to pair the headset to your phone.
+                Then go to "Game Setup -> Control Options -> Gamepad Configuration" screen to configure a button on it as the trigger.
+                </p>
+            </div>
+            <div class="button" data-page="pageGameSetup">Game Setup</div>
+        </div>
+
+        <div class="flex-distribute" id="pageTablet">
+            <div>
+                <h1>Smartphone or Tablet Users:</h1>
+                <p>
+                Stand and hold the device in front of your face. Turn your body or move the device up and down to look around.
+                Press your finger anywhere on the screen to move in the direction you are facing; tap to shoot.</p>
+                <p>
+                By default, the display will be shown in 2D on your phone or tablet. If you would like, you can enable anaglyph 3D from the "Display Options"
+                screen. This allows you to see 3D using inexpensive red/cyan glasses.
+                </p>
+            </div>
+            <div class="button" data-page="pageDisplayOptions">Display Options</div>
+        </div>
+
+        <div class="flex-distribute" id="pageDesktop">
+            <div>
+                <h1>Desktop or Laptop Users:</h1>
+                <p>
+                Move the mouse to look around, hold down the mouse button to move in the direction you are facing; click rapidly to shoot.
+                </p>
+                <p>
+                By default, the display will be shown in 2D on your monitor. If you would like, you can enable anaglyph 3D from the "Display Options"
+                screen. This allows you to see 3D using inexpensive red/cyan glasses.
+                </p>
+            </div>
+            <div class="button" data-page="pageDisplayOptions">Display Options</div>
+        </div>
+
+        <div class="flex-distribute" id="pageGearVR">
+            <div>
+                <h1>Samsung Gear VR Users:</h1>
+                <p>
+                You must download the <a href="https://www.oculus.com/experiences/gear-vr/849609821813454/" target="_blank">Samsung Internet Browser for Gear VR</a>
+                from the <cite>Oculus Store</cite> Android app. This is not the same as the <cite>Samsung Internet for Android</cite> from the <cite>Galaxy App</cite> store.
+                </p>
+                <p>
+                    You may then play <cite>Maze War VR</cite> online by going to <a href="http://marciot.com/mazewar-vr" target="_blank">http://marciot.com/mazewar-vr</a> while in VR mode.
+                </p>
+            </div>
+            <div class="button" data-page="page1">Back</div>
+        </div>
+
+        <div class="flex-distribute" id="pageDesktopVR">
+            <div>
+                <h1>Oculus Rift &amp; HTC Vive Users:</h1>
+                <p>
+                At the present time, you must download an experimental version of <a href="https://webvr.info/get-chrome/" target="_blank">Chrome</a> or
+                <a href="https://mozvr.com/" target="_blank">Firefox</a> to play <cite>Maze War VR</cite>.
+                </p>
+                <p>
+                Once you have these browsers setup, follow the instructions at <a href="https://webvr.info">https://webvr.info</a>
+                to enable the experimental WebVR and the Gamepad extensions.
+                </p>
+                <p>
+                When you begin a game, the page will go black. This means that the graphics have been sent to the headset and you should put it on. While in a game, double-tap the headset with your finger to re-center your view.
+                </p>
+            </div>
+            <div class="button" data-page="page1">Go back</div>
+        </div>
+
+        <div class="flex-distribute" id="pageCredits">
+            <div>
+                <h1>Credits</h1>
+                <div class="side-by-side align-top">
+                    <div>
+                        This game may include source code from:
+                        <ul>
+                        <li><a href="https://threejs.org/">THREE.js</a>
+                        <li><a href="http://webcomponents.org">Webcomponents.org</a>
+                        <li><a href="https://github.com/chenglou/tween-functions">Tween-Functions</a>
+                        <li><a href="http://peerjs.com">Peerjs.com</a>
+                        <li><a href="http://www.yorgsite.fr/experiments/YConsole/">YConsole</a>
+                        <li><a href="https://github.com/eface2face/cordova-plugin-iosrtc">cordova-plugin-iosrtc</a>
+                        <li><a href="https://github.com/googlevr/webvr-polyfill">WebVR Polyfill</a>
+                        <li><a href="https://www.promisejs.org/">promisejs.org</a>
+                        </ul>
+                    </div>
+                    <div>
+                        This game include media from:
+                        <ul>
+                            <li><a href="http://fav.me/d4ecxyt">Brick texture</a> by AGF81.
+                            <li><a href="https://www.freesound.org/s/169762/">Footstep sounds</a> by nhaudio.
+                            <li><a href="http://www.freesound.org/people/SweetNeo85/sounds/13797/">Wilhelm scream</a> recorded by SweetNeo85
+                            <li><a href="https://www.freesound.org/s/183467/">Pow sound</a> by Snapper4298
+                        </ul>
+                        <figure class="sponsor">
+                            <figcaption>Testing services provided by:</figcaption>
+                            <a href="https://browserstack.com">
+                            <img src="artwork/browserstack.png">
+                            </a>
+                        </figure>
+                    </div>
+                </div>
+                <p class="centered">
+                Complete source code and licenses are available on <a href="https://github.com/marciot/mazewar-vr">GitHub</a>.
+                </p>
+                <p class="centered">
+                Please help support the developement of this program and others. Check out my <a href="https://www.patreon.com/marciot">Patreon</a> page.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageHelp">
+            <div>
+                <h1>How to Play</h1>
+                <p>
+                    Find your opponents in the maze and shoot at them! Face your body in the direction you want to go and hold down the trigger to walk; press and release the trigger rapidly to shoot.
+                </p>
+                <h2>Let your ears be your guide!</h2>
+                <p>
+                    <cite>Maze War VR</cite> has 3D audio and is meant to be played
+                    with your ears wide open! Wear good stereo headphones (make sure
+                    left and right are not reversed), listen carefully and with
+                    practice you learn to track your opponents by sound!
+                </p>
+            </div>
+            <div>
+                <p class="centered">
+                Please help further the development of this remake. Check out my <a href="https://www.patreon.com/marciot">Patreon</a> page.
+                </p>
+            </div>
+            <div class="button" data-page="pageHistory">Next: 40 Years of Maze War</div>
+        </div>
+
+        <div class="flex-distribute" id="pageHistory">
+            <div>
+                <h1>The History of Maze War</h1>
+                <figure class="float">
+                <img src="artwork/mazewar-imlac.jpg">
+                <figcaption>
+                Maze War on the Imlac - By Bruce Damer<br><a rel="nofollow" class="external free" href="https://www.youtube.com/watch?v=ZgT9IgRlrvI&amp;ab_channel=brucedamer">video</a>, <a href="http://creativecommons.org/licenses/by/2.5" title="Creative Commons Attribution 2.5">CC BY 2.5</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=47507741">wikimedia</a>
+                </figcaption>
+                </figure>
+                <p>
+                <cite>Maze War</cite> was written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California.
+                </p>
+                <p>
+                Players would move down a three-dimensional maze taking shots at opponents. This made it the <a href="http://www.polygon.com/features/2015/5/21/8627231/the-first-first-person-shooter" target="_blank">first first person shooter</a> game!
+                </p>
+            </div>
+            <div class="button" data-page="pageInspiration">Maze War on the Alto</div>
+        </div>
+
+        <div class="flex-distribute" id="pageInspiration">
+            <div>
+                <h1>Maze War on the Alto</h1>
+                <img src="artwork/mazewar-alto.png" class="float">
+                <p>
+                By 1977, the game was taken to MIT, where it was rewritten for the Xerox Alto
+                and made playable on an early version of the Ethernet packet switched network.
+                </p>
+                <p>
+                <cite>Maze War VR</cite> is directly inspired by the Xerox Alto version of Maze War. I've made a special effort to use the same networking protocol as that version.
+                </p>
+                On the next page, you can play Maze War on the Xerox Alto. The demonstration is made possible by the efforts of the following people and organizations:
+                <ul>
+                <li><a href="https://github.com/livingcomputermuseum/ContrAlto">Contralto</a> from <a href="http://www.livingcomputers.org">Living
+                Computers: Museum + Labs</a>
+                <li><a href="http://www.loomcom.com/contraltojs/">ContraltoJS</a> from <a href="http://www.loomcom.com">loomcom.com</a>
+                <li>The preservation efforts of <a href="http://bitsavers.org">Bitsavers.org</a>
+                </ul>
+                </p>
+            </div>
+            <div id="altoLink" class="button" data-page="pageAltoMazeWar">Play the Alto Version!</div>
+        </div>
+
+        <div class="flex-distribute" id="pageDisplayOptions">
+            <div>
+                <h1>Select your VR Experience:</h1>
+                <p>
+                Click an icon below to choose your VR experience. Click the headset icon on the left if you will be wearing a VR headset;
+                click the middle icon if you are playing without a headset in 2D; or click on the right-most icon if you will be wearing red/cyan glasses for 3D.
+                </p>
+                <div id="mode-select">
+                    <p>
+                    <svg id="headset" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 63 58.75" enable-background="new 0 0 63 47" xml:space="preserve"><line x1="87.4" y1="37.2" x2="97.2" y2="37.2"/><g><path d="M42.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S46.4,20,42.9,20z M42.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S40,21,42.9,21s5.2,2.4,5.2,5.2S45.8,31.5,42.9,31.5z"/><path d="M20.9,20c-3.4,0-6.2,2.8-6.2,6.2s2.8,6.2,6.2,6.2s6.2-2.8,6.2-6.2S24.4,20,20.9,20z M20.9,31.5c-2.9,0-5.2-2.4-5.2-5.2   S18,21,20.9,21s5.2,2.4,5.2,5.2S23.8,31.5,20.9,31.5z"/><path d="M55.7,9V7.9c0-1.6-1.3-2.9-2.9-2.9H11.3C9.7,5,8.4,6.3,8.4,7.9V9c-2.3,0.7-4,2.8-4,5.3v22.6c0,3,2.5,5.5,5.5,5.5h13.4   c1.8,0,3.4-1,4.1-2.6c0,0,0-0.1,0-0.1l0.2-0.5h8l0.1,0.4c0,0,0,0.1,0,0.1c0.7,1.7,2.3,2.8,4.2,2.8h13.9c3,0,5.5-2.5,5.5-5.5V14.3   C59.4,11.8,57.8,9.8,55.7,9z M10.7,7.9c0-0.3,0.3-0.6,0.6-0.6h41.4c0.3,0,0.6,0.3,0.6,0.6v2H10.7V7.9z M27.3,36.7l2-5   c0.5-1,1.4-1.6,2.5-1.6c0.9,0,2.1,0.5,2.6,1.7l1.7,4.9H27.3z M57.2,36.9c0,1.8-1.5,3.2-3.2,3.2H40c-0.9,0-1.7-0.5-2.1-1.4l-2.6-7.3   c-0.6-1.4-1.9-2.3-3.5-2.3c-1.5,0-2.8,0.8-3.4,2.2l-3,7.5c-0.4,0.8-1.2,1.3-2.1,1.3H9.9c-1.8,0-3.2-1.5-3.2-3.2V14.3   c0-1.8,1.5-3.2,3.2-3.2h44c1.8,0,3.2,1.5,3.2,3.2V36.9z"/></g></svg>
+                    <svg id="monitor" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/></svg>
+                    <svg id="anaglyph" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" x="0px" y="0px" viewBox="0 0 146 158.75" enable-background="new 0 0 146 127" xml:space="preserve"><g><path d="M68.5,18H78c0.6,0,1-0.4,1-1s-0.4-1-1-1h-9.5c-0.6,0-1,0.4-1,1S67.9,18,68.5,18z"/><path d="M121,21H25c-2.2,0-4,1.8-4,4v57c0,2.2,1.8,4,4,4h96c2.2,0,4-1.8,4-4V25C125,22.8,123.2,21,121,21z M123,82c0,1.1-0.9,2-2,2   H25c-1.1,0-2-0.9-2-2V25c0-1.1,0.9-2,2-2h96c1.1,0,2,0.9,2,2V82z"/></g><path d="M125,9H21c-5.5,0-10,4.5-10,10v68c0,5.5,4.5,10,10,10h37v9l-7.5,5.2c-1.5,1.1-2.5,2.5-1.8,4.9c0.7,2.3,2.4,3,4.3,3h40  c1.9,0,3.6-0.6,4.3-3c0.7-2.3-0.3-3.8-1.8-4.8l-7.5-5.3l0-8.9h37c5.5,0,10-4.5,10-10V19C135,13.5,130.5,9,125,9z M93.2,114.5  c0.5,0.3,0.4,0.6-0.2,0.6H53c-0.5,0-0.6-0.3-0.2-0.6l8-5.6h17.7c0.6,0,1-0.4,1-1v-0.2c0-0.6-0.4-1-1-1H62V95h22v12  c0,0.6,0.3,1.2,0.8,1.5L93.2,114.5z M131,87c0,3.3-2.7,6-6,6H88h-4H62h-4H21c-3.3,0-6-2.7-6-6V19c0-3.3,2.7-6,6-6h104  c3.3,0,6,2.7,6,6V87z"/><path d="m 41.3,40.2 c -2.4,0 -4.3,1.9 -4.3,4.3 l 0,17.1 c 0,2.4 1.9,4.3 4.3,4.3 l 21.4,0 c 1,0 1.9,-0.3 2.6,-0.9 l 6.4,-5 c 0.2,-0.1 0.2,-0.1 0.5,-0.2 0.6,-0.2 1.4,-0.3 1.2,-0.3 -0.2,0 0.5,0.1 1,0.3 0.3,0.1 0.3,0.1 0.5,0.2 l 6.6,5.1 c 0.7,0.6 1.7,0.9 2.6,0.9 l 21.4,0 c 2.4,0 4.3,-1.9 4.3,-4.3 l 0,-17.1 c 0,-2.4 -1.9,-4.3 -4.3,-4.3 z" /><path d="m 44.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkRed;"/><path d="m 85.2,45.9 c -1,0 -1.8,0.8 -1.8,1.8 l 0,10.7 c 0,1 0.8,1.8 1.8,1.8 l 17.4,0 c 1,0 1.8,-0.8 1.8,-1.8 l 0,-10.7 c 0,-1 -0.8,-1.8 -1.8,-1.8 z" style="fill: darkCyan;"/></svg>
+                    </p>
+                    <p>
+                    Icons by Nick Bluth from the Noun Project
+                    </p>
+                </div>
+            </div>
+            <div class="button" data-page="page1">Back</div>
+        </div>
+
+        <div class="flex-distribute" id="pageThemeChoices">
+            <div>
+                <h1>Select Theme:</h1>
+                <p>
+                <cite>Maze War VR</cite> comes with two different themes. The day theme is bright and is suitable for most devices; the night theme provides a darker and suspenseful atmosphere, but may require a faster device for smooth playback.
+                </p>
+            </div>
+            <div class="button" data-href="?theme=day">Day Theme</div>
+            <div class="button" data-href="?theme=night">Night Theme</div>
+        </div>
+
+        <div class="flex-distribute" id="pageRotationalBoost">
+            <div>
+                <h1>Rotational Boost:</h1>
+                <p>
+                Rotational Boost allows you to look behind you while seated on a stationary chair.
+                However, playing this way may increase your chances of motion sickness. If you wish to
+                proceed:
+                <ul>
+                    <li>Click the "Allow" button here.
+                    <li>Once wearing your headset in a game:
+                    <ul>
+                        <li>Sit comfortably and relaxed, looking straight ahead.
+                        <li>Double-tap the side of your headset.
+                        <li>The message &quot;View centered. Boost enabled.&quot; will appear in your headset.
+                        <li>You may double-tap again at any time to toggle it off and on.
+                    </ul>
+                </ul>
+                <div class="side-by-side">
+                <div id="disableRotationalBoost" class="button" data-page="back">Go back</div>
+                <div id="enableRotationalBoost"  class="button" data-page="back">Allow</div>
+                </div>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex-distribute" id="pageGamepadConfiguration">
+            <div>
+                <h1>Gamepad Configuration:</h1>
+                <p>
+                    If you have a device with an electronic controller or gamepad, you will need to configure a
+                    game pad button for use with <cite>Maze War VR</cite>. You can do so here, or by pressing
+                    a game pad button within a minute of starting a game.
+                <p>
+            </div>
+            <div id="configureGamepad" class="button">Choose Gamepad Button</div>
+            <div class="button" data-page="page1">Go Back</div>
         </div>
 
         <div class="flex-distribute" id="pageHeadsets">
@@ -904,11 +877,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <li>Do you wear glasses?
                 </ul>
             </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageHeadsets1">Companion vs. Generic</div>
-                </center>
-            </div>
+            <div class="button" data-page="pageHeadsets1">Companion vs. Generic</div>
         </div>
 
         <div class="flex-distribute" id="pageHeadsets1">
@@ -916,28 +885,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <h2>Companion Headsets</h2>
                 <p>
                 Some phones have a companion headset for VR. These companion headsets are designed specifically for
-                your phone.
+                your phone and are generally your best choice.
                 </p>
                 <p>
-                If you have a Samsung Galaxy phone, check out the <a target="_blank" href="https://www.amazon.com/gp/product/B01HU3J9QA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01HU3J9QA&linkCode=as2&tag=marciot-20&linkId=c34467730a87718185b1feb9fca99073">Gear VR</a>.<br>
-                If you have a Daydream-ready phone, such as the Google Pixel, check out the <a target="_blank" href="https://www.amazon.com/gp/product/B01N634P7O/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01N634P7O&linkCode=as2&tag=marciot-20&linkId=d4a6fb5b8c47ba451ca33813939dd365">Google Daydream View</a>.
+                If you have a Samsung Galaxy phone, consider the <a target="_blank" href="https://www.amazon.com/gp/product/B01HU3J9QA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01HU3J9QA&linkCode=as2&tag=marciot-20&linkId=c34467730a87718185b1feb9fca99073">Gear VR (amazon link)</a>.<br>
+                If you have a Daydream-ready phone, consider the <a target="_blank" href="https://www.amazon.com/gp/product/B01N634P7O/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01N634P7O&linkCode=as2&tag=marciot-20&linkId=d4a6fb5b8c47ba451ca33813939dd365">Google Daydream View (amazon link)</a>.
 
                 <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B01HU3J9QA" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
                 <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B01N634P7O" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
                 <h2>Generic Headsets</h2>
                 <p>
-                If your phone does not have a companion headset, or you want to spend less, there are generic headsets that work with great with <cite>Maze War VR</cite>.
+                If your phone does not have a companion headset or you own an iPhone, there are generic headsets that work with great with <cite>Maze War VR</cite>.
                 </p>
                 <p>
-                When you pick a generic, get one with a trigger button, as not all generics do. On the next two page, I present two excellent choices.
+                When you pick a generic, get one with a trigger button, as not all generics do. On the next few pages, I present some excellent choices.
                 </p>
             </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageHeadsets2">The Homido</div>
-                </center>
-            </div>
+            <div class="button" data-page="pageHeadsets2">Next Up: The Homido</div>
         </div>
 
         <div class="flex-distribute" id="pageHeadsets2">
@@ -963,27 +928,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B01LZWDNX6" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
             </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageHeadsets3">The ViewMaster</div>
-                </center>
-            </div>
+            <div class="button" data-page="pageHeadsets3">Next Up: The Merge VR</div>
         </div>
 
         <div class="flex-distribute" id="pageHeadsets3">
             <div>
+                <h2>The Merge VR</h2>
+                <p>
+                The <cite>Merge VR</cite> headset features a slot that works well with skinny phones like the iPhone.
+                It is made out of soft foam, making it light weight and comfortable to wear. The padded exterior
+                also protects your phone from accidental drops. In a fairly unique capability, it sports
+                <strong>two</strong> independent trigger buttons. With lens adjustments and head straps, the
+                <cite>Merge VR</cite> is a feature packed headset at a mid-range price!
+                </p>
+                <div class="side-by-side">
+                    <img src="artwork/merge-vr.png">
+
+                    <div class="associate-links">
+                        <a href="https://www.amazon.com/gp/product/B015CD6NVE/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B015CD6NVE&linkCode=as2&tag=marciot-20&linkId=88c101df6e472379e81b812e2954d1f6" target="_blank">
+                        <span>Get the <cite>Merge VR</cite></span>
+                        </a>
+                        <br>at amazon.com
+                    </div>
+                </div>
+                <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B015CD6NVE" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+            </div>
+            <div class="button" data-page="pageHeadsets4">Next Up: The ViewMaster</div>
+        </div>
+
+        <div class="flex-distribute" id="pageHeadsets4">
+            <div>
                 <h2>The ViewMaster</h2>
                 <p>
-                The <cite>Mattel ViewMaster VR</cite> has a responsive trigger and works great with
-                <cite>Maze War VR</cite>. It is simple to use, accomodates most phones and costs very
-                little. The basic model starts at $17, making it a fantastic choice if you don't want to
-                spend much to experience VR.
+                The <cite>Mattel ViewMaster VR</cite> accomodates most phones and has a responsive trigger.
+                It starts at $17, making it a fantastic choice if you don't want to spend too much to
+                experience VR. The deluxe version adds focal length adjustment, an improved latch and a headphone jack (which is recommended for <cite>Maze Wars VR</cite>, unless you have Bluetooth headphones).
                 </p>
                 <p>
                 The downside is that the ViewMaster does not fit over glasses and it lacks head straps,
-                meaning you will have to hold it to your face as you play. These limitations aside, the
-                <cite>Mattel ViewMaster VR</cite> is a great choice for getting started with VR on a
-                budget.
+                meaning you will need to hold it up to your face as you play.
                 </p>
 
                 <div class="side-by-side">
@@ -1003,68 +986,61 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B011EG5HJ2" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
                 <img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=am2&o=1&a=B01CNSO79Q" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
             </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageHeadsets4">Cardboard Headsets</div>
-                </center>
-            </div>
+            <div class="button" data-page="pageHeadsets5">Next: Cardboard Headsets</div>
         </div>
 
-        <div class="flex-distribute" id="pageHeadsets4">
+        <div class="flex-distribute" id="pageHeadsets5">
             <div>
                 <h1>Cardboard Headsets</h1>
                 <p>
-                Cardboard headsets are the least expensive and are often spacious enough for
-                people with glasses, but they have disadvantages. They are not very durable
-                nor particularly comfortable. They also leak a lot of light around the
+                Cardboard headsets are the least expensive. They are spacious enough for
+                people with glasses, but they have disadvantages: they are not very durable
+                nor particularly comfortable; they also leak a lot of light around the
                 sides which can detract from the VR experience.
                 </p>
                 <h2>Magnetic vs. Foam Trigger</h2>
                 <p>
-                Some of the cardboard headsets use a magnet and washer as a trigger. This
-                is an older design and won't work with <cite>Maze War VR</cite>. Look instead
-                for a cardboard headset listed as being compatible with Google Cardboard version
-                2. These have a trigger that touches a small foam tip on the screen of your phone.
+                Older cardboard headsets use a magnetic trigger that won't work with
+                <cite>Maze War VR</cite>.
                 </p>
                 <p>
-                Expect to spend about $7 to $15 for a cardboard headset.
+                If you buy one, look for a Cardboard Version 2 headset; these
+                have a trigger with conductive foam and will work with
+                <cite>Maze War VR</cite>.
                 </p>
             </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="pageHeadsets5">Go Headset Free!</div>
-                </center>
-            </div>
+            <div class="button" data-page="pageHeadsets6">Next: Go Retro!</div>
         </div>
         
-        <div class="flex-distribute" id="pageHeadsets5">
+        <div class="flex-distribute" id="pageHeadsets6">
+            <div>
+                <h1>Can I use red/cyan (anaglyph) glasses?</h1>
+                <img class="float" src="artwork/red-cyan.png">
+                <p>
+                Absolutely! These old-style 3D glasses were common in theaters in the 50s; they allow you
+                to play <cite>Maze War VR</cite> in 3D on a regular PC monitor, tablet or smartphone. Choose the anaglyph mode from the &quot;Display Options&quot; to play.
+                </p>
+                <p>
+                You can get <a target="_blank" href="https://www.amazon.com/gp/search?ie=UTF8&tag=marciot-20&linkCode=ur2&linkId=7039ae7afbd53a756bb85f6ffd16d437&camp=1789&creative=9325&index=electronics&keywords=Red Cyan Anaglyph">anaglyph glasses</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=ur2&o=1" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> online from $1 to $10. The least expensive are made out of paper, but you can get frames or clip-ons to wear over prescription glasses.
+                </p>
+                <p>
+                Make sure you use the red/cyan variety as the other color combinations will not work with <cite>Maze War VR</cite>. Clear 3D glasses from modern movie theaters will not work either.
+                </p>
+            </div>
+            <div class="button" data-page="pageHeadsets7">Next: Go Naked!</div>
+        </div>
+
+        <div class="flex-distribute" id="pageHeadsets7">
             <div>
                 <h1>Go headset free!</h1>
                 <p>
-                <cite>Maze War VR</cite> can be played on a regular PC, tablet or smartphone without a headset.
-                This is a good choice if you fear a fully-immersive VR environment may cause you nausea.
-                </p>
-            </div>
-            <div>
-                <h1>What about anaglyph stereo?</h1>
-                <p>
-                If you want to play in 3D without a headset, you can use the old-style 3D glasses that were common
-                in movies in the 50s. Using anaglyph 3D is an inexpensive
-                way to play <cite>Maze War VR</cite> in 3D on your regular PC, tablet or smartphone. Choose the anaglyph mode from the &quot;Display Options&quot; and get some <a target="_blank" href="https://www.amazon.com/gp/search?ie=UTF8&tag=marciot-20&linkCode=ur2&linkId=7039ae7afbd53a756bb85f6ffd16d437&camp=1789&creative=9325&index=electronics&keywords=Red Cyan Anaglyph">anaglyph glasses</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=marciot-20&l=ur2&o=1" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> online from $1 to $10.
+                <cite>Maze War VR</cite> can be played on a regular PC monitor, tablet or smartphone.
                 </p>
                 <p>
-                Make sure you get the red/cyan variety as the other color combinations will not work with <cite>Maze War VR</cite>. Clear 3D glasses from modern movie theaters will not work either.
-                </p>
-                <p>
-                The cheapest anaglyph glasses are made out of paper, but you can get frames or even clip-ons to
-                wear over your prescription glasses.
+                Select the regular monitor mode from the &quot;Display Options&quot; to play without 3D.
                 </p>
             </div>
-            <div>
-                <center>
-                <div class="page-link clickable centered-button" data-page="page1">Done</div>
-                </center>
-            </div>
+            <div class="button" data-page="page1">Let's Play!</div>
         </div>
 
         <div id="pageAltoMazeWar">
@@ -1140,45 +1116,52 @@ function gotoRecommendedHeadsets() {
         shadowRoot.querySelector("#monitor").addEventListener("click", selectExperience.bind(this, "monitor"));
         shadowRoot.querySelector("#anaglyph").addEventListener("click", selectExperience.bind(this, "anaglyph"));
 
-        var afterHeadphoneTest;
+        // Net play
+        var me = this;
+        function gotoNetPlay(e) {
+            if(typeof window.RTCPeerConnection === 'undefined') {
+                me.swipePages.gotoPage("pageNoWebRTC");
+            } else {
+                me.swipePages.gotoPage("pageNetPlay");
+            }
+        }
+        shadowRoot.querySelector("#netPlay").addEventListener("click", gotoNetPlay);
+
+        function startNetGame() {
+            shadowRoot.dispatchCallback("startNetworkGame");
+            me.swipePages.gotoPage("pageNetWaiting");
+        }
+
         function postHeadphoneTest() {
-            switch(afterHeadphoneTest) {
-                case "Solo":
+            console.log("Post headphone test");
+            switch(me.swipePages.getReferringPage()) {
+                case "playSolo":
+                    console.log("Starting solo game");
                     shadowRoot.dispatchCallback("startSoloGame");
                     break;
-                case "Net":
-                    shadowRoot.dispatchCallback("startNetworkGame");
+                case "pageNetPlay":
+                    startNetGame();
                     break;
+                default:
+                    console.log(me.swipePages.getReferringPage());
             }
         }
         shadowRoot.querySelector("#postHeadphoneTest").addEventListener("click", postHeadphoneTest);
 
-        var me = this;
-        function startSoloGame() {
-            afterHeadphoneTest = "Solo";
-            me.swipePages.gotoPage("pageHeadphoneTest");
-        }
-        shadowRoot.querySelector("#playSolo").addEventListener("click", startSoloGame);
-
-        function startNetworkGame() {
-            afterHeadphoneTest = "Net";
-            me.swipePages.gotoPage("pageHeadphoneTest");
-        }
-        shadowRoot.querySelector("#startNetworkGame").addEventListener("click", startNetworkGame);
-
-        function configureTurnAmplification(enabled) {
-            motionTracker.turnAmplificationAllowed = enabled;
-            me.swipePages.gotoPage("page1");
-            if(enabled) {
-                shadowRoot.querySelector("#enableTurnAmplification").classList.add("selected");
-                shadowRoot.querySelector("#disableTurnAmplification").classList.remove("selected");
+        function enableBoost(e) {
+            motionTracker.rotationalBoostAllowed = true;
+            if(me.swipePages.getReferringPage() === "pageSetupWizard1") {
+                me.swipePages.gotoPage("pageSetupWizard2");
             } else {
-                shadowRoot.querySelector("#enableTurnAmplification").classList.remove("selected");
-                shadowRoot.querySelector("#disableTurnAmplification").classList.add("selected");
+                me.swipePages.followLink(e.target);
             }
         }
-        shadowRoot.querySelector("#enableTurnAmplification").addEventListener("click", configureTurnAmplification.bind(true));
-        shadowRoot.querySelector("#disableTurnAmplification").addEventListener("click", configureTurnAmplification.bind(false));
+        function disableBoost(e) {
+            motionTracker.rotationalBoostAllowed = false;
+            me.swipePages.followLink(e.target);
+        }
+        shadowRoot.querySelector("#enableRotationalBoost").addEventListener("click", enableBoost);
+        shadowRoot.querySelector("#disableRotationalBoost").addEventListener("click", disableBoost);
 
         var swipePages    = shadowRoot.querySelector("swipe-pages");
         var emulator      = shadowRoot.querySelector("alto-emulator");
@@ -1187,8 +1170,12 @@ function gotoRecommendedHeadsets() {
 
         this.swipePages   = swipePages;
 
-        swipePages.bindElements(shadowRoot.querySelectorAll(".page-link"));
-        swipePages.bindElements(shadowRoot.querySelectorAll(".grid-button"));
+        swipePages.bindElements(
+            Array.prototype.filter.call(
+                shadowRoot.querySelectorAll(".button"),
+                el => el.id === ''
+            )
+        );
 
         shadowRoot.querySelector("#altoLink").addEventListener("click",
             function(e) {
@@ -1309,18 +1296,22 @@ function gotoRecommendedHeadsets() {
                     }, function(response){});
             }
         }
-        shadowRoot.querySelector("#inviteFriends").addEventListener("click", shareInviteOnFacebook);
+        //shadowRoot.querySelector("#inviteFriends").addEventListener("click", shareInviteOnFacebook);
 
-        // Net play
-        var me = this;
-        function gotoNetPlay(e) {
-            if(typeof window.RTCPeerConnection === 'undefined') {
-                me.swipePages.gotoPage("pageNoWebRTC");
-            } else {
-                me.swipePages.gotoPage("pageNetPlay");
+        // Copy Link
+        function copyLink(e) {
+            var textarea = document.getElementById(e.target.getAttribute("data-textarea"));
+            textarea.select();
+            try {
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Copy text command was ' + msg);
+            } catch(err) {
+                console.log('Oops, unable to copy');
             }
         }
-        shadowRoot.querySelector("#netPlay").addEventListener("click", gotoNetPlay);
+        shadowRoot.querySelector("#copyLink1").addEventListener("click", copyLink);
+        shadowRoot.querySelector("#copyLink2").addEventListener("click", copyLink);
 
         // Gamepad Configuration
         function configureGamepad() {

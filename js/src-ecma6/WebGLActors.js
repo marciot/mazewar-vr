@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 const eyeRadius                      = 0.75;
-const eyeHeight                      = 1.6;
+const eyeHeight                      = 1.5;
 const chestHeight                    = 1.3;
 const distanceOfHeldObjectsFromChest = 0.2;
 
@@ -167,6 +167,8 @@ function getMissileMaterial(missileColor) {
 class AnimatedRepresentation extends VisibleRepresentation {
     constructor(speedUp) {
         super();
+        const fallSpinVelocity = 2;
+
         this.animationFinishedCallback = null;
         this.animationDuration         = 0.33 / (speedUp || 1);
         this.tween = new Tween();
@@ -186,6 +188,14 @@ class AnimatedRepresentation extends VisibleRepresentation {
             (function(t, dt) {
                 this.quaternion.slerp(this.animationQuatFinal, Math.min(1, dt/(1-t)));
             }).bind(this));
+        this._animationFallTween = Tween.deltaT(
+                (t, dt) => {
+                    this.animationSpinQuat.setFromAxisAngle(
+                        this.animationSpinAxis, dt * fallSpinVelocity
+                    );
+                    this.object.quaternion.multiply(this.animationSpinQuat);
+                }
+            );
     }
     
     dispose() {
@@ -225,7 +235,6 @@ class AnimatedRepresentation extends VisibleRepresentation {
     }
 
     animateFall(isEnemy) {
-        const spinVelocity = 2;
         const spinEasing   = tweenFunctions.linear;
         /* The use of separate easing functions for enemy vs self
          * allows us to see enemies when they fall with us */
@@ -240,17 +249,7 @@ class AnimatedRepresentation extends VisibleRepresentation {
         );
         
         this.animationSpinAxis.copy(this.directionVector);
-        
-        this.tween.add(fallDuration, spinEasing,
-            Tween.deltaT(
-                (t, dt) => {
-                    this.animationSpinQuat.setFromAxisAngle(
-                        this.animationSpinAxis, dt * spinVelocity
-                    );
-                    this.object.quaternion.multiply(this.animationSpinQuat);
-                }
-            )
-        );
+        this.tween.add(fallDuration, spinEasing, this._animationFallTween);
     }
 
     stopAnimating() {
@@ -645,13 +644,13 @@ class SelfBody {
         this.combined.add(this.neck);
 
         function recenterCallback() {
-            if(motionTracker.turnAmplificationAllowed) {
+            if(motionTracker.rotationalBoostAllowed) {
                 if(motionTracker.motionScaling > 1.0) {
                     motionTracker.motionScaling = 1.0;
-                    theme.showStatusMessage("Recentered view.\nTurn amplification off.");
+                    theme.showStatusMessage("View centered.\nBoost disabled.");
                 } else {
                     motionTracker.motionScaling = 2.0;
-                    theme.showStatusMessage("Recentered view.\nTurn amplification on.");
+                    theme.showStatusMessage("View centered.\nBoost enabled.");
                 }
             } else {
                 theme.showStatusMessage("Recentered view.");

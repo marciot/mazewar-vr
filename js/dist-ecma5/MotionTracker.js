@@ -38,6 +38,11 @@ var MotionTracker = function () {
 
         this.rotationalBoost = new RotationalBoost();
         this.helper = new SphericalOps();
+
+        this.motionModel = MotionTracker.GEARVR_EMULATION;
+
+        // The following is used with motionModel.GEARVR_EMULATION
+        this.eyeToNeckDistance = new THREE.Vector3(0, 0.075, -0.0805);
     }
 
     _createClass(MotionTracker, [{
@@ -83,8 +88,8 @@ var MotionTracker = function () {
             this.callback(this.adjustedPose, this.adjustedOrientation);
         }
     }, {
-        key: "performMotionAdjustments",
-        value: function performMotionAdjustments() {
+        key: "riftTracking",
+        value: function riftTracking() {
             this.adjustedPose.copy(this.headsetPose);
             this.adjustedOrientation.copy(this.headsetOrientation);
 
@@ -100,10 +105,56 @@ var MotionTracker = function () {
             if(this.adjustedPose.length() > maxDistanceFromOrigin) {
                 this.resetPose();
             }*/
+        }
+    }, {
+        key: "gearEmulation",
+        value: function gearEmulation() {
+            /* Reference:
+              https://forums.oculus.com/vip/discussion/20885/head-neck-model-extreme
+              https://product-guides.oculus.com/en-us/documentation/dk2/latest/concepts/ug-tray-start-advanced/
+             */
+            this.adjustedPose.copy(this.eyeToNeckDistance).applyQuaternion(this.headsetOrientation);
+            this.adjustedOrientation.copy(this.headsetOrientation);
+        }
+    }, {
+        key: "ignorePose",
+        value: function ignorePose() {
+            this.adjustedPose.set(0, 0, 0);
+            this.adjustedOrientation.copy(this.headsetOrientation);
+        }
+    }, {
+        key: "performMotionAdjustments",
+        value: function performMotionAdjustments() {
+            switch (this.motionModel) {
+                case MotionTracker.IGNORE_POSE:
+                    this.ignorePose();
+                    break;
+                case MotionTracker.GEARVR_EMULATION:
+                    this.gearEmulation();
+                    break;
+                case MotionTracker.POSITIONAL_TRACKING:
+                    this.riftTracking();
+                    break;
+            }
 
             if (this.motionScaling > 1) {
                 this.rotationalBoost.apply(this.adjustedOrientation, this.adjustedPose, this.motionScaling);
             }
+        }
+    }], [{
+        key: "IGNORE_POSE",
+        get: function () {
+            return 0;
+        }
+    }, {
+        key: "GEARVR_EMULATION",
+        get: function () {
+            return 1;
+        }
+    }, {
+        key: "POSITIONAL_TRACKING",
+        get: function () {
+            return 2;
         }
     }]);
 
