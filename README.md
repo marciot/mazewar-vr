@@ -10,12 +10,14 @@ first person shooter games.
 
 _Maze War VR_  recreates the game in virtual reality. This remake is made for smartphones
 using inexpensive VR headsets such as the [Mattel ViewMaster VR] or [Homido VR], but can also be played on
-a PC using the latest version of Chrome.
+a PC using the latest version of Chrome or Firefox.
 
 _Maze War VR_ is modeled after version 2.0 of the Xerox Alto remake of Maze War that came about
 at the Xerox's Palo Alto Research Center in 1977. This version speaks a superset of that version's
 Ethernet protocol, allowing for game play with players playing the Xerox Alto game on an online
-[Xerox Alto Emulator].
+[Xerox Alto Emulator], as shown in this video:
+
+[![Maze War Video](https://github.com/marciot/mazewar-vr/raw/master/artwork/mazewar-youtube.png)](https://youtu.be/XXOH0z3Aki8)
 
 ## Play it now (beta):
 
@@ -76,6 +78,7 @@ Testing service provided by:
 
 [logo]: https://github.com/marciot/mazewar-vr/raw/master/artwork/fb-share.jpg "A screenshot from MazeWar VR"
 [Patreon page]: https://www.patreon.com/marciot
+[online video]: https://youtu.be/XXOH0z3Aki8
 [Homido VR]: https://www.amazon.com/gp/product/B01LZWDNX6/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01LZWDNX6&linkCode=as2&tag=marciot-20&linkId=d1dc4fe1c00bf166bf2fd7eaf2ddc08d
 [Mattel ViewMaster VR]: https://www.amazon.com/gp/product/B01CNSO79Q/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B01CNSO79Q&linkCode=as2&tag=marciot-20&linkId=4cbc30bb928aa42d2d028106a56cb072
 [Xerox Alto Emulator]: https://github.com/sethm/ContrAltoJS
