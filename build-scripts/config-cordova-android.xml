@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.marciot.mazewar_vr_free" version="0.1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Maze War VR</name>
+    <description>
+        Maze War VR is a remake of the game written by Steve Colley and Greg Thompson in 1974 at the NASA Ames
+        Research Center in California. Players would hunt down opponents in a three-dimensional maze, making it
+        the grandfather of first person shooter games.
+    </description>
+    <author email="mlt4356-github@yahoo.com" href="http://marciot.com/mazewar-vr">
+        Marcio Teixeira
+    </author>
+    <content src="cordova.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    
+    <preference name="SplashScreenDelay" value="10000" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashMaintainAspectRatio" value="true" />
+    
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+    <plugin name="cordova-plugin-splashscreen" spec="2.1.0" />
+    <platform name="android">
+        <icon density="ldpi" src="www/artwork/icon_512px.png" />
+        <icon density="mdpi" src="www/artwork/icon_512px.png" />
+        <icon density="hdpi" src="www/artwork/icon_512px.png" />
+        <icon density="xhdpi" src="www/artwork/icon_512px.png" />
+        <icon density="xxhdpi" src="www/artwork/icon_512px.png" />
+        <icon density="xxxhdpi" src="www/artwork/icon_512px.png" />
+        <splash density="land-hdpi" src="www/artwork/splash.png" />
+        <splash density="land-ldpi" src="www/artwork/splash.png" />
+        <splash density="land-mdpi" src="www/artwork/splash.png" />
+        <splash density="land-xhdpi" src="www/artwork/splash.png" />
+        <splash density="land-xhdpi" src="www/artwork/splash.png" />
+        <splash density="land-xhdpi" src="www/artwork/splash.png" />
+        <splash density="port-hdpi" src="www/artwork/splash.png" />
+        <splash density="port-ldpi" src="www/artwork/splash.png" />
+        <splash density="port-mdpi" src="www/artwork/splash.png" />
+        <splash density="port-xhdpi" src="www/artwork/splash.png" />
+        <splash density="port-xxhdpi" src="www/artwork/splash.png" />
+        <splash density="port-xxxhdpi" src="www/artwork/splash.png" />
+        <allow-intent href="market:*" />
+    </platform>
+    <platform name="ios">
+        <icon height="180" src="www/artwork/icon_512px.png" width="180" />
+        <icon height="60" src="www/artwork/icon_512px.png" width="60" />
+        <icon height="120" src="www/artwork/icon_512px.png" width="120" />
+        <icon height="76" src="www/artwork/icon_512px.png" width="76" />
+        <icon height="152" src="www/artwork/icon_512px.png" width="152" />
+        <icon height="40" src="www/artwork/icon_512px.png" width="40" />
+        <icon height="80" src="www/artwork/icon_512px.png" width="80" />
+        <icon height="57" src="www/artwork/icon_512px.png" width="57" />
+        <icon height="114" src="www/artwork/icon_512px.png" width="114" />
+        <icon height="72" src="www/artwork/icon_512px.png" width="72" />
+        <icon height="144" src="www/artwork/icon_512px.png" width="144" />
+        <icon height="29" src="www/artwork/icon_512px.png" width="29" />
+        <icon height="58" src="www/artwork/icon_512px.png" width="58" />
+        <icon height="50" src="www/artwork/icon_512px.png" width="50" />
+        <icon height="100" src="www/artwork/icon_512px.png" width="100" />
+        <splash height="480" src="www/artwork/splash.png" width="320" />
+        <splash height="960" src="www/artwork/splash.png" width="640" />
+        <splash height="1024" src="www/artwork/splash.png" width="768" />
+        <splash height="2048" src="www/artwork/splash.png" width="1536" />
+        <splash height="768" src="www/artwork/splash.png" width="1024" />
+        <splash height="1536" src="www/artwork/splash.png" width="2048" />
+        <splash height="1136" src="www/artwork/splash.png" width="640" />
+        <splash height="1334" src="www/artwork/splash.png" width="750" />
+        <splash height="2208" src="www/artwork/splash.png" width="1242" />
+        <splash height="1242" src="www/artwork/splash.png" width="2208" />
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+    <plugin name="cordova-plugin-crosswalk-webview" spec="~2.2.0">
+        <variable name="XWALK_VERSION" value="22+" />
+        <variable name="XWALK_LITEVERSION" value="xwalk_core_library_canary:17+" />
+        <variable name="XWALK_COMMANDLINE" value="--disable-pull-to-refresh-effect" />
+        <variable name="XWALK_MODE" value="embedded" />
+        <variable name="XWALK_MULTIPLEAPK" value="true" />
+    </plugin>
+    <plugin name="cordova-plugin-inappbrowser" spec="~1.6.1" />
+    <engine name="android" spec="~6.1.0" />
+</widget>

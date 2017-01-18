@@ -42,6 +42,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
         <meta http-equiv="Pragma" content="no-cache"/>
         <meta http-equiv="Expires" content="0"/>
+        
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' gap://ready; script-src 'self' 'unsafe-inline' http://connect.facebook.net; style-src 'self' 'unsafe-inline'; connect-src 'self' ws://0.peerjs.com:9000 http://0.peerjs.com:9000 https://storage.googleapis.com; img-src 'self' http://ir-na.amazon-adsystem.com https://www.facebook.com data: blob:; frame-src http://staticxx.facebook.com">
 
         <style>
             body {
@@ -108,8 +110,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             document.body.addEventListener("touchstart", onTouch);
         </script>
         <about-box></about-box>
-
-        <!-- Cordova CSP Configuration:
+        
+        <script type="text/javascript" src="cordova.js"></script>
+        
+        <!-- Phonegap CSP Configuration:
              Note: This normally goes in the head, but when running under PhoneGap App, the meta tag in head
              appears to get overwritten. Placing it here seems to be a workaround.
         -->
@@ -121,6 +125,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <!-- For some reason using the full webcomponents library breaks WebGL on iOS -->
         <!--<script type="text/javascript" src="js/third-party/webcomponents/webcomponents-lite.min.js"></script>-->
 
+        <!-- Networking Code -->
+        <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
+        <script type="text/javascript" src="js/src-ecma6/networking/cordova-setup.js?v=1"></script>
+        
         <link rel="import" href="js/SwipePages.html?v=1"></link>
         <link rel="import" href="js/AboutBox.html?v=1"></link>
 
@@ -131,7 +139,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             };
         </script>
         <script type="text/javascript" src="js/third-party/promise-7.0.4.min.js"></script>
-        <script type="text/javascript" src="js/third-party/webvr-polyfill.js"></script>
+        <script type="text/javascript" src="js/third-party/webvr-polyfill/webvr-polyfill.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/three.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/VREffect.js"></script>
 
@@ -139,9 +147,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <script type="text/javascript" src="js/third-party/fastclick.js"></script>
         <script type="text/javascript" src="js/third-party/tween-functions.js"></script>
         <script type="text/javascript" src="js/third-party/threejs/AnaglyphEffect.js"></script>
-
-        <!-- Networking Code -->
-        <script type="text/javascript" src="js/third-party/peerjs/peer-modified.js"></script>
 
         <!-- Shader programs for skydome -->
         <script type="application/x-glsl" id="sky-vertex">  
@@ -179,7 +184,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Main Program -->
 
-        <script type="text/javascript" src="js/src-ecma6/networking/cordova-setup.js?v=1"></script>
         <script type="text/javascript" src="js/src-ecma6/networking/frame-utilities.js?v=1"></script>
         <script type="text/javascript" src="js/src-ecma6/networking/pup-services.js?v=1"></script>
         <script type="text/javascript" src="js/src-ecma6/networking/pup-services-mazewar.js?v=1"></script>

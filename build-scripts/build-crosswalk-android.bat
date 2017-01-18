@@ -6,6 +6,9 @@ set "APK_X86=x86.apk"
 
 set "scriptDir=%cd%"
 pushd ..
+set "srcDir=%cd%"
+pushd ..
+set "dstDir=%cd%\mazewar-vr-crosswalk-android"
 
 IF "%1"=="build"           GOTO :BUILD
 IF "%1"=="build-release"   GOTO :BUILD_RELEASE
@@ -27,10 +30,10 @@ ECHO   clean           - Delete all built APKs
 EXIT /B
 
 :BUILD
-ECHO Building %scriptDir%
+ECHO Building %srcDir%
 del %APK_PREFIX%-debug.%APK_ARM%
 del %APK_PREFIX%-debug.%APK_X86%
-crosswalk-pkg "%scriptDir%"
+crosswalk-pkg "%srcDir%"
 GOTO :EXIT
 
 :BUILD_RELEASE

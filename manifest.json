@@ -3,7 +3,7 @@
   "name":       "Maze War VR",
   "icons": [
     {
-         "src":   "artwork/icon-512px.png",
+         "src":   "artwork/icon_512px.png",
          "sizes": "72x72 192x192",
          "type":  "image/png"
     }
@@ -12,5 +12,6 @@
   "xwalk_package_id":  "com.marciot.mazewar_vr_free",
   "start_url":         "/crosswalk.html",
   "display":           "standalone",
-  "orientation":       "landscape"
+  "orientation":       "landscape",
+  "csp": "script-src 'self' 'unsafe-eval' 'unsafe-inline'; object-src 'self'"
 }
