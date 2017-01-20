@@ -34,27 +34,34 @@ var AudioManager = function () {
             });
         }
 
-        loadSound("walking", 'sounds/169762__nhaudio__steps-amped.mp3', true);
-        loadSound("scream", 'sounds/13797__sweetneo85__wilhelm.mp3', false);
-        loadSound("pow", 'sounds/183467__snapper4298__pow1.mp3', false);
+        // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/audio.js?source=cc */
+        var elem = document.createElement('audio');
+        var supportsOgg = elem.canPlayType('audio/ogg; codecs="vorbis"').replace(/^no$/, '');
+        var ext = supportsOgg ? ".ogg" : ".mp3";
+
+        /* mp3 files don't work under Crosswalk Android. ogg does not work under iOS...
+        /* https://crosswalk-project.org/jira/si/jira.issueviews:issue-html/XWALK-7307/XWALK-7307.html */
+        loadSound("walking", 'sounds/169762__nhaudio__steps-amped' + ext, true);
+        loadSound("scream", 'sounds/13797__sweetneo85__wilhelm' + ext, false);
+        loadSound("pow", 'sounds/183467__snapper4298__pow1' + ext, false);
 
         this.listener = new THREE.AudioListener();
     }
 
     _createClass(AudioManager, [{
-        key: "saveSoundSet",
+        key: 'saveSoundSet',
         value: function saveSoundSet(label, soundSet) {
             this.inactiveSoundSets[label].push(soundSet);
         }
     }, {
-        key: "reuseSoundSet",
+        key: 'reuseSoundSet',
         value: function reuseSoundSet(label) {
             if (this.inactiveSoundSets[label].length) {
                 return this.inactiveSoundSets[label].pop();
             }
         }
     }, {
-        key: "attachBufferToNode",
+        key: 'attachBufferToNode',
         value: function attachBufferToNode(label, node) {
             var sound = this.sounds[label];
             if (!sound.buffer) {
@@ -71,7 +78,7 @@ var AudioManager = function () {
             }
         }
     }, {
-        key: "isReady",
+        key: 'isReady',
         get: function () {
             return this.pendingSounds == 0;
         }
@@ -112,20 +119,20 @@ var ActorSounds = function () {
     }
 
     _createClass(ActorSounds, [{
-        key: "dispose",
+        key: 'dispose',
         value: function dispose() {
             audioManager.saveSoundSet("playerSounds", this.soundSet);
             this.representation.children.length = 0;
         }
     }, {
-        key: "startWalking",
+        key: 'startWalking',
         value: function startWalking() {
             if (audioManager.isReady) {
                 this.soundSet.walk.play();
             }
         }
     }, {
-        key: "scream",
+        key: 'scream',
         value: function scream() {
             if (audioManager.isReady) {
                 this.soundSet.walk.stop();
@@ -133,7 +140,7 @@ var ActorSounds = function () {
             }
         }
     }, {
-        key: "bang",
+        key: 'bang',
         value: function bang() {
             if (audioManager.isReady) {
                 this.soundSet.bang.play();
