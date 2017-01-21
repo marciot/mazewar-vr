@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         .middle {
             width:      80%;
+            height:     60%;
             flex:       1 0 60%;
         }
 
@@ -50,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         .flex-grid {
             display:        flex;
             flex-direction: column;
-            align-items:    center;
+            align-items:    stretch;
             flex-wrap:      wrap;
 
             /* Fallback: */
@@ -62,9 +63,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             box-sizing: border-box;
             position:   relative;
             flex-grow:  1;
-
-            /* Fallback: */
-            margin:     0 auto;
         }
 
         @media (orientation: landscape) {
@@ -383,32 +381,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }
 
         @media (orientation: landscape) {
-            .float {
+            figure.float {
                 float:      right;
                 max-height: 25vw;
                 max-width:  30%;
                 padding:    1em;
+                margin:     0 5px;
             }
         }
 
         @media (orientation: portrait) {
-            .float {
-                display:    block;
-                max-height: 20vh;
-                max-width:  30%;
+            figure.float {
+                max-width:  40%;
                 padding:    0.5em;
                 margin:     0 auto;
             }
         }
 
-        figure {
+        figure.float {
+            display: table;
             padding: 0;
-            margin: 0;
         }
 
-        figcaption {
+        figcaption.float {
             font-size: small;
             padding: 2px 0;
+            caption-side: bottom;
+        }
+
+        figure > img {
+            width: 100%;
         }
 
         #headphoneInstructions2 {
@@ -733,14 +735,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <h1>How to Play</h1>
                 <p>
-                    Find your opponents in the maze and shoot at them! Face your body in the direction you want to go and hold down the trigger to walk; press and release the trigger rapidly to shoot.
+                    Find your opponents in the maze and shoot at them! Face in the direction you want to go and hold down the button to walk; press and release the button rapidly to shoot.
                 </p>
                 <h2>Let your ears be your guide!</h2>
                 <p>
-                    <cite>Maze War VR</cite> has 3D audio and is meant to be played
-                    with your ears wide open! Wear good stereo headphones (make sure
-                    left and right are not reversed), listen carefully and with
-                    practice you learn to track your opponents by sound!
+                    <cite>Maze War VR</cite> has positional audio. Wear good stereo headphones<sup>&dagger;</sup>, listen carefully and with practice you'll learn to track your opponents by sound!
+                </p>
+                <p>
+                    <sup>&dagger;</sup> Use the audio test at the start of each game to
+                    make sure the left and right are not reversed!
                 </p>
             </div>
             <div>
@@ -755,16 +758,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <div>
                 <h1>The History of Maze War</h1>
                 <figure class="float">
-                <img src="artwork/mazewar-imlac.jpg">
-                <figcaption>
-                Maze War on the Imlac - By Bruce Damer<br><a rel="nofollow" class="external free" href="https://www.youtube.com/watch?v=ZgT9IgRlrvI&amp;ab_channel=brucedamer">video</a>, <a href="http://creativecommons.org/licenses/by/2.5" title="Creative Commons Attribution 2.5">CC BY 2.5</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=47507741">wikimedia</a>
-                </figcaption>
+                    <img src="artwork/mazewar-imlac.jpg">
+                    <figcaption>
+                    Screen capture from <a rel="nofollow" class="external free" href="https://www.youtube.com/watch?v=ZgT9IgRlrvI&amp;ab_channel=brucedamer">video by Bruce Damer</a>, <a href="http://creativecommons.org/licenses/by/2.5" title="Creative Commons Attribution 2.5">CC BY 2.5</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=47507741">wikimedia</a>
+                    </figcaption>
                 </figure>
                 <p>
-                <cite>Maze War</cite> was written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California.
+                The original <cite>Maze War</cite> was written by Steve Colley and Greg Thompson in 1974 at the NASA Ames Research Center in California.
                 </p>
                 <p>
-                Players would move down a three-dimensional maze taking shots at opponents. This made it the <a href="http://www.polygon.com/features/2015/5/21/8627231/the-first-first-person-shooter" target="_blank">first first person shooter</a> game!
+                Players moved down a three-dimensional maze taking shots at opponents, making it the <a href="http://www.polygon.com/features/2015/5/21/8627231/the-first-first-person-shooter" target="_blank">first first person shooter</a> game!
                 </p>
             </div>
             <div class="button" data-page="pageInspiration">Maze War on the Alto</div>
@@ -773,14 +776,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <div class="flex-distribute" id="pageInspiration">
             <div>
                 <h1>Maze War on the Alto</h1>
-                <img src="artwork/mazewar-alto.png" class="float">
+                <figure class="float">
+                <img src="artwork/mazewar-alto.png">
+                <figcaption>Maze Wars on the Xerox Alto</figcaption>
+                </figure>
                 <p>
                 By 1977, the game was taken to MIT, where it was rewritten for the Xerox Alto
                 and made playable on an early version of the Ethernet packet switched network.
                 </p>
                 <p>
-                <cite>Maze War VR</cite> is directly inspired by the Xerox Alto version of Maze War. I've made a special effort to use the same networking protocol as that version, allowing the two games to interact (see <a href="https://youtu.be/XXOH0z3Aki8" target="_blank">video demo on YouTube</a>).
+                I've made a special effort in <cite>Maze War VR</cite> to use the same networking protocol as that version, allowing the two games to interact (see <a href="https://youtu.be/XXOH0z3Aki8" target="_blank">video demo on YouTube</a>).
                 </p>
+            </div>
+            <div id="altoLink" class="button" data-page="pagePlayAltoIntro">Play the Alto Version!</div>
+        </div>
+
+        <div class="flex-distribute" id="pagePlayAltoIntro">
+            <div>
+                <h1>Maze War on the Alto</h1>
                 On the next page, you can play Maze War on the Xerox Alto. The demonstration is made possible by the efforts of the following people and organizations:
                 <ul>
                 <li><a href="https://github.com/livingcomputermuseum/ContrAlto">Contralto</a> from <a href="http://www.livingcomputers.org">Living
@@ -790,7 +803,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 </ul>
                 </p>
             </div>
-            <div id="altoLink" class="button" data-page="pageAltoMazeWar">Play the Alto Version!</div>
+            <div id="altoLink" class="button" data-page="pageAltoMazeWar">Start Demo</div>
         </div>
 
         <div class="flex-distribute" id="pageDisplayOptions">
