@@ -26,6 +26,7 @@ ECHO   build           - Builds crosswalk APK
 ECHO   build-release   - Builds crosswalk APK
 ECHO   install         - Install ARM APK to device using "adb"
 ECHO   install-release - Install ARM APK to device using "adb"
+ECHO   sign-release    - Sign the APK files for distribution
 ECHO   clean           - Delete all built APKs
 EXIT /B
 
