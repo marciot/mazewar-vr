@@ -12,7 +12,7 @@ _Maze War VR_  recreates the game in virtual reality. This remake is made for sm
 using inexpensive VR headsets such as the [Mattel ViewMaster VR] or [Homido VR], but can also be played on
 a PC using the latest version of Chrome or Firefox.
 
-Official game trailer on YouTube:
+## Official game trailer on YouTube:
 
 [![Maze War VR Trailer](https://github.com/marciot/mazewar-vr/raw/master/artwork/mazewar-youtube1.png)](https://www.youtube.com/watch?v=MyrLqLo-6qA)
 
@@ -36,9 +36,9 @@ See the project [wiki page] for compatibility notes for specific devices that ha
 
 ### Compatibility with the Xerox Alto version
 
-_Maze War VR_ is modeled after version 2.0 of the Xerox Alto remake of Maze War that came about
-at the Xerox's Palo Alto Research Center in 1977. This version speaks a superset of that version's
-Ethernet protocol, allowing for game play with players playing the Xerox Alto game on an online
+_Maze War VR_ is modeled after version 2.0 of the Xerox Alto remake of Maze War that was developed
+at the Xerox's Palo Alto Research Center in 1977. _Maze War VR_ implements the same [PUP protocol]
+as that version, allowing _Maze War VR_ to be compatible with Maze War running on an
 [Xerox Alto Emulator], as shown in this technical demonstration:
 
 [![Alto Maze War Side-By-Side](https://github.com/marciot/mazewar-vr/raw/master/artwork/mazewar-youtube2.png)](https://www.youtube.com/watch?v=XXOH0z3Aki8)
@@ -95,6 +95,7 @@ Testing service provided by:
 [WebVR]: https://webvr.info
 [WebAudio]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
 [WebRTC]: https://webrtc.org
+[PUP protocol]: https://en.wikipedia.org/wiki/PARC_Universal_Packet
 [Gamepad API]: https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
 [Babel]: https://babeljs.io/
 [mesh networking code]: https://github.com/marciot/retroweb-networking
