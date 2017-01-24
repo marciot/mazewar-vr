@@ -116,15 +116,17 @@ function init() {
     document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
     document.addEventListener("visibilitychange",       onVisibilityChange, false);
 
-    function startGame() {
-        game.endGame();
-
-        game = new SoloGame(getWebGLPlayerFactory());
-        game.startGame();
-
+    function enterGameInProgress() {
         startVr();
         theme.fadeEffect();
         gpClicker.gameStarting();
+    }
+
+    function startSoloGame() {
+        game.endGame();
+        game = new SoloGame(getWebGLPlayerFactory());
+        game.startGame();
+        enterGameInProgress();
     }
 
     function joinNetworkGame() {
@@ -141,7 +143,7 @@ function init() {
                     break;
                 case "opponentAvailable":
                     console.log("Opponent found");
-                    enterGame();
+                    enterGameInProgress();
                     break;
             }
         }
@@ -164,7 +166,7 @@ function init() {
         var about = document.querySelector("about-box");
         if(about) {
             about.addCallback("gfxModeSelected",  modeSelected);
-            about.addCallback("startSoloGame",    startGame);
+            about.addCallback("startSoloGame",    startSoloGame);
             about.addCallback("startNetworkGame", joinNetworkGame);
             if(FastClick) {
                 FastClick.attach(about);

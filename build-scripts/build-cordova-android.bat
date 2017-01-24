@@ -1,6 +1,6 @@
 @ECHO OFF
 set "APK_PREFIX_ORIG=android"
-set "APK_PREFIX=com.marciot.mazewar_vr_free-0.1.1"
+set "APK_PREFIX=com.marciot.mazewar_vr_free-0.1.2"
 set "APK_SIGNING_KEY=mazewar-vr-store-assets/mazewar-vr-release-key.jks"
 set "APK_ARM=armv7"
 set "APK_X86=x86"
