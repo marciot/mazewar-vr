@@ -443,7 +443,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <div class="button" data-page="pageHeadsets">Headset Buying Guide</div>
             </div>
             <div class="footer">
-                <span id="version">Version 0.1.1</span>
+                <span id="version">Version 0.1.2</span>
             </div>
         </div>
 
@@ -1351,8 +1351,8 @@ function gotoRecommendedHeadsets() {
             console.log("Opening external link using _system", url);
             window.open(url, '_system');
         }
-        if(window.isCrosswalk) {
-            console.log("Crosswalk detected, rewriting links");
+        if(window.isCrosswalk || window.isCordova) {
+            console.log("Running under Cordova/Crosswalk, rewriting links");
             var links = shadowRoot.querySelectorAll("A");
             var domainRegex = /^https?:\/\/((?:[\w\d-]+\.)+[\w\d]{2,})/i;
             for(var i = 0; i < links.length; i++) {

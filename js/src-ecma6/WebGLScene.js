@@ -1,7 +1,7 @@
 const fadeDuration = 5;
 
 var overlay, camera, scene, renderer, effect, game;
-var maze, theme;
+var maze, theme, audioManager;
 var loader = new THREE.TextureLoader();
 var tween = new Tween();
 
@@ -28,8 +28,8 @@ function setupScene() {
 
     overlay   = new OverlayText(camera);
 
-    var soundManager = new AudioManager();
-    camera.add( soundManager.listener );
+    audioManager = new AudioManager();
+    camera.add( audioManager.listener );
 
     window.addEventListener('resize', resize, false);
 

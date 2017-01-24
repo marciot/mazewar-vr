@@ -130,8 +130,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
         <!-- Library Code -->
         <script>
-            WebVRConfig = {
-                ROTATE_INSTRUCTIONS_DISABLED: true
+            window.WebVRConfig = {
+                ROTATE_INSTRUCTIONS_DISABLED:   true,
+                ALWAYS_APPEND_POLYFILL_DISPLAY: true
             };
         </script>
         <script type="text/javascript" src="js/third-party/promise-7.0.4.min.js"></script>

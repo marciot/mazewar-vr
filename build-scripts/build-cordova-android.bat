@@ -41,6 +41,7 @@ xcopy /s /i "%srcDir%\sounds"    "%dstDir%\www\sounds"
 xcopy /s /i "%srcDir%\textures"  "%dstDir%\www\textures"
 cd "%dstDir%"
 call cordova prepare
+
 GOTO :EXIT
 
 :BUILD
@@ -55,6 +56,7 @@ CALL :PREPARE
 ECHO Building "%dstDir%"
 cd "%dstDir%"
 call cordova build android --release
+copy "%scriptDir%\xwalk-command-line" "%dstDir%\platform\android\assets"
 GOTO :EXIT
 
 :SIGN_RELEASE

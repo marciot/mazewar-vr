@@ -45,12 +45,15 @@ function setupVR(sceneCallback) {
         // Get the VRDisplay and save it for later.
         vrDisplay = null;
         navigator.getVRDisplays().then(function (displays) {
-            if (displays.length > 0) {
-                vrDisplay = displays[0];
-            } else {
-                mwLog("WebVR is supported, but no VR displays found");
+            for (var i = 0; i < displays.length; i++) {
+                if (displays[i].capabilities.hasOrientation) {
+                    console.log("Using VR display", i + 1, "of", displays.length);
+                    vrDisplay = displays[0];
+                    sceneCallback();
+                    return;
+                }
             }
-            sceneCallback();
+            mwLog("WebVR is supported, but no VR displays found");
         });
     } catch (e) {
         mwLog("Query of VRDisplays failed");
@@ -100,16 +103,23 @@ function init() {
     }
 
     function onVisibilityChange(event) {
-        if (document.hidden || event.target.webkitHidden) {
+        var hidden = document.visibilityState === "hidden";
+        if (hidden) {
             endVr();
             document.querySelector("about-box").setOverlayVisibility(true);
+            game.endGame();
         }
     }
 
     document.addEventListener("webkitvisibilitychange", onVisibilityChange, false);
     document.addEventListener("visibilitychange", onVisibilityChange, false);
 
-    function enterGame() {
+    function startGame() {
+        game.endGame();
+
+        game = new SoloGame(getWebGLPlayerFactory());
+        game.startGame();
+
         startVr();
         theme.fadeEffect();
         gpClicker.gameStarting();
@@ -152,7 +162,7 @@ function init() {
         var about = document.querySelector("about-box");
         if (about) {
             about.addCallback("gfxModeSelected", modeSelected);
-            about.addCallback("startSoloGame", enterGame);
+            about.addCallback("startSoloGame", startGame);
             about.addCallback("startNetworkGame", joinNetworkGame);
             if (FastClick) {
                 FastClick.attach(about);
@@ -185,7 +195,6 @@ function update(dt) {
 
     if (headsetDirector) {
         headsetDirector.update(dt);
-        gpClicker.poll();
     }
 
     actors.animate(dt);

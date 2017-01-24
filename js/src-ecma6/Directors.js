@@ -215,6 +215,7 @@ class HeadsetDirector extends Director {
         if(this.pressTimer) {
             window.clearTimeout(this.pressTimer);
         }
+        headsetDirector = null;
     }
 
     triggerHeld() {
@@ -267,5 +268,6 @@ class HeadsetDirector extends Director {
                 this.animationFinished();
             }
         }
+        gpClicker.poll();
     }
 }

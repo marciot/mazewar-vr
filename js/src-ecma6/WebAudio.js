@@ -73,8 +73,6 @@ class AudioManager {
     }
 }
 
-var audioManager = new AudioManager();
-
 class ActorSounds {
     constructor() {
         const fadeDistance = MazeWalls.cellDimension * 2;
@@ -100,29 +98,60 @@ class ActorSounds {
         this.representation.add(this.soundSet.walk);
         this.representation.add(this.soundSet.fall);
         this.representation.add(this.soundSet.bang);
+
+        this.onVisChangeFunc = this.onVisibilityChange.bind(this);
+        document.addEventListener("webkitvisibilitychange", this.onVisChangeFunc, false);
+        document.addEventListener("visibilitychange",       this.onVisChangeFunc, false);
+    }
+
+    onVisibilityChange(event) {
+        const isVisible = document.visibilityState === "visible";
+        if(!isVisible) {
+            this.stopAll();
+        }
+    }
+
+    stopAll() {
+        this.stopSound("walk");
+        this.stopSound("fall");
+        this.stopSound("bang");
     }
 
     dispose() {
+        document.removeEventListener("webkitvisibilitychange", this.onVisChangeFunc, false);
+        document.removeEventListener("visibilitychange",       this.onVisChangeFunc, false);
+
+        this.stopAll();
         audioManager.saveSoundSet("playerSounds", this.soundSet);
         this.representation.children.length = 0;
     }
 
-    startWalking() {
-        if(audioManager.isReady) {
-            this.soundSet.walk.play();
+    isPlaying(label) {
+        return this.soundSet[label].isPlaying;
+    }
+
+    playSound(label) {
+        if(audioManager.isReady && !this.isPlaying(label)) {
+            this.soundSet[label].play();
         }
+    }
+
+    stopSound(label) {
+        if(audioManager.isReady && this.isPlaying(label)) {
+            this.soundSet[label].stop();
+        }
+    }
+
+    startWalking() {
+        this.playSound("walk");
     }
 
     scream() {
-        if(audioManager.isReady) {
-            this.soundSet.walk.stop();
-            this.soundSet.fall.play();
-        }
+        this.stopSound("walk");
+        this.playSound("fall");
     }
 
     bang() {
-        if(audioManager.isReady) {
-            this.soundSet.bang.play();
-        }
+        this.playSound("bang");
     }
 }

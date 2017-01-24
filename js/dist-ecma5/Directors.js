@@ -273,6 +273,7 @@ var HeadsetDirector = function (_Director3) {
             if (this.pressTimer) {
                 window.clearTimeout(this.pressTimer);
             }
+            headsetDirector = null;
         }
     }, {
         key: 'triggerHeld',
@@ -332,6 +333,7 @@ var HeadsetDirector = function (_Director3) {
                     this.animationFinished();
                 }
             }
+            gpClicker.poll();
         }
     }]);
 

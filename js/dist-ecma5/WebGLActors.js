@@ -655,6 +655,7 @@ var SelfRepresentation = function (_AnimatedRepresentati3) {
         value: function dispose() {
             _get(SelfRepresentation.prototype.__proto__ || Object.getPrototypeOf(SelfRepresentation.prototype), "dispose", this).call(this);
             this.map.dispose();
+            this.body.dispose();
         }
     }, {
         key: "setPosition",
@@ -792,6 +793,9 @@ var SelfBody = function () {
     }
 
     _createClass(SelfBody, [{
+        key: "dispose",
+        value: function dispose() {}
+    }, {
         key: "getNeck",
         value: function getNeck() {
             return this.neck;

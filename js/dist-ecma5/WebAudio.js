@@ -87,8 +87,6 @@ var AudioManager = function () {
     return AudioManager;
 }();
 
-var audioManager = new AudioManager();
-
 var ActorSounds = function () {
     function ActorSounds() {
         _classCallCheck(this, ActorSounds);
@@ -116,35 +114,71 @@ var ActorSounds = function () {
         this.representation.add(this.soundSet.walk);
         this.representation.add(this.soundSet.fall);
         this.representation.add(this.soundSet.bang);
+
+        this.onVisChangeFunc = this.onVisibilityChange.bind(this);
+        document.addEventListener("webkitvisibilitychange", this.onVisChangeFunc, false);
+        document.addEventListener("visibilitychange", this.onVisChangeFunc, false);
     }
 
     _createClass(ActorSounds, [{
+        key: 'onVisibilityChange',
+        value: function onVisibilityChange(event) {
+            var isVisible = document.visibilityState === "visible";
+            if (!isVisible) {
+                this.stopAll();
+            }
+        }
+    }, {
+        key: 'stopAll',
+        value: function stopAll() {
+            this.stopSound("walk");
+            this.stopSound("fall");
+            this.stopSound("bang");
+        }
+    }, {
         key: 'dispose',
         value: function dispose() {
+            document.removeEventListener("webkitvisibilitychange", this.onVisChangeFunc, false);
+            document.removeEventListener("visibilitychange", this.onVisChangeFunc, false);
+
+            this.stopAll();
             audioManager.saveSoundSet("playerSounds", this.soundSet);
             this.representation.children.length = 0;
         }
     }, {
+        key: 'isPlaying',
+        value: function isPlaying(label) {
+            return this.soundSet[label].isPlaying;
+        }
+    }, {
+        key: 'playSound',
+        value: function playSound(label) {
+            if (audioManager.isReady && !this.isPlaying(label)) {
+                this.soundSet[label].play();
+            }
+        }
+    }, {
+        key: 'stopSound',
+        value: function stopSound(label) {
+            if (audioManager.isReady && this.isPlaying(label)) {
+                this.soundSet[label].stop();
+            }
+        }
+    }, {
         key: 'startWalking',
         value: function startWalking() {
-            if (audioManager.isReady) {
-                this.soundSet.walk.play();
-            }
+            this.playSound("walk");
         }
     }, {
         key: 'scream',
         value: function scream() {
-            if (audioManager.isReady) {
-                this.soundSet.walk.stop();
-                this.soundSet.fall.play();
-            }
+            this.stopSound("walk");
+            this.playSound("fall");
         }
     }, {
         key: 'bang',
         value: function bang() {
-            if (audioManager.isReady) {
-                this.soundSet.bang.play();
-            }
+            this.playSound("bang");
         }
     }]);
 

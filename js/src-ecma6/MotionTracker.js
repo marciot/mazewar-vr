@@ -1,11 +1,5 @@
 class MotionTracker {
     constructor(callback, recenterCallback) {
-        if('VRFrameData' in window) {
-            if(!this.frameData) {
-                this.frameData = new VRFrameData();
-            }
-        }
-        
         console.log("Motion tracker initialized");
 
         this.zeroPose             = new THREE.Vector3();
@@ -39,6 +33,11 @@ class MotionTracker {
         this.eyeToNeckDistance = new THREE.Vector3(0, 0.075, -0.0805);
     }
 
+    dispose() {
+        this.callback = null;
+        this.tapDetector.dispose();
+    }
+
     static get IGNORE_POSE()         {return 0;}
     static get GEARVR_EMULATION()    {return 1;}
     static get POSITIONAL_TRACKING() {return 2;}
@@ -61,13 +60,7 @@ class MotionTracker {
 
     update() {
         // Get the headset position and orientation.
-        var pose;
-        if (vrDisplay.getFrameData) {
-            vrDisplay.getFrameData(this.frameData);
-            pose = this.frameData.pose;
-        } else if (vrDisplay.getPose) {
-            pose = vrDisplay.getPose();
-        }
+        var pose = vrDisplay.getPose();
         if (pose.position !== null) {
             this.headsetPose.fromArray(pose.position);
         }
@@ -200,6 +193,10 @@ class TapDetector {
         };
 
         this.tapClock = new THREE.Clock(false);
+    }
+
+    dispose() {
+        this.eventListeners.length = 0;
     }
 
     addEventListener(eventStr, callback) {

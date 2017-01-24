@@ -551,6 +551,7 @@ class SelfRepresentation extends AnimatedRepresentation {
     dispose() {
         super.dispose();
         this.map.dispose();
+        this.body.dispose();
     }
 
     setPosition(x, z) {
@@ -660,6 +661,9 @@ class SelfBody {
         motionTracker = this.motionTracker;
 
         this.headsetOrientationVector = new THREE.Vector3();
+    }
+
+    dispose() {
     }
 
     getNeck() {

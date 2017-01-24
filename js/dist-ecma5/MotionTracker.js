@@ -6,12 +6,6 @@ var MotionTracker = function () {
     function MotionTracker(callback, recenterCallback) {
         _classCallCheck(this, MotionTracker);
 
-        if ('VRFrameData' in window) {
-            if (!this.frameData) {
-                this.frameData = new VRFrameData();
-            }
-        }
-
         console.log("Motion tracker initialized");
 
         this.zeroPose = new THREE.Vector3();
@@ -46,6 +40,12 @@ var MotionTracker = function () {
     }
 
     _createClass(MotionTracker, [{
+        key: "dispose",
+        value: function dispose() {
+            this.callback = null;
+            this.tapDetector.dispose();
+        }
+    }, {
         key: "resetPose",
         value: function resetPose() {
             this.zeroPose.copy(this.headsetPose);
@@ -65,13 +65,7 @@ var MotionTracker = function () {
         key: "update",
         value: function update() {
             // Get the headset position and orientation.
-            var pose;
-            if (vrDisplay.getFrameData) {
-                vrDisplay.getFrameData(this.frameData);
-                pose = this.frameData.pose;
-            } else if (vrDisplay.getPose) {
-                pose = vrDisplay.getPose();
-            }
+            var pose = vrDisplay.getPose();
             if (pose.position !== null) {
                 this.headsetPose.fromArray(pose.position);
             }
@@ -240,6 +234,11 @@ var TapDetector = function () {
     }
 
     _createClass(TapDetector, [{
+        key: "dispose",
+        value: function dispose() {
+            this.eventListeners.length = 0;
+        }
+    }, {
         key: "addEventListener",
         value: function addEventListener(eventStr, callback) {
             this.eventListeners[eventStr].push(callback);
