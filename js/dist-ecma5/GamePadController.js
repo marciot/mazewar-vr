@@ -25,6 +25,13 @@ var GamePadController = function () {
     }
 
     _createClass(GamePadController, [{
+        key: "dispose",
+        value: function dispose() {
+            this.pressedCallback = null;
+            this.releasedCallback = null;
+            this.statusCallback = null;
+        }
+    }, {
         key: "searchForButton",
         value: function searchForButton() {
             var gamepads = this.gamepads;

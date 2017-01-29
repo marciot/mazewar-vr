@@ -11,6 +11,12 @@ class GamePadController {
         this.releasedCallback = releasedCallback;
         this.statusCallback   = statusCallback;
     }
+
+    dispose() {
+        this.pressedCallback  = null;
+        this.releasedCallback = null;
+        this.statusCallback   = null;
+    }
     
     static get NO_GAMEPADS()     {return -1};
     static get NO_BUTTONS_DOWN() {return  0};

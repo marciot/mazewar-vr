@@ -216,6 +216,9 @@ class HeadsetDirector extends Director {
             window.clearTimeout(this.pressTimer);
         }
         headsetDirector = null;
+
+        gpClicker.dispose();
+        gpClicker = null;
     }
 
     triggerHeld() {

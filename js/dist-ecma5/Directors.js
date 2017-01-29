@@ -274,6 +274,9 @@ var HeadsetDirector = function (_Director3) {
                 window.clearTimeout(this.pressTimer);
             }
             headsetDirector = null;
+
+            gpClicker.dispose();
+            gpClicker = null;
         }
     }, {
         key: 'triggerHeld',
