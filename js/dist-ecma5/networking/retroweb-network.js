@@ -312,22 +312,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }, {
             key: '_receivedNetworkObject',
             value: function _receivedNetworkObject(peer, obj) {
-                var _this = this;
-
                 if (obj.hasOwnProperty("peerList")) {
-                    (function () {
-                        _this._info("retroweb-network: Receiving updated peer list", obj.peerList);
-                        _this.peerList = obj.peerList;
-                        _this._checkIfFullyConnected();
-                        /* All peers will receive the peerList updates. To avoid two peers from
-                         * trying to make redundant connections to each other, we impose a rule
-                         * where only a peer with the higher ID connects to the peer with the
-                         * lower ID */
-                        function connectionSieve(peer) {
-                            return this.myPeerId > peer;
-                        }
-                        _this._connectToPeers(_this.peerList, connectionSieve.bind(_this));
-                    })();
+                    /* All peers will receive the peerList updates. To avoid two peers from
+                     * trying to make redundant connections to each other, we impose a rule
+                     * where only a peer with the higher ID connects to the peer with the
+                     * lower ID */
+                    var connectionSieve = function (peer) {
+                        return this.myPeerId > peer;
+                    };
+
+                    this._info("retroweb-network: Receiving updated peer list", obj.peerList);
+                    this.peerList = obj.peerList;
+                    this._checkIfFullyConnected();
+                    this._connectToPeers(this.peerList, connectionSieve.bind(this));
                 } else {
                     this.receivedNetworkObject(peer, obj);
                 }
@@ -468,25 +465,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         function _class2(linkType, peerOptions, networkDataCallback, stateChangedCallback) {
             _classCallCheck(this, _class2);
 
-            var _this2 = _possibleConstructorReturn(this, (_class2.__proto__ || Object.getPrototypeOf(_class2)).call(this, peerOptions, networkDataCallback, stateChangedCallback));
+            var _this = _possibleConstructorReturn(this, (_class2.__proto__ || Object.getPrototypeOf(_class2)).call(this, peerOptions, networkDataCallback, stateChangedCallback));
 
-            _this2.broadcastDstId = "*";
+            _this.broadcastDstId = "*";
             switch (linkType.toUpperCase()) {
                 case "LOCALTALK":
-                    _this2.peerPrefix = "retroweb_lt_";break;
+                    _this.peerPrefix = "retroweb_lt_";break;
                 case "ALTO":
-                    _this2.peerPrefix = "retroweb_al_";break;
+                    _this.peerPrefix = "retroweb_al_";break;
                 default:
-                    _this2.peerPrefix = "retroweb_" + linkType.toLowerCase() + "_";
-                    _this2._error("retroweb-network: Unknown link type", linkType);
+                    _this.peerPrefix = "retroweb_" + linkType.toLowerCase() + "_";
+                    _this._error("retroweb-network: Unknown link type", linkType);
                     break;
             }
             /* Attempt to pre-populate the peerMap by requesting node id updates from all peers */
             function queryAddresses() {
                 this.sendObjectToAll({ command: "queryNodeId" });
             }
-            setTimeout(queryAddresses.bind(_this2), 600);
-            return _this2;
+            setTimeout(queryAddresses.bind(_this), 600);
+            return _this;
         }
 
         _createClass(_class2, [{

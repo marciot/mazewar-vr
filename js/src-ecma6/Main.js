@@ -115,6 +115,12 @@ function init() {
             endVr();
             document.querySelector("about-box").setOverlayVisibility(true);
             game.endGame();
+            this.startNetworkGameOnReturn = document.querySelector("about-box").getCurrentPage() === "pageNetWaiting";
+        } else {
+            if(this.startNetworkGameOnReturn) {
+                this.startNetworkGameOnReturn = false;
+                joinNetworkGame();
+            }
         }
     }
 

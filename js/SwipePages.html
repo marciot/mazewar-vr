@@ -303,6 +303,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         return this.pages.referringPage;
     }
 
+    SwipePagesProto.getCurrentPage = function() {
+        return this.pages.currentPage;
+    }
+
     document.registerElement('swipe-pages', {prototype: SwipePagesProto});
 
 })((document._currentScript || document.currentScript).ownerDocument);

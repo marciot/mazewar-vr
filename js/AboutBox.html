@@ -1376,7 +1376,7 @@ function gotoRecommendedHeadsets() {
         function openHyperlink(e) {
             e.preventDefault();
             e.stopPropagation();
-            const url = e.target.href;
+            const url = e.currentTarget.href;
             console.log("Opening external link using _system", url);
             window.open(url, '_system');
         }
@@ -1397,6 +1397,10 @@ function gotoRecommendedHeadsets() {
     AboutBoxProto.showPage = function(page) {
         this.setOverlayVisibility(true);
         this.swipePages.gotoPage(page);
+    }
+
+    AboutBoxProto.getCurrentPage = function() {
+        return this.swipePages.getCurrentPage();
     }
 
     AboutBoxProto.showNetworkError = function(error) {
