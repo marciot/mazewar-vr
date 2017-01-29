@@ -102,6 +102,11 @@ function init() {
         }
     }
 
+    function onBeforeUnload(event) {
+        game.endGame();
+    }
+    window.addEventListener("beforeunload", onBeforeUnload, false);
+
     function onVisibilityChange(event) {
         var hidden = document.visibilityState === "hidden";
         if (hidden) {

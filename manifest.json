@@ -8,7 +8,7 @@
          "type":  "image/png"
     }
   ],
-  "xwalk_app_version": "0.1.1",
+  "xwalk_app_version": "0.1.4",
   "xwalk_package_id":  "com.marciot.mazewar_vr_free",
   "start_url":         "/crosswalk.html",
   "display":           "standalone",

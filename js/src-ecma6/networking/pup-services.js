@@ -124,6 +124,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             this.network.broadcastId = ETHERNET_ADDR_BROADCAST;
         }
 
+        stopServices(delayed) {
+            const networkDisconnectDelay = 1000;
+            if(delayed) {
+                window.setTimeout(this.stopServices.bind(this), networkDisconnectDelay);
+            } else {
+                this.network.leaveRoom();
+            }
+        }
+
         networkReady() {
             for(var i = 0; i < this.pupServices.length; i++) {
                 var srvc = this.pupServices[i];

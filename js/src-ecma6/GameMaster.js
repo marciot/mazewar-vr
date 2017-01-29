@@ -80,6 +80,7 @@ class NetworkedGame {
         this.mazeService.addEventListener("ratUpdate", this.ratUpdateCallback.bind(this));
         this.mazeService.addEventListener("ratKill",   this.ratKillCallback.bind(this));
         this.mazeService.addEventListener("ratDead",   this.ratDeadCallback.bind(this));
+        this.mazeService.addEventListener("ratGone",   this.ratGoneCallback.bind(this));
 
         this.server = new RetroWeb.PupServer();
         this.server.addService(this.mazeService);
@@ -129,6 +130,17 @@ class NetworkedGame {
         actor.shotDead(this.players[killedBy]);
     }
 
+    ratGoneCallback(ratId) {
+        var actor = this.players[ratId];
+        if(actor) {
+            actors.remove(actor);
+            actor.dispose();
+            this.players[ratId] = null;
+        } else {
+            console.log("Received ratGone for player which is non-existent");
+        }
+    }
+
     getActorRatId(actor) {
         for(var ratId = 0; ratId < this.players.length; ratId++) {
             if(this.players[ratId] === actor) {
@@ -138,7 +150,11 @@ class NetworkedGame {
     }
 
     endGame() {
-        actors.disposeAll();
+        if(!this.gameEnded) {
+            this.gameEnded = true;
+            actors.disposeAll();
+            this.mazeService.endGame();
+        }
     }
 }
 
@@ -160,6 +176,9 @@ class SoloGame {
     }
 
     endGame() {
-        actors.disposeAll();
+        if(!this.gameEnded) {
+            this.gameEnded = true;
+            actors.disposeAll();
+        }
     }
 }

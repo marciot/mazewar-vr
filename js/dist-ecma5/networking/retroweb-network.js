@@ -53,6 +53,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             key: 'reset',
             value: function reset() {
                 if (this.peer) {
+                    this.peer.disconnect();
                     this.peer.destroy();
                     this.peer = null;
                 }
@@ -180,6 +181,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         }, {
             key: '_processConnection',
             value: function _processConnection(callback, newConnection) {
+                if (!this.peer) {
+                    // Ignore closed connections after peer is destroyed
+                    return;
+                }
                 this.fullyConnected = false;
                 var peer = newConnection.peer;
                 var me = this;
@@ -244,6 +249,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             key: '_connectionClosed',
             value: function _connectionClosed(peer) {
                 this._info("retroweb-network: Connection closed:", peer);
+                if (!this.peer) {
+                    // Ignore closed connections after peer is destroyed
+                    return;
+                }
                 delete this.connections[peer];
                 if (this.peerList) {
                     // Remove peer from peer list
@@ -253,8 +262,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                     }
                     // Check to see if I need to promote myself to master
                     if (peer == this.masterId && this.myPeerId == this.peerList[0]) {
-                        this._info("retroweb-network: Master closed connection. Promoting myself to master");
-                        this._reconnectAsMaster();
+                        this._info("retroweb-network: Master closed connection. Will promoting myself to master in 3 seconds.");
+                        // Note: Delay before reconnecting, as it takes a bit of time
+                        // for the peerjs server to release the id for reuse.
+                        window.setTimeout(this._reconnectAsMaster.bind(this), 3000);
                     }
                 }
             }

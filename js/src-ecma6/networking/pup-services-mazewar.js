@@ -227,7 +227,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 newGame:    [],
                 ratUpdate:  [],
                 ratKill:    [],
-                ratDead:    []
+                ratDead:    [],
+                ratGone:    []
             };
 
             this.SocketVersion20          = 0x4d415a45;
@@ -239,7 +240,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.MazeWarRatDead           = parseInt('172', 8); // 2 bytes
             this.MazeWarRatStatus         = parseInt('173', 8); // 242 bytes
             this.MazeWarRatNew            = parseInt('174', 8); // 30 bytes
-            this.MazeWarRatGone           = parseInt('175', 8); // 4 bytes
+            this.MazeWarRatGone           = parseInt('175', 8); // 2 bytes
             this.MazeWarRatQuery          = parseInt('176', 8); // 2 bytes
             this.MazeWarRatQueryReply     = parseInt('177', 8); // 2 bytes
 
@@ -248,6 +249,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.MazeWarRatLocationSize   = 6;
             this.MazeWarRatKillSize       = 4;
             this.MazeWarRatDeadSize       = 2;
+            this.MazeWarRatGoneSize       = 2;
+            this.MazeWarRatQuerySize      = 2;
             this.MazeWarRatQueryReplySize = 2;
 
             this.state = ParticipantState.waitingForNetwork;
@@ -289,8 +292,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 ratId:      0
             }
             this.ratQuery    = {
-                radId:      0
+                ratId:      0
             };
+
+            // Keep track of time last message was received by rat to detect disconnected players
+            this.ratCheckInterval = 3000;
+            this.ratLastSeen      = new Array(8);
         }
 
         networkReady() {
@@ -383,7 +390,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     break;
                 case this.MazeWarRatGone:
                     PupMazeWarPackets.decodeRatGone(requestObj.reader, this.ratGone);
-                    console.log("Rat Gone:", this.ratGone);
+                    this.updateRatGone();
                     break;
                 case this.MazeWarRatQuery:
                     PupMazeWarPackets.decodeRatQuery(requestObj.reader, this.ratQuery);
@@ -391,19 +398,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     break;
                 case this.MazeWarRatQueryReply:
                     PupMazeWarPackets.decodeRatQuery(requestObj.reader, this.ratQuery);
-                    console.log("Rat Query Reply:", this.ratQuery);
+                    this.updateRatLastSeen(this.ratQuery.ratId);
                     break;
             }
             return reply;
         }
 
-        newMazeWarFrame(replyType, payloadSize) {
+        newMazeWarFrame(replyType, payloadSize, dstAddr) {
             return super.newPupFrame({
                     pupType:       replyType,
                     pupIdentifier: 0,
-                    dstId:         0,
+                    dstId:         dstAddr || 0,
                     dstNet:        0,
-                    dstHost:       0,
+                    dstHost:       dstAddr || 0,
                     dstSock:       this.SocketVersion20,
                     srcId:         this.server.pupServerAddr,
                     srcNet:        this.server.pupServerNet,
@@ -428,7 +435,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             for(var ratId = 0; ratId < 8; ratId++) {
                 var rat = this.ratStatus.rats[ratId];
                 var val = func(rat, ratId);
-                if(val) {
+                if(typeof val !== "undefined") {
                     return val;
                 }
             }
@@ -445,11 +452,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             return addrs;
         }
 
+        getRatAddress(ratId) {
+            return this.ratStatus.rats[ratId].addr;
+        }
+
         findUnoccupiedRatId() {
             return this.forAllRats((rat, ratId) => {
                 if(!rat.playing) {
                     return ratId;
                 }
+            }, -1);
+        }
+
+        findRatOtherThanMe() {
+            return this.forAllRats((rat, ratId) => {
+                if(rat.playing && rat.addr !== this.server.pupServerAddr) {
+                        return ratId;
+                    }
             }, -1);
         }
 
@@ -496,8 +515,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     rat.yLoc    = this.initialPlayer.yLoc;
                     rat.dir     = this.initialPlayer.dir;
 
-                    console.log("I am now the duke");
-                    this.state = ParticipantState.iAmTheDuke;
+                    this.becomeTheDuke();
                     this.dispatchEvent("newGame", 0, rat);
                 }
             }
@@ -566,6 +584,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.updateFromStatus();
         }
 
+        becomeTheDuke() {
+            console.log("I am now the duke");
+            this.state = ParticipantState.iAmTheDuke;
+            this.periodicRatCheckTask();
+        }
+
         // Methods for replying to rat queries
 
         makeRatQueryPacket(requestObj) {
@@ -579,10 +603,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }
 
         replyToRatQuery(requestObj) {
-            console.log("Replying to rat query");
-            var ratId = this.findMyRatId();
-            this.ratQuery.ratId = this.ratId;
+            this.ratQuery.ratId = this.findMyRatId();
             return this.makeRatQueryPacket(requestObj);
+        }
+
+        sendRatQuery(ratId) {
+            this.ratQuery.ratId = this.findMyRatId();
+            var frameWriter = this.newMazeWarFrame(
+                this.MazeWarRatQuery, this.MazeWarRatQuerySize,
+                this.getRatAddress(ratId)
+            );
+            PupMazeWarPackets.encodeRatQuery(frameWriter, this.ratQuery);
+            this.sendFrame(frameWriter.frame);
+        }
+
+        updateRatLastSeen(ratId) {
+            this.ratLastSeen[ratId] = performance.now();
+        }
+
+        periodicRatCheckTask() {
+            if(this.state === ParticipantState.iAmTheDuke) {
+                this.lastRatCheck = performance.now();
+                if(!this.boundRatCheckTask) {
+                    this.boundRatCheckTask = this.ratCheckTask.bind(this);
+                    this.boundPeriodicTask = this.periodicRatCheckTask.bind(this);
+                }
+                this.forAllRats(this.boundRatCheckTask);
+                window.setTimeout(this.boundPeriodicTask, this.ratCheckInterval);
+            }
+        }
+
+        ratCheckTask(rat, ratId) {
+            if(rat.playing && rat.addr !== this.server.pupServerAddr && this.ratLastSeen[ratId]) {
+                const timeSinceLastSeen = this.lastRatCheck - this.ratLastSeen[ratId];
+                if(timeSinceLastSeen > this.ratCheckInterval * 5) {
+                    console.log("Rat with id", ratId, "appears to be a gone.");
+                    this.removeRat(ratId);
+                } else if(timeSinceLastSeen > this.ratCheckInterval) {
+                    this.sendRatQuery(ratId);
+                }
+            }
         }
 
         // Methods to receive state updates
@@ -595,6 +655,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             rat.dir   = this.ratLocation.dir;
             rat.score = this.ratLocation.score;
             this.dispatchEvent("ratUpdate", ratId, rat);
+            this.updateRatLastSeen(ratId);
         }
 
         updateFromStatus() {
@@ -609,7 +670,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             if(this.ratStatus.rats[this.ratStatus.dukeRat].addr === this.server.pupServerAddr) {
                 console.log("I've been promoted to duke");
-                this.state = ParticipantState.iAmTheDuke;
+                this.becomeTheDuke();
             }
         }
 
@@ -623,6 +684,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             var ratId     = this.ratDead.ratId;
             var killedBy  = this.ratDead.killedBy;
             this.dispatchEvent("ratDead", ratId, killedBy);
+        }
+
+        updateRatGone() {
+            var ratId     = this.ratGone.ratId;
+            console.log("Rat Gone:", ratId);
+            this.removeRat(ratId);
+        }
+
+        removeRat(ratId) {
+            this.ratStatus.rats[ratId].playing = false;
+            this.dispatchEvent("ratGone", ratId);
+            if(this.state === ParticipantState.iAmTheDuke) {
+                this.sendRatStatus();
+            }
         }
 
         // Methods to send state updates
@@ -690,8 +765,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             this.multicastFrame(frameWriter.frame, address ? [address] : this.multicastAddresses);
         }
 
+        sendRatGone(ratId) {
+            this.ratGone.ratId    = ratId;
+
+            var frameWriter = this.newMazeWarFrame(this.MazeWarRatGone, this.MazeWarRatGoneSize);
+            PupMazeWarPackets.encodeRatGone(frameWriter, this.ratGone);
+            this.multicastFrame(frameWriter.frame, this.multicastAddresses);
+        }
+
         getFicticiousRatName(ratId) {
             return this.ficticiousRatNames[ratId];
+        }
+
+        // Routines for leaving the game gracefully
+        electNewDuke() {
+            const eligibleRat = this.findRatOtherThanMe();
+            if(eligibleRat > -1) {
+                this.ratStatus.dukeRat = eligibleRat;
+                this.state             = ParticipantState.iAmParticipant;
+            }
+        }
+
+        endGame() {
+            const myRatId = this.findMyRatId();
+            this.sendRatGone(myRatId);
+            if(this.state === ParticipantState.iAmTheDuke) {
+                this.ratStatus.rats[myRatId].playing = false;
+                this.electNewDuke();
+                this.sendRatStatus();
+            }
+            this.server.stopServices(true);
         }
     }
 })(window.RetroWeb = window.RetroWeb || {});
