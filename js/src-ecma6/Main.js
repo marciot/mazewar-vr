@@ -137,6 +137,7 @@ function init() {
     function joinNetworkGame() {
         const name = "Hunter";
 
+        var me = this;
         function stateChangedCallback(state, error) {
             switch(state) {
                 case "joined":
@@ -148,7 +149,7 @@ function init() {
                     break;
                 case "opponentAvailable":
                     console.log("Opponent found");
-                    enterGameInProgress();
+                    document.querySelector("about-box").showPage("pageNetReady");
                     break;
             }
         }
@@ -163,6 +164,9 @@ function init() {
 
         game = new NetworkedGame(getWebGLPlayerFactory());
         game.startGame(hostId, name, stateChangedCallback);
+
+        // Goto the waiting page
+        document.querySelector("about-box").showPage("pageNetWaiting");
     }
 
     // WebComponents initialization
@@ -173,6 +177,7 @@ function init() {
             about.addCallback("gfxModeSelected",  modeSelected);
             about.addCallback("startSoloGame",    startSoloGame);
             about.addCallback("startNetworkGame", joinNetworkGame);
+            about.addCallback("enterNetworkGame", enterGameInProgress);
             if(FastClick) {
                 FastClick.attach(about);
             }

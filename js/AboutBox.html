@@ -505,6 +505,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
+        <div class="flex-distribute centered" id="pageNetReady">
+            <div>
+                <h1>Let the games begin!</h1>
+                <p>
+                There is someone else in the maze!
+                </p>
+                <p>
+                Ready, set...
+                </p>
+            </div>
+            <div>
+                <div class="button" id="enterNetGame">Go!</div>
+            </div>
+        </div>
+
         <div class="flex-distribute centered" id="pageInviteFriends">
             <div>
                 <h1>Send Invitation</h1>
@@ -1151,7 +1166,6 @@ function gotoRecommendedHeadsets() {
 
         function startNetGame() {
             shadowRoot.dispatchCallback("startNetworkGame");
-            me.swipePages.gotoPage("pageNetWaiting");
         }
 
         function postHeadphoneTest() {
@@ -1169,6 +1183,11 @@ function gotoRecommendedHeadsets() {
             }
         }
         shadowRoot.querySelector("#postHeadphoneTest").addEventListener("click", postHeadphoneTest);
+
+        function enterGame() {
+            shadowRoot.dispatchCallback("enterNetworkGame");
+        }
+        shadowRoot.querySelector("#enterNetGame").addEventListener("click", enterGame);
 
         function enableBoost(e) {
             motionTracker.rotationalBoostAllowed = true;
@@ -1299,7 +1318,8 @@ function gotoRecommendedHeadsets() {
         this.eventListeners = {
             gfxModeSelected:  [],
             startSoloGame:    [],
-            startNetworkGame: []
+            startNetworkGame: [],
+            enterNetworkGame: []
         };
 
         // Facebook share
