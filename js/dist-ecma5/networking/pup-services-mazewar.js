@@ -624,6 +624,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 rat.dir = this.ratNew.dir;
                 rat.name = this.ratNew.name;
                 this.dispatchEvent("ratUpdate", ratId, rat);
+                this.updateRatLastSeen(ratId);
 
                 // Send updated rat status to all players
                 this.sendRatStatus();
@@ -696,8 +697,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 if (rat.playing && rat.addr !== this.server.pupServerAddr && this.ratLastSeen[ratId]) {
                     var timeSinceLastSeen = this.lastRatCheck - this.ratLastSeen[ratId];
                     if (timeSinceLastSeen > this.ratCheckInterval * 5) {
-                        console.log("Rat with id", ratId, "appears to be a gone.");
+                        console.log("Rat with id", ratId, "vanished due to network timeout.");
                         this.removeRat(ratId);
+
+                        // Inform other players that the rat is gone
+                        this.sendRatGone(ratId);
+                        this.sendRatStatus();
                     } else if (timeSinceLastSeen > this.ratCheckInterval) {
                         this.sendRatQuery(ratId);
                     }
@@ -761,11 +766,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }, {
             key: "removeRat",
             value: function removeRat(ratId) {
-                this.ratStatus.rats[ratId].playing = false;
                 this.dispatchEvent("ratGone", ratId);
-                if (this.state === ParticipantState.iAmTheDuke) {
-                    this.sendRatStatus();
-                }
+                this.ratStatus.rats[ratId].playing = false;
             }
 
             // Methods to send state updates
@@ -870,6 +872,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         }, {
             key: "endGame",
             value: function endGame() {
+                console.log("Leaving network game.");
                 var myRatId = this.findMyRatId();
                 this.sendRatGone(myRatId);
                 if (this.state === ParticipantState.iAmTheDuke) {

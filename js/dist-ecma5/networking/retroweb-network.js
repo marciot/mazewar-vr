@@ -40,7 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             this.peerOptions = peerOptions;
             this.networkDataCallback = networkDataCallback;
             this.stateChangedCallback = stateChangedCallback;
-            this.verbose = false;
+            this.verbose = true;
             this.peerPrefix = "retroweb_";
             this.reset();
 
@@ -53,9 +53,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             key: 'reset',
             value: function reset() {
                 if (this.peer) {
-                    this.peer.disconnect();
-                    this.peer.destroy();
+                    var peer = this.peer;
                     this.peer = null;
+                    peer.disconnect();
+                    peer.destroy();
                 }
                 this.joinInitiated = false;
                 this.isJoined = false;
