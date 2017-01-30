@@ -21,7 +21,9 @@ class MotionTracker {
         this.tapDetector.addEventListener("doubletap", function() {
             me.resetPose();
             me.resetOrientation();
-            recenterCallback();
+            if(recenterCallback) {
+                recenterCallback();
+            }
         });
 
         this.rotationalBoost = new RotationalBoost();

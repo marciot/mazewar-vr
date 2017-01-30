@@ -14,7 +14,7 @@ a PC using the latest version of Chrome or Firefox.
 
 ## Official game trailer on YouTube:
 
-[![Maze War VR Trailer](https://github.com/marciot/mazewar-vr/raw/master/artwork/mazewar-youtube1.png)](https://www.youtube.com/watch?v=MyrLqLo-6qA)
+[![Maze War VR Trailer](https://github.com/marciot/mazewar-vr/raw/master/artwork/mazewar-youtube1.png)](https://www.youtube.com/watch?v=6umxTXG5XYg)
 
 ## Play it now (beta):
 
