@@ -2,6 +2,8 @@ class MotionTracker {
     constructor(callback, recenterCallback) {
         console.log("Motion tracker initialized");
 
+        this.vrFrameData = new VRFrameData();
+
         this.zeroPose             = new THREE.Vector3();
         this.zeroOrientation      = new THREE.Quaternion();
 
@@ -62,15 +64,15 @@ class MotionTracker {
 
     update() {
         // Get the headset position and orientation.
-        var pose = vrDisplay.getPose();
-        if (pose.position !== null) {
-            this.headsetPose.fromArray(pose.position);
+        vrDisplay.getFrameData(this.vrFrameData);
+        if (this.vrFrameData.pose && this.vrFrameData.pose.position) {
+            this.headsetPose.fromArray(this.vrFrameData.pose);
         }
-        if (pose.orientation !== null) {
-            this.headsetOrientation.fromArray(pose.orientation);
+        if (this.vrFrameData.pose && this.vrFrameData.pose.orientation) {
+            this.headsetOrientation.fromArray(this.vrFrameData.pose.orientation);
         }
-        if (pose.linearAcceleration !== null) {
-            this.headsetAcceleration.fromArray(pose.linearAcceleration);
+        if (this.vrFrameData.pose.linearAcceleration && this.vrFrameData.pose.linearAcceleration) {
+            this.headsetAcceleration.fromArray(this.vrFrameData.pose.linearAcceleration);
             this.tapDetector.detectFromVector(this.headsetAcceleration);
         }
 

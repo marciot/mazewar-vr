@@ -17,9 +17,10 @@ var tween = new Tween();
 
 function setupScene() {
     renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(Math.floor(window.devicePixelRatio));
 
     effect = new THREE.VREffect(renderer);
-    effect.setVRDisplay(vrDisplay);
+    //effect.setVRDisplay(vrDisplay);
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.001, 700);
     scene = new THREE.Scene();

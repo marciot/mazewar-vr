@@ -8,6 +8,8 @@ var MotionTracker = function () {
 
         console.log("Motion tracker initialized");
 
+        this.vrFrameData = new VRFrameData();
+
         this.zeroPose = new THREE.Vector3();
         this.zeroOrientation = new THREE.Quaternion();
 
@@ -27,7 +29,9 @@ var MotionTracker = function () {
         this.tapDetector.addEventListener("doubletap", function () {
             me.resetPose();
             me.resetOrientation();
-            recenterCallback();
+            if (recenterCallback) {
+                recenterCallback();
+            }
         });
 
         this.rotationalBoost = new RotationalBoost();
@@ -65,15 +69,15 @@ var MotionTracker = function () {
         key: "update",
         value: function update() {
             // Get the headset position and orientation.
-            var pose = vrDisplay.getPose();
-            if (pose.position !== null) {
-                this.headsetPose.fromArray(pose.position);
+            vrDisplay.getFrameData(this.vrFrameData);
+            if (this.vrFrameData.pose && this.vrFrameData.pose.position) {
+                this.headsetPose.fromArray(this.vrFrameData.pose);
             }
-            if (pose.orientation !== null) {
-                this.headsetOrientation.fromArray(pose.orientation);
+            if (this.vrFrameData.pose && this.vrFrameData.pose.orientation) {
+                this.headsetOrientation.fromArray(this.vrFrameData.pose.orientation);
             }
-            if (pose.linearAcceleration !== null) {
-                this.headsetAcceleration.fromArray(pose.linearAcceleration);
+            if (this.vrFrameData.pose.linearAcceleration && this.vrFrameData.pose.linearAcceleration) {
+                this.headsetAcceleration.fromArray(this.vrFrameData.pose.linearAcceleration);
                 this.tapDetector.detectFromVector(this.headsetAcceleration);
             }
 

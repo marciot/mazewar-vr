@@ -199,13 +199,18 @@ function init() {
 }
 
 function resize() {
-    var width  = window.innerWidth;
-    var height = window.innerHeight;
+    if(!this.resizeTimeout) {
+        this.resizeTimeout = setTimeout(() => {
+            var width  = window.innerWidth;
+            var height = window.innerHeight;
 
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
 
-    effect.setSize(width, height);
+            effect.setSize(width, height);
+            this.resizeTimeout = null;
+        }, 250);
+    }
 }
 
 function update(dt) {

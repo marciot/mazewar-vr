@@ -197,13 +197,20 @@ function init() {
 }
 
 function resize() {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
+    var _this = this;
 
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+    if (!this.resizeTimeout) {
+        this.resizeTimeout = setTimeout(function () {
+            var width = window.innerWidth;
+            var height = window.innerHeight;
 
-    effect.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            effect.setSize(width, height);
+            _this.resizeTimeout = null;
+        }, 250);
+    }
 }
 
 function update(dt) {
